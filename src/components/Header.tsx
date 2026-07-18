@@ -1,10 +1,10 @@
 import logo from '../assets/logo-white.png'
 import line from '../assets/linee.png'
+
 export default function Header() {
 
     return (
         <div className="header-css">
-
             <button className="line-css">
                 <img src={line} style={{ width: '10px', height: 'auto'}} />
             </button>
