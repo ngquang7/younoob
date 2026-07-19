@@ -1,7 +1,16 @@
+import React, {useState } from "react"
 
-export default function YoutubeGrid() {
+type YoutubeGridProps = {
+  open: boolean;
+};
+export default function YoutubeGrid({ open }: YoutubeGridProps) {
 
   return (
-    <div className="">video</div>
+    <div className={`content ${open ? "shifted" : ""}`}>
+      
+
+      video
+      
+      </div>
   );
 }

@@ -12,8 +12,7 @@ body {
     top: 0;
     left: 0;
     width: 100vw;          /* phủ toàn bộ chiều ngang */
-    height: 60px;         /* phủ toàn bộ chiều dọc */
-    pointer-events: none;  /* KHÔNG chặn click, để header/sidebar vẫn hoạt động */
+    height: 70px;         /* phủ toàn bộ chiều dọc */
     z-index: 9999;  /* nằm trên cùng */
     background: rgba(255, 255, 255, 0.36);
 }
@@ -24,10 +23,6 @@ body {
     background: rgb(255, 255, 255);
 }
 
-
-
-
-
 .line-separate-css{
     margin-top: 15px;
     padding: 0.1px;
@@ -37,7 +32,7 @@ body {
 }
 
 .left-side-css{
-    border-left: 2px solid rgb(247, 240, 240);
+    border-left: 2px solid rgb(226, 34, 34);
     height: 100vh;             
     position: fixed;            
     margin-left: 70px;  
@@ -58,29 +53,30 @@ body {
 .line-css{
     background: black;
     margin-top: 20px;
-    margin-left: 10px;
+    margin-left: 20px;
     cursor: pointer;
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 30px;
+    align-items: center;
 
     border-color: red;
     /* border: none; */
 }
 
 .home-css{
-    width: 100px;
-    height: 25px;
+    width: 120px;
+    height: 35px;
     cursor: pointer;
     margin-top: 20px;
-    margin-left: 20px;
+    margin-left: 80px;
     background: black;
 
     /* border: none; */
-        border-color: red;
+    border-color: red;
 }
 .search-bar{
-    width: 500px;
-    height: 30px;
+    width: 550px;
+    height: 38px;
     cursor:auto;
     margin-top: 10px;
     margin-left: 260px;
@@ -89,7 +85,7 @@ body {
     background: black;
     color:white;
 
-    border-radius: 15px;
+    border-radius: 20px;
     border-color: red;
 }
 
@@ -98,3 +94,46 @@ body {
     margin-top: 80px;
     margin-left: 90px;
 }
+
+.button-bar{
+    height: 70px;
+    width: 63px;
+    
+    cursor: pointer;
+    margin-left: 5px;
+    margin-top: -15px;
+    margin-bottom: 25px;
+    background-color: #09070f;
+
+    /* border: 1px solid white; */
+    border-color: red;
+}
+
+.sidebar {
+    position: fixed;
+    margin-top: 20px;
+    width: 150px;
+    height: 100%;
+    background-color: #000000;
+    color: white;
+    transition: transform;
+    transform: translateX(-100%); /*hide it*/
+    z-index: 0;
+    padding: 20px;
+}
+
+.sidebar.open {
+  transform: translateX(0) ; /* trượt ra */
+}
+
+.content {
+  flex: 1;
+  transition: margin-left;
+  margin-left: 0;
+  padding: 20px;
+}
+
+.content.shifted {
+  margin-left: 100px;
+}
+
