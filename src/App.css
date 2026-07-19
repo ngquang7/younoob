@@ -8,12 +8,12 @@ body {
 }
 
 .overlay {
-    position: fixed;       /* cố định theo màn hình, không cuộn theo nội dung */
+    position: fixed;       
     top: 0;
     left: 0;
-    width: 100vw;          /* phủ toàn bộ chiều ngang */
-    height: 70px;         /* phủ toàn bộ chiều dọc */
-    z-index: 9999;  /* nằm trên cùng */
+    width: 100vw;          
+    height: 70px;         
+    z-index: 9999; 
     background: rgba(255, 255, 255, 0.36);
 }
 .overlay::before,
@@ -123,7 +123,7 @@ body {
 }
 
 .sidebar.open {
-  transform: translateX(0) ; /* trượt ra */
+  transform: translateX(0) ;
 }
 
 .content {
