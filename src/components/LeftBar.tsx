@@ -1,58 +1,24 @@
-import homeee from '../assets/homeee.png';
-import sub from '../assets/sub4.png';
-import line from '../assets/linee.png'
-import React, {useState } from "react"
 
-type LeftBarProps = {
-  open: boolean;
-  toggleSidebar: () => void;
-};
+export default function LeftBar(){
 
 
-export default function LeftBar({ open, toggleSidebar }: LeftBarProps) {
-    return (
-        
-        <>
-    <div style={{marginTop: '-68px'}}>
-    <button className="line-css" onClick={toggleSidebar}>
-    <img src={line} style={{ width: '18px', height: 'auto'}} />
-    </button>
-    </div>
+    return(
+    <aside className="fixed top-14 left-0 bottom-0 w-60 bg- p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1]">
+          {/* Main Section */}
+      <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
 
+            <button
 
-        <div className={`sidebar ${open ? "open" : ""}`}>
-            <button style={{display: 'flex', flexDirection:'row', marginTop: '5px', width: '150px', borderRadius: '10px', backgroundColor: 'black', cursor: 'pointer'}}>
-                    <img src={homeee} style={{ width: '30px', height: 'auto', alignItems: 'center'}}/>
-                    <div style={{color: 'white', fontSize: '15px', marginTop: '10px'}}>home</div>
+              className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer `}
+            >
+
             </button>
-        </div>
-      <div className={`content ${open ? "shifted" : ""}`}>
-      </div>    
-
-
-    {/* Home */}
-    <button className="button-bar">
-        <img src={homeee} style={{ width: '30px', height: 'auto', alignItems: 'center'}}/>
-        <br />
-        <div style={{color: 'white', fontSize: '10px'}}>home</div>
-    </button>
-
-    {/* Subscription */}
-        <br />
-
-        <button className="button-bar">
-            <img src={sub} style={{ width: '30px', height: 'auto', alignItems: 'center'}}/>
-            <br />
-            <div style={{color: 'white', fontSize: '10px', marginLeft: '-3px'}}>subscription</div>
-        </button>
-
-
-
-    
-
-
-
         
-        </>
-    );  
+        
+      </div>
+    
+    
+    
+    </aside>
+    );
 }
