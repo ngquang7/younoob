@@ -8,7 +8,7 @@ function App() {
   return (
 <>
   <LeftBar />
-  <div>hello</div>
+
 </>  
   );
 }
