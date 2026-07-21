@@ -8,10 +8,9 @@ export default function LeftBar(){
       <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
 
             <button
-
-              className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer bg-red-500`}
+              className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer bg-red-500 shrink-0`}
             >
-              <img src="/public/sidebar.png" alt="Logo" className="w-6 h-6" />
+              <img src="/public/sidebar.png" alt="sidebar" className="w-6 h-6" />
             </button>
         
         
