@@ -1,19 +1,21 @@
 
+interface HeaderProps {
+  onToggleSidebar: () => void;
 
-export default function () {
+}
+export default function Header ( {  onToggleSidebar}: HeaderProps ) {
 
 
     return (
     <nav className="fixed top-0 left-0 right-0 h-14 bg-[#0f0f0f] flex items-center justify-between px-4 z-50 select-none border-b border-[#212121]">
-      {/* Left Area: Hamburger & Logo */}
+      {/* Left Area: SidebarButton & Logo */}
       <div className="flex items-center gap-4">
         <button
-        //   onClick={onToggleSidebar}
+          onClick={onToggleSidebar}
           id="nav-toggle-btn"
           className="p-2 hover:bg-[#212121] rounded-full active:scale-95 transition cursor-pointer text-[#f1f1f1]"
         >
             <img src="/public/sidebar.png" alt="sidebar" className="w-6 h-6" />
-          {/* <Menu className="w-5 h-5" /> */}
         </button>
         
         <div 
