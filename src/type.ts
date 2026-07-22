@@ -1,42 +1,106 @@
-export interface Video {
-  id: string;
-  title: string;
-  description: string;
-  thumbnailUrl: string;
-  channelId: string;
-  channelTitle: string;
-  channelAvatar: string;
-  views: number;
-  publishedAt: string;
-  duration: string;
-  likeCount?: number;
-  tags?: string[];
+export interface YouTubeThumbnail {
+  url: string;
+  width?: number;
+  height?: number;
 }
 
-export interface Comment {
-  id: string;
-  authorName: string;
-  authorAvatar: string;
-  text: string;
-  publishedAt: string;
-  likeCount: number;
+export interface YouTubeThumbnails {
+  default?: YouTubeThumbnail;
+  medium?: YouTubeThumbnail;
+  high?: YouTubeThumbnail;
+  standard?: YouTubeThumbnail;
+  maxres?: YouTubeThumbnail;
 }
 
-export interface Channel {
-  id: string;
-  title: string;
-  avatar: string;
-  subscriberCount: string;
-  description: string;
+export interface YouTubeListResponse<T> {
+  items: T[];
+  nextPageToken?: string;
+  prevPageToken?: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number;
+  };
 }
 
-export interface SearchResult {
-  videoId: string;
-  title: string;
-  description: string;
-  thumbnailUrl: string;
-  channelId: string;
-  channelTitle: string;
-  channelAvatar: string;
-  publishedAt: string;
+export interface YouTubeSearchItem {
+  id: {
+    kind: string;
+    videoId?: string;
+    channelId?: string;
+    playlistId?: string;
+  };
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    channelTitle: string;
+    thumbnails: YouTubeThumbnails;
+  };
+}
+
+export interface YouTubeVideo {
+  id: string;
+  snippet: {
+    publishedAt: string;
+    channelId: string;
+    title: string;
+    description: string;
+    channelTitle: string;
+    thumbnails: YouTubeThumbnails;
+    tags?: string[];
+  };
+  contentDetails?: {
+    duration: string;
+    definition: string;
+    caption: string;
+  };
+  statistics?: {
+    viewCount?: string;
+    likeCount?: string;
+    commentCount?: string;
+  };
+}
+
+export interface YouTubeChannel {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    customUrl?: string;
+    publishedAt: string;
+    thumbnails: YouTubeThumbnails;
+  };
+  statistics?: {
+    viewCount?: string;
+    subscriberCount?: string;
+    hiddenSubscriberCount?: boolean;
+    videoCount?: string;
+  };
+  contentDetails?: {
+    relatedPlaylists: {
+      uploads: string;
+      likes?: string;
+    };
+  };
+}
+
+export interface YouTubePlaylistItem {
+  id: string;
+  snippet: {
+    publishedAt: string;
+    title: string;
+    description: string;
+    channelTitle: string;
+    position: number;
+    thumbnails: YouTubeThumbnails;
+    resourceId: {
+      kind: string;
+      videoId: string;
+    };
+  };
+  contentDetails?: {
+    videoId: string;
+    videoPublishedAt?: string;
+  };
 }
