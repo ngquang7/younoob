@@ -10,7 +10,7 @@ export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps
         setSearchText(e.target.value);
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault(); // Ngăn trang refresh lại
     if (searchText.trim()) {
       onCustomClick(searchText); // Truyền giá trị searchText ra ngoài
@@ -26,17 +26,16 @@ export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps
           id="nav-toggle-btn"
           className="p-2 hover:bg-[#212121] rounded-full active:scale-95 transition cursor-pointer text-[#f1f1f1]"
         >
-            <img src="/public/sidebar.png" alt="sidebar" className="w-6 h-6" />
+            <img src="/public/sidebar.png" className="w-6 h-6" />
         </button>
         
         <div 
-        //   onClick={onHomeClick}
           id="nav-logo"
           className="flex items-center gap-1.5 cursor-pointer active:scale-98 transition group"
         >
           {/* Custom YouTube Red Icon SVG */}
           <span className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
-            <img src="/public/logo-white.png" alt='Loogo' className="w-30 h-8"/>
+            <img src="/public/logo-white.png" className="w-30 h-8"/>
           </span>
         </div>
       </div>
