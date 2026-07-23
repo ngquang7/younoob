@@ -2,19 +2,20 @@ import {useState } from 'react'
 interface HeaderProps {
   onToggleSidebar: () => void;
   onCustomClick: (message :string ) => void;
+  goHome: () => void;
 }
-export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps ) {
+export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: HeaderProps ) {
   const [searchText, setSearchText] = useState('');
-
+  
   const handleChange =  (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(e.target.value);
   }
-
+  // TEST
+  // console.log(`${searchText}`);
+  
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault(); // Ngăn trang refresh lại
-    if (searchText.trim()) {
-      onCustomClick(searchText); // Truyền giá trị searchText ra ngoài
-    }
+    onCustomClick(searchText.trim()); // Pass searchText value into goToSearchResults
   };
 
     return (
@@ -33,8 +34,8 @@ export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps
           id="nav-logo"
           className="flex items-center gap-1.5 cursor-pointer active:scale-98 transition group"
         >
-          {/* Custom YouTube Red Icon SVG */}
-          <span className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
+
+          <span onClick={goHome} className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
             <img src="/public/logo-white.png" className="w-30 h-8"/>
           </span>
         </div>
@@ -52,6 +53,7 @@ export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps
           />
         </div>
 
+      {/* Submit (Finding) button */}
         <button
           onClick={() => onCustomClick(searchText)} 
           type="submit"

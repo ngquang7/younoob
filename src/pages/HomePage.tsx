@@ -10,8 +10,11 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
+  const goHome = () => {
+    navigate(`/`);
+  }
+
   const goToSearchResults = (search: String) => {
-    console.log("da goi ham goToSearchResults useNavigate");
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
   };
@@ -22,7 +25,8 @@ const HomePage = () => {
     }, []);
   return (
 <>
-  <Header 
+  <Header
+    goHome={goHome}
     onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
     onCustomClick={goToSearchResults}
 />

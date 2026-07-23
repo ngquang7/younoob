@@ -7,16 +7,13 @@ import LeftBar from '../components/LeftBar'
 
 
 const SearchResultsPage = () => {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-
-  const goToSearchResults = (search: String) => {
-    console.log("da goi ham goToSearchResults useNavigate");
-    // Navigate to a new route with query parameters
-    navigate(`/search?q=${search}`);
-  };
-
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+
+  const goHome = () => {
+    navigate(`/`);
+  }
 
   const handleSearchAgain = (searchTerm: string) => {
     navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
@@ -24,25 +21,25 @@ const SearchResultsPage = () => {
 
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
-
     useEffect(() => {
       if (window.innerWidth < 768) {
       setSidebarExpanded(false);
     }
     }, []);
   return (
+
 <>
     <Header 
+        goHome={goHome}
         onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
         onCustomClick={handleSearchAgain}
     />
     <LeftBar 
             expanded={sidebarExpanded}
     />
-
     {/* Video search */}
     <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-white`}>
-        <p className="text-red-500 font-bold text-2xl">YOU ARE searching FOR "{query}"</p>
+        <p className="text-red-500 font-bold text-2xl">YOU ARE SEARCHING FOR "{query}"</p>
     </main>
 </>
   );
