@@ -41,7 +41,7 @@ export default function Header ( {  onToggleSidebar, onCustomClick}: HeaderProps
       </div>
 
   { /* Search bar */}
-      <form onSubmit={handleSubmit} className="flex-1 max-2xl mx-4 hidden md:flex items-center ml-60  mr-100 " >
+      <form onSubmit={handleSubmit} className="flex-1 max-2xl mx-4 hidden md:flex items-center ml-60 mr-100 " >
         <div className="flex flex-1 items-center bg-[#121212] border border-[#303030] rounded-l-full px-4 py-1.5 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
           <input
             onChange={handleChange}
