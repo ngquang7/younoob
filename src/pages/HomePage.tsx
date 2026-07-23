@@ -7,32 +7,27 @@ import LeftBar from '../components/LeftBar'
 
 const HomePage = () => {
 
-    const navigate = useNavigate();
-    const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const navigate = useNavigate();
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
-const goToSearchResults = () => {
+  const goToSearchResults = (search: String) => {
     console.log("da goi ham goToSearchResults useNavigate");
     // Navigate to a new route with query parameters
-    navigate('/search?q=react');
+    navigate(`/search?q=${search}`);
   };
-
     useEffect(() => {
       if (window.innerWidth < 768) {
       setSidebarExpanded(false);
     }
     }, []);
-
-      if (window.innerWidth < 768) {
-      setSidebarExpanded(false); // Auto-collapse on mobile select
-    }
   return (
 <>
   <Header 
     onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
-    onCustomClick={() => goToSearchResults()}
+    onCustomClick={goToSearchResults}
 />
   <LeftBar 
-          expanded={sidebarExpanded}
+    expanded={sidebarExpanded}
 />
   <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
     <p className="text-red-500 font-bold text-2xl">video</p>
