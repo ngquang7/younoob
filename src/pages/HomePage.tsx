@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from '../components/Header';
-// import YoutubeGrid from './components/YoutubeGrid'
+import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/LeftBar'
 
 const HomePage = () => {
@@ -34,7 +34,7 @@ const HomePage = () => {
     expanded={sidebarExpanded}
 />
   <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-    <p className="text-red-500 font-bold text-2xl">video</p>
+      <VideoGrid />
   </main>
 </>
 );
