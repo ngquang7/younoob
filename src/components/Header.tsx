@@ -61,7 +61,6 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
         >
         </button>
       </form>
-
     </nav>
     );
 }
