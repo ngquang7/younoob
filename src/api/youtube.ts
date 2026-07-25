@@ -1,6 +1,5 @@
 // src/api/youtube.ts
 import axios from "axios";
-
 interface YouTubeThumbnail {
   url: string;
   width: number;
@@ -46,7 +45,7 @@ export async function searchYouTube(
   pageToken?: string
 ): Promise<YouTubeSearchResponse> {
   // const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-  const apiKey = "VITE_YOUTUBE_API_KEY";
+  const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   if (!apiKey) {
     throw new Error("YouTube API key is missing.");
   }

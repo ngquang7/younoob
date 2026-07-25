@@ -34,7 +34,7 @@ const HomePage = () => {
     expanded={sidebarExpanded}
 />
   <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-      <VideoGrid />
+      {/* <VideoGrid /> */}
   </main>
 </>
 );
