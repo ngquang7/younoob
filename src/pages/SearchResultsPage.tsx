@@ -46,7 +46,20 @@ const SearchResultsPage = () => {
         console.log('callingSearchYoutube');
         const data = await searchYouTube(newKeyword);
 
-        console.log("youtube data received:", data.items);
+        console.log("youtube data received:", data.items[0]);
+        const firstVideo = data.items[0];
+        console.log("First video key: ", Object.keys(firstVideo));
+        console.log("First kind 1: ", firstVideo['kind'] ?? 'error');
+        console.log("First etag 2: ", firstVideo['etag'] ?? 'error');
+        console.log("First id 3 : ", firstVideo['id'] ?? 'error');
+        console.log("First snippet 4: ", firstVideo['snippet'] ?? 'error');
+
+        
+        
+        
+        const employee1 = {'name':'quang'}
+        employee1['name']
+
         } 
         catch(error: unknown) {
           console.log("loi ki thuat", error);
@@ -60,10 +73,7 @@ const SearchResultsPage = () => {
       loadVideos(); 
     }, [searchParams]);
 
-    useEffect(() => {
-      
-    }
-  )
+    
 
   return (
 

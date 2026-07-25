@@ -46,7 +46,7 @@ export async function searchYouTube(
   pageToken?: string
 ): Promise<YouTubeSearchResponse> {
   // const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-  const apiKey = "AIzaSyCb-WysOtuwynF7xamiivza3uePvzXdlec";
+  const apiKey = "VITE_YOUTUBE_API_KEY";
   if (!apiKey) {
     throw new Error("YouTube API key is missing.");
   }
