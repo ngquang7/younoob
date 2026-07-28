@@ -1,4 +1,4 @@
-import type {YouTubeSearchItem}  from "../type";
+import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
 // Interface
 interface VideoGridProps {
   video: YouTubeSearchItem;
@@ -49,9 +49,9 @@ export default function VideoGrid ( {video}: VideoGridProps) {
             </span>
             
             <div className="flex items-center text-xs font-sans text-gray-400">
-              <span>formatViews_videoviews</span>
-              <span className="mx-1.5 text-[8px]">•</span>
-              <span>{new Date(video.snippet.publishedAt).toLocaleDateString()}</span>
+              <span className="text-gray-400">.</span>
+              <span className="mx-1.5 text-[8px]"></span>
+              <span>view</span>
             </div>
           </div>
         </div>

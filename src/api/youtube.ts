@@ -17,11 +17,19 @@ export interface YouTubeSearchItem {
     title: string;
     description: string;
     channelTitle: string;
+    viewCount?: string;
     thumbnails: {
       default: YouTubeThumbnail;
       medium: YouTubeThumbnail;
       high: YouTubeThumbnail;
     };
+  };
+}
+
+export interface YoutubeVideo {
+  id: {
+    kind: "youtube#video";
+    videoId1: string;
   };
 }
 
@@ -32,6 +40,7 @@ export interface YouTubeSearchResponse {
     totalResults: number;
     resultsPerPage: number;
   };
+  //Change YoutubeVideo
   items: YouTubeSearchItem[];
 }
 

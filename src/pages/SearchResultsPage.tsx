@@ -6,6 +6,7 @@ import LeftBar from '../components/LeftBar'
 import {searchYouTube, type YouTubeSearchItem} from "../api/youtube.ts";
 import type { YouTubeListResponse} from "../type";
 import axios from "axios";
+import type { YouTubeVideo}  from "../type";
 
 
 const SearchResultsPage = () => {
@@ -44,12 +45,13 @@ const SearchResultsPage = () => {
       try {
         console.log('callingSearchYoutube');
         const data = await searchYouTube(newKeyword);
+        
 
         // Add this, we can set VIDEO
         setVideos(data.items);
         // console.log("youtube data received:", data.items[0]);
-        // const firstVideo = data.items[0];
-        // console.log("First video key: ", Object.keys(firstVideo));
+        const firstVideo = data.items[0];
+        console.log("First video key: ", Object.keys(firstVideo));
 
 
         // console.log("First kind 1: ", firstVideo['kind'] ?? 'error');
@@ -79,14 +81,17 @@ const SearchResultsPage = () => {
         onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
         onCustomClick={handleSearchAgain}
     />
-    <LeftBar 
+    <LeftBar
+        goHome={goHome}
         expanded={sidebarExpanded}
     />
     {/* Video search */}
-    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-black grid grid-cols-3 gap-6`}>
+    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-black grid grid-cols-3 gap-6 `}>
       {/*Use this to render video  */}
         {videos.map((video) => (
-        <VideoGrid key={video.id.videoId} video={video}/>
+        <VideoGrid
+        key={video.id.videoId} video={video}
+        />
         ))}
     </main>
 </>

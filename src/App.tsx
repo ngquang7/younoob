@@ -17,11 +17,12 @@ function App() {
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<HomePage />} />
+      
       <Route path="/search" element={<SearchResultsPage />} />
     </Routes>
   </BrowserRouter>
 </>
-);
+  );
 }
 
 export default App
