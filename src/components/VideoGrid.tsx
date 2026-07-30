@@ -5,7 +5,33 @@ interface VideoGridProps {
 }
 export default function VideoGrid ( {video}: VideoGridProps) {
 
+  
+  const getTimeago = (date: string) => {
+    const videoDate = new Date(date);
+    const currentTime = new Date();
+    const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
+    if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+    else if (timeAgo < 3600) { // MINUTE
+      const minutes = Math.floor(timeAgo / 60);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } else if (timeAgo < 86400) { // HOUR
+      const hours = Math.floor(timeAgo/3600);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (timeAgo < 604800) { // DAY
+      const days = Math.floor(timeAgo / 86400);
+      return `${days} day${days > 1 ? 's' : '' } ago`;
+    } else if (timeAgo < 2592000) { // WEEK
+      const weeks = Math.floor(timeAgo / 604800);
+      return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
+    } else if (timeAgo < 31536000) { // MONTH
+      const months = Math.floor(timeAgo / 2592000);
+      return `${months} month${months > 1 ? 's' : '' } ago`;
+    } else { //YEAR
+      const years = Math.floor(timeAgo / 31536000);
+      return `${years} year${years > 1 ? 's' : '' } ago`;
+    } 
+  }
 
     return (
     <div
@@ -50,9 +76,9 @@ export default function VideoGrid ( {video}: VideoGridProps) {
             </span>
             {/* View */}
             <div className="flex items-center text-xs font-sans text-gray-400">
-              <span className="text-gray-400">.</span>
-              <span className="mx-1.5 text-[8px]">{video.snippet.publishedAt}</span>
-              <span></span>
+              <span className="text-gray-400">view</span>
+              <span className="mx-1.5 text-[8px]">•</span>
+              <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
             </div>
           </div>
         </div>

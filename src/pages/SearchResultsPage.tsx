@@ -32,7 +32,7 @@ const SearchResultsPage = () => {
       setSidebarExpanded(false);
     }
     }, []);
-
+  // UseEffect to get and fetch results after searching on the searching bar
     useEffect( () => {
       const newKeyword: string = searchParams.get("q") ?? "";
       console.log("New search result", newKeyword);
@@ -63,31 +63,24 @@ const SearchResultsPage = () => {
         }
       }
       loadVideos();
-
-
-
-
-
-
-
-
-
       return () => {
       // cleanup: hủy request khi dependency thay đổi hoặc component unmount
       controller.abort();
     };
     }, [searchParams]);
 
+  //Useeffect to get like and view from videoDetail Api
     useEffect( () => {
       const idList = videos.map((video) => {
+        //videoId, to get id from video, and convert
         return video.id.videoId;
       })
       // Load detail (like and view) to videos array
-const loadDetail = async () => {
+      const loadDetail = async () => {
       try {
         console.log('callingSearchYoutube');
         const data1 = await videoDetailApi(idList);
-
+        
         // Add this, we can set VIDEO
     
         // 4 key: kind, etag, id, snippet
