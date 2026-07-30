@@ -1,4 +1,4 @@
-import type { YoutubeVideo } from "./api/youtube";
+import type { YoutubeVideo } from "./api/youtubeSearch";
 
 export interface YouTubeThumbnail {
   url: string;
@@ -39,11 +39,6 @@ export interface YouTubeSearchItem {
     channelTitle: string;
     thumbnails: YouTubeThumbnails;
   };
-  statistic : {
-    viewCount?: string;
-    likeCount?: string;
-    commentCount?: string;
-  }
 }
 
 export interface YouTubeVideo {

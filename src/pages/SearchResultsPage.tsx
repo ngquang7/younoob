@@ -3,11 +3,11 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/LeftBar'
-import {searchYouTube, type YouTubeSearchItem} from "../api/youtube.ts";
+import {searchYouTube, type YouTubeSearchItem} from "../api/youtubeSearch.ts";
 import type { YouTubeListResponse} from "../type";
 import axios from "axios";
 import type { YouTubeVideo}  from "../type";
-
+import {videoDetailApi} from "../api/videoDetail.ts"
 
 const SearchResultsPage = () => {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ const SearchResultsPage = () => {
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [videos, setVideos] = useState<YouTubeSearchItem[]>([]);
+// Cleanup Function 
+  const controller = new AbortController();
   const goHome = () => {
     navigate(`/`);
   }
@@ -37,28 +39,18 @@ const SearchResultsPage = () => {
       setKeyword(newKeyword);
 
       const loadVideos = async () => {
-      if(!newKeyword.trim()) {
-        return;
-      }
-      setLoading(true);
+        if(!newKeyword.trim()) {
+          return;
+        }
+        setLoading(true);
       
       try {
         console.log('callingSearchYoutube');
         const data = await searchYouTube(newKeyword);
-        
 
         // Add this, we can set VIDEO
         setVideos(data.items);
-        // console.log("youtube data received:", data.items[0]);
-        const firstVideo = data.items[0];
-        console.log("First video key: ", Object.keys(firstVideo));
-
-
-        // console.log("First kind 1: ", firstVideo['kind'] ?? 'error');
-        // console.log("First etag 2: ", firstVideo['etag'] ?? 'error');
-        // console.log("First id 3 : ", firstVideo['id'] ?? 'error');
-        // console.log("First snippet 4: ", firstVideo['snippet'] ?? 'error');
-
+        // 4 key: kind, etag, id, snippet
 
         } 
         catch(error: unknown) {
@@ -70,8 +62,50 @@ const SearchResultsPage = () => {
         setLoading(false);
         }
       }
-      loadVideos(); 
+      loadVideos();
+
+
+
+
+
+
+
+
+
+      return () => {
+      // cleanup: hủy request khi dependency thay đổi hoặc component unmount
+      controller.abort();
+    };
     }, [searchParams]);
+
+    useEffect( () => {
+      const idList = videos.map((video) => {
+        return video.id.videoId;
+      })
+      // Load detail (like and view) to videos array
+const loadDetail = async () => {
+      try {
+        console.log('callingSearchYoutube');
+        const data1 = await videoDetailApi(idList);
+
+        // Add this, we can set VIDEO
+    
+        // 4 key: kind, etag, id, snippet
+
+        } 
+        catch(error: unknown) {
+          console.log("loi ki thuat", error);
+          if(axios.isAxiosError(error)) {
+          console.error("Youtube API call FAILED:", error.response?.data); 
+          }
+        } finally {
+        setLoading(false);
+        }
+      }
+
+
+
+    }, [videos])
     
   return (
 
@@ -90,7 +124,7 @@ const SearchResultsPage = () => {
       {/*Use this to render video  */}
         {videos.map((video) => (
         <VideoGrid
-        key={video.id.videoId} video={video}
+        video={video}
         />
         ))}
     </main>

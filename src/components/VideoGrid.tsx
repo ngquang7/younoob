@@ -20,9 +20,10 @@ export default function VideoGrid ( {video}: VideoGridProps) {
           alt={video.snippet.title}
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
-        <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
-          video duration
-        </span>
+        {/* Video duration */}
+          {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
+            video duration
+          </span> */}
       </div>
 
       {/* Details (Avatar, Title, Channel, Stats) */}
@@ -47,11 +48,11 @@ export default function VideoGrid ( {video}: VideoGridProps) {
             <span className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate">
               {video.snippet.channelTitle}
             </span>
-            
+            {/* View */}
             <div className="flex items-center text-xs font-sans text-gray-400">
               <span className="text-gray-400">.</span>
-              <span className="mx-1.5 text-[8px]"></span>
-              <span>view</span>
+              <span className="mx-1.5 text-[8px]">{video.snippet.publishedAt}</span>
+              <span></span>
             </div>
           </div>
         </div>

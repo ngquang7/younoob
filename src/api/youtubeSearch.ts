@@ -64,7 +64,7 @@ export async function searchYouTube(
       part: "snippet",
       q: query,
       type: "video",
-      maxResults: 10,
+      maxResults: 1000,
       pageToken,
       key: apiKey,
     },
