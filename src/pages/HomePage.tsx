@@ -13,7 +13,6 @@ const HomePage = () => {
   const goHome = () => {
     navigate(`/`);
   }
-
   const goToSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
@@ -24,19 +23,21 @@ const HomePage = () => {
     }
     }, []);
   return (
-<>
-  <Header
-    goHome={goHome}
-    onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
-    onCustomClick={goToSearchResults}
-/>
-  <LeftBar 
-    expanded={sidebarExpanded}
-/>
-  <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-      {/* <VideoGrid /> */}
-  </main>
-</>
+  <>
+      <Header
+        goHome={goHome}
+        onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
+        onCustomClick={goToSearchResults}
+      />
+      <LeftBar
+        goHome={goHome}
+        expanded={sidebarExpanded}
+      />
+      
+      <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
+          {/* <VideoGrid /> */}
+      </main>
+  </>
 );
 }
 export default HomePage;

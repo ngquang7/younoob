@@ -35,7 +35,7 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
           className="flex items-center gap-1.5 cursor-pointer active:scale-98 transition group"
         >
 
-          <span onClick={goHome} className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
+          <span onClick={goHome} title="Youtube Home" className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
             <img src="/public/logo-white.png" className="w-30 h-8"/>
           </span>
         </div>

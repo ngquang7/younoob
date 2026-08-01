@@ -1,11 +1,13 @@
 import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
+import {useState} from 'react';
 // Interface
 interface VideoGridProps {
   video: YouTubeSearchItem;
+  goWatch: (videoId: string) => void;
 }
-export default function VideoGrid ( {video}: VideoGridProps) {
+export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
 
-  
+  const [isHovered, setIsHovered] = useState(false);  
   const getTimeago = (date: string) => {
     const videoDate = new Date(date);
     const currentTime = new Date();
@@ -35,17 +37,35 @@ export default function VideoGrid ( {video}: VideoGridProps) {
 
     return (
     <div
-      className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full"
-    >
+      className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
+      onClick={() => {
+        if (video.id.videoId) {
+        goWatch(video.id.videoId);
+        }
+          }}      >
       {/* Thumbnail with overlay duration */}
       {/* adjust size here --------------------
                                               | */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        >
+        {isHovered ? (
+          <iframe
+        className="w-full h-full pointer-events-none"
+        //mute=1 -> mute
+        src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1`}
+        // src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0`}
+        title="YouTube video preview"
+        // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      />
+        ) : (
         <img
           src={video.snippet.thumbnails.medium?.url}
           alt={video.snippet.title}
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
+        )}
         {/* Video duration */}
           {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
             video duration

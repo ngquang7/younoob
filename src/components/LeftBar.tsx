@@ -27,18 +27,20 @@ export default function LeftBar({expanded, goHome}: SidebarProps){
             {/* Home button */}
               <button
                 className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+                //Never put goHome button in div, put it in button card
+                onClick={goHome}
+                title="Home"
               >
                 <img src="/public/home.png" className="h-8 w-8"/>
-                <div 
-                  onClick={goHome} 
-                  className="ml--30 text-base"
-                  title="Home">
+                <div
+                  className="ml--30 text-base">
                     Home
                 </div>
               </button>
             {/* Subcription button */}
               <button
                 className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+                title="Subcription"
               >
                 <img src="/public/subcribe.png" className="h-8 w-8"/>
                 <div className="ml--30 text-base">Subcription</div>

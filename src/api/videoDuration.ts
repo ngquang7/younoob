@@ -44,9 +44,8 @@ const youtubeApi = axios.create({
   timeout: 10_000,
 });
 
-export async function searchYouTube(
+export async function videoDuationApi(
     videoIdArray: string[],
-
 ): Promise<YouTubeSearchResponse> {
   // const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;

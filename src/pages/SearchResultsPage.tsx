@@ -18,12 +18,20 @@ const SearchResultsPage = () => {
   const [videos, setVideos] = useState<YouTubeSearchItem[]>([]);
 // Cleanup Function 
   const controller = new AbortController();
+
   const goHome = () => {
     navigate(`/`);
+    console.log("go home by HEADER");
   }
+
+  const goWatch = (videoidd: string) => {
+    navigate(`/watch?v=${videoidd}`);
+  }
+
   const handleSearchAgain = (searchTerm: string) => {
     navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
   };
+
 
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
@@ -66,7 +74,7 @@ const SearchResultsPage = () => {
       return () => {
       // cleanup: hủy request khi dependency thay đổi hoặc component unmount
       controller.abort();
-    };
+      };
     }, [searchParams]);
 
   //Useeffect to get like and view from videoDetail Api
@@ -80,11 +88,8 @@ const SearchResultsPage = () => {
       try {
         console.log('callingSearchYoutube');
         const data1 = await videoDetailApi(idList);
-        
         // Add this, we can set VIDEO
-    
         // 4 key: kind, etag, id, snippet
-
         } 
         catch(error: unknown) {
           console.log("loi ki thuat", error);
@@ -95,9 +100,6 @@ const SearchResultsPage = () => {
         setLoading(false);
         }
       }
-
-
-
     }, [videos])
     
   return (
@@ -118,6 +120,7 @@ const SearchResultsPage = () => {
         {videos.map((video) => (
         <VideoGrid
         video={video}
+        goWatch={goWatch}
         />
         ))}
     </main>

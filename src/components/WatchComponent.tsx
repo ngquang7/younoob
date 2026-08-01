@@ -1,8 +1,24 @@
+import { useSearchParams } from 'react-router-dom';
 import {useState} from 'react';
 export default function WatchComponent() {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [isdisLiked, setDisIsLiked] = useState(false);
+
+    const handleShareClick = () => {
+      const shareUrl = `https://youtube.com/watch?v=${videoId}`;
+      try {
+      navigator.clipboard.writeText(shareUrl);
+      } catch (error) {
+      console.warn("Clipboard write failed: ", error);
+    }
+  };
+
+  const [searchParams] = useSearchParams();
+
+  // 2. Extract the 'v' parameter value
+  const videoId = searchParams.get('v');
+
 
   return (
     // 
@@ -15,8 +31,7 @@ export default function WatchComponent() {
         {/* width video, */}
         <div className="w-200 rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
           <iframe
-            // src={`https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`}
-            // title={video.title}
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
             className="w-full h-full border-none"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
@@ -87,10 +102,10 @@ export default function WatchComponent() {
 
             {/* Share */}
             <button
-            //   onClick={handleShareClick}
+              onClick={handleShareClick}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
             >
-              {/* <Share2 className="w-4 h-4" /> */}
+
               <span>Share</span>
             </button>
           </div>
@@ -107,10 +122,7 @@ export default function WatchComponent() {
             
 
             {/* Mini details */}
-            
-        
       </div>
-
     </div>
   </div>
     );
