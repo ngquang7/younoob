@@ -1,23 +1,70 @@
 import { useSearchParams } from 'react-router-dom';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
+import { video } from 'motion/react-m';
+import type { YoutubeVideo } from '../api/youtubeSearch';
+import {getVideosDetails} from "../api/videoWatchInformation";
+
+import axios from 'axios'
 export default function WatchComponent() {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [isdisLiked, setDisIsLiked] = useState(false);
+    const [isNotice, setisNotice] = useState(false);
+    const [isExpandedDecription, setisExpandedDecription] = useState(false);    
+
 
     const handleShareClick = () => {
-      const shareUrl = `https://youtube.com/watch?v=${videoId}`;
+    const shareUrl = `https://youtube.com/watch?v=${videoId}`;
       try {
-      navigator.clipboard.writeText(shareUrl);
+        navigator.clipboard.writeText(shareUrl);
+        setisNotice(true);
+        setTimeout ( () => {
+          setisNotice(false);
+        }, 2300);
       } catch (error) {
-      console.warn("Clipboard write failed: ", error);
-    }
-  };
+        console.warn("Copy failed ", error);
+      }
+    };
+
+  if(isExpandedDecription === false) console.log("falseeede");
+  else {console.log("trueeeee");}
 
   const [searchParams] = useSearchParams();
-
-  // 2. Extract the 'v' parameter value
   const videoId = searchParams.get('v');
+
+
+  const [video, setVideo] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  useEffect(() => {
+    if (!videoId) return;
+
+    const fetchVideo = async () => {
+      setLoading(true);
+      try {
+        const response = await getVideosDetails(videoId);
+
+        response.items.forEach(video => {
+          console.log("Title:", video.snippet.title);
+          console.log("Description:", video.snippet.description);
+          console.log("Channel:", video.snippet.channelTitle);
+          console.log("Views:", video.statistics?.viewCount);
+          console.log("Likes:", video.statistics?.likeCount);
+        });
+
+        //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
+        if (response.items && response.items.length > 0) {
+          setVideo(response.items[0]);
+        }
+        
+      } catch (error) {
+        console.error("Failed to fetch video:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideo();
+  }, [searchParams]);
 
 
   return (
@@ -38,9 +85,9 @@ export default function WatchComponent() {
           ></iframe>
         </div>
 
-        {/* Video Title */}
+    {/* Video Title */}
         <h1 className="text-lg md:text-xl font-sans font-bold mt-4 leading-snug">
-          {/* {video.title} */}
+          {video?.snippet?.title || "Loading"}
         </h1>
 
         {/* Action Controls & Channel Details Row */}
@@ -48,19 +95,19 @@ export default function WatchComponent() {
           {/* Channel Avatar & Subscribers & Subscribe Trigger */}
           <div className="flex items-center gap-3">
             <img
-            //   src={video.channelAvatar}
+              src={video?.Channel?.Avatar || "null"}
             //   alt={video.channelTitle}
               className="w-10 h-10 rounded-full object-cover border border-[#303030]"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
-              <span className="font-sans font-semibold text-sm hover:text-white cursor-pointer">videochannelTitle</span>
+              <span className="font-sans font-semibold text-sm hover:text-white cursor-pointer">{video?.snippet?.channelTitle || "Loading..."}</span>
               <span className="text-xs text-gray-400">n subscribers</span>
             </div>
             
             <button
               onClick={() => setIsSubscribed(!isSubscribed)}
-              className={`ml-3 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
+              className={`gap-1 ml-3 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
                 isSubscribed 
                   ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]' 
                   : 'bg-white hover:bg-gray-200 text-black'
@@ -71,7 +118,7 @@ export default function WatchComponent() {
           </div>
           
           {/* Action buttons (Likes, Share, Save) */}
-          <div className="flex items-center gap-2 overflow-x-auto py-1">
+          <div className="flex items-center gap-2 overflow-x-auto py-0">
             {/* Likes */}
             <div className="flex items-center bg-[#212121] rounded-full border border-[#303030]/50 shrink-0">
               <button
@@ -81,7 +128,7 @@ export default function WatchComponent() {
                   isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
                 }`}
               >
-                Like
+                {video?.statistics?.likeCount || "Loading..."}Like
               </button>
                 {/* dislike button */}
                   {/* Pay attention to hover */}
@@ -108,12 +155,43 @@ export default function WatchComponent() {
 
               <span>Share</span>
             </button>
+                        {isNotice && (
+        <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
+          Copy link Successfull !
+        </div>
+      )}
           </div>
         </div>
 
         {/* Expandable Description Card */}
+          <button
+          onClick={() => setisExpandedDecription(!isExpandedDecription)} 
+          className={`bg-[#212121] cursor-pointer hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed
+          ${
+                isExpandedDecription ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
+          }`}
+          >
+        
+          <div className="flex items-center gap-3 font-semibold text-xs text-gray-200 mb-1">
+            <span>{video?.statistics?.viewCount} views</span>
+            <span>{video?.snippet?.description || "Loading..."}</span>
+          </div>
 
+          <p className={`font-sans text-gray-300 break-words`}>
+            ...more
+          </p>
 
+          <button 
+          className="flex items-center gap-1 mt-3 text-xs font-semibold hover:underline text-white cursor-pointer"
+          
+          >
+            
+            
+          </button>
+        </button>
+
+    </div>
+    
       {/* Right Column (Recommended Sidebar Feed) */}
       <div className="w-full lg:w-[400px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
@@ -123,7 +201,9 @@ export default function WatchComponent() {
 
             {/* Mini details */}
       </div>
-    </div>
   </div>
+
+
+
     );
 }

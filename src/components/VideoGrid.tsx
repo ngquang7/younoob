@@ -14,22 +14,22 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
     const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
     if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-    else if (timeAgo < 3600) { // MINUTE
+    if (timeAgo < 3600) { // MINUTE
       const minutes = Math.floor(timeAgo / 60);
       return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    } else if (timeAgo < 86400) { // HOUR
+    } if (timeAgo < 86400) { // HOUR
       const hours = Math.floor(timeAgo/3600);
       return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else if (timeAgo < 604800) { // DAY
+    } if (timeAgo < 604800) { // DAY
       const days = Math.floor(timeAgo / 86400);
       return `${days} day${days > 1 ? 's' : '' } ago`;
-    } else if (timeAgo < 2592000) { // WEEK
+    } if (timeAgo < 2592000) { // WEEK
       const weeks = Math.floor(timeAgo / 604800);
       return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
-    } else if (timeAgo < 31536000) { // MONTH
+    } if (timeAgo < 31536000) { // MONTH
       const months = Math.floor(timeAgo / 2592000);
       return `${months} month${months > 1 ? 's' : '' } ago`;
-    } else { //YEAR
+    }  { //YEAR
       const years = Math.floor(timeAgo / 31536000);
       return `${years} year${years > 1 ? 's' : '' } ago`;
     } 
@@ -55,14 +55,13 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
         className="w-full h-full pointer-events-none"
         //mute=1 -> mute
         src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1`}
-        // src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0`}
         title="YouTube video preview"
-        // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="autoplay"
       />
         ) : (
         <img
           src={video.snippet.thumbnails.medium?.url}
-          alt={video.snippet.title}
+          // alt={video.snippet.title}
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
         )}

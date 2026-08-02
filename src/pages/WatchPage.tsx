@@ -10,8 +10,7 @@ export default function WatchPage() {
 
     const goHome = () => {
     navigate(`/`);
-    }
-
+    }    
     const goToSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);

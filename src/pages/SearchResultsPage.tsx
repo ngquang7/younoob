@@ -11,6 +11,7 @@ import {videoDetailApi} from "../api/videoDetail.ts"
 
 const SearchResultsPage = () => {
   const navigate = useNavigate();
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [searchParams] = useSearchParams();
   // const query = searchParams.get('q') || '';
   const [keyword, setKeyword] = useState('');
@@ -21,7 +22,6 @@ const SearchResultsPage = () => {
 
   const goHome = () => {
     navigate(`/`);
-    console.log("go home by HEADER");
   }
 
   const goWatch = (videoidd: string) => {
@@ -32,8 +32,6 @@ const SearchResultsPage = () => {
     navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
   };
 
-
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
     useEffect(() => {
       if (window.innerWidth < 768) {
@@ -51,15 +49,12 @@ const SearchResultsPage = () => {
           return;
         }
         setLoading(true);
-      
       try {
         console.log('callingSearchYoutube');
         const data = await searchYouTube(newKeyword);
-
         // Add this, we can set VIDEO
         setVideos(data.items);
         // 4 key: kind, etag, id, snippet
-
         } 
         catch(error: unknown) {
           console.log("loi ki thuat", error);
@@ -115,7 +110,7 @@ const SearchResultsPage = () => {
         expanded={sidebarExpanded}
     />
     {/* Video search */}
-    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-black grid grid-cols-3 gap-6 `}>
+    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-black grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3`}>
       {/*Use this to render video  */}
         {videos.map((video) => (
         <VideoGrid
