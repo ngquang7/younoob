@@ -14,9 +14,14 @@
     "@types/gapi": "^0.0.47",
     "axios": "^1.18.1",
     "googleapis": "^173.0.0",
+    "linkify-plugin-hashtag": "^4.3.3",
+    "linkify-plugin-mention": "^4.3.3",
+    "linkify-react": "^4.3.3",
+    "linkifyjs": "^4.3.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.1",
+    "react-router": "^8.3.0",
+    "react-router-dom": "^7.18.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

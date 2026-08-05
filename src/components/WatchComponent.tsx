@@ -26,8 +26,9 @@ export default function WatchComponent() {
       }
     };
 
-  if(isExpandedDecription === false) console.log("falseeede");
-  else {console.log("trueeeee");}
+  if(isExpandedDecription === false){
+
+  }
 
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
@@ -164,32 +165,38 @@ export default function WatchComponent() {
         </div>
 
         {/* Expandable Description Card */}
-          <button
-          onClick={() => setisExpandedDecription(!isExpandedDecription)} 
-          className={`bg-[#212121] cursor-pointer hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed
-          ${
-                isExpandedDecription ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-          }`}
-          >
-        
+        <div
+          onClick={() => setisExpandedDecription(true)} 
+          className={`bg-[#212121] hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed ${!isExpandedDecription ? 'cursor-pointer' : ''}`}
+        >
+          {/* VIEW  */}
           <div className="flex items-center gap-3 font-semibold text-xs text-gray-200 mb-1">
             <span>{video?.statistics?.viewCount} views</span>
-            <span>{video?.snippet?.description || "Loading..."}</span>
           </div>
-
-          <p className={`font-sans text-gray-300 break-words`}>
-            ...more
+        {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
+          <p className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
+            {video?.snippet?.description || "Loading..."} 
           </p>
 
-          <button 
-          className="flex items-center gap-1 mt-3 text-xs font-semibold hover:underline text-white cursor-pointer"
-          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setisExpandedDecription(!isExpandedDecription);
+            }}
+            className="flex items-center gap-1 mt-3 text-xs font-semibold"
           >
-            
-            
+            {isExpandedDecription ? (
+              <>
+                <button className="w-3.5 h-3.5 cursor-pointer hover:underline text-white cursor-pointer">Less</button>
+              </>
+            ) : (
+              <>
+                <div className="cursor-pointer">more...</div>
+              </>
+            )}
           </button>
-        </button>
 
+        </div>
     </div>
     
       {/* Right Column (Recommended Sidebar Feed) */}
