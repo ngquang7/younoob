@@ -11,7 +11,7 @@ export default function WatchComponent() {
     const [isdisLiked, setDisIsLiked] = useState(false);
     const [isNotice, setisNotice] = useState(false);
     const [isExpandedDecription, setisExpandedDecription] = useState(false);    
-
+    const [isAddComment, setIsAddComment] = useState(false);
 
     const handleShareClick = () => {
     const shareUrl = `https://youtube.com/watch?v=${videoId}`;
@@ -197,6 +197,54 @@ export default function WatchComponent() {
           </button>
 
         </div>
+        
+        {/* Comments */}
+      <div className="mt-6">
+
+        <div className="flex items-center gap-2 mb-6">
+          <h1 className="text-base font-bold tracking-tight font-sans">
+          {video?.statistics?.commentCount || "Loading..."} Comments
+          </h1>
+        </div>
+        
+        <form className="flex gap-3 mb-6">
+          <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
+              Q
+          </div>
+                      <div className="flex-1 flex flex-col gap-2">
+
+          <input
+            onClick={() => setIsAddComment(true)}
+            type="text"
+            placeholder="Add a comment..."
+            className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
+          />
+
+
+            <div className="flex justify-end gap-2 animate-in fade-in duration-100">
+              {isAddComment &&
+              <>
+              <button 
+                onClick={() => setIsAddComment(false)}
+                className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
+                >
+                cancel
+              </button>
+              
+              <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
+                Comment
+              </button>
+              </>
+                }
+  
+            </div>    
+          </div>
+        </form>
+      </div>
+
+
+
+
     </div>
     
       {/* Right Column (Recommended Sidebar Feed) */}
@@ -205,7 +253,6 @@ export default function WatchComponent() {
 
             {/* Mini Thumbnail */}
             
-
             {/* Mini details */}
       </div>
   </div>
