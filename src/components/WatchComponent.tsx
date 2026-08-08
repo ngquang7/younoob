@@ -68,6 +68,65 @@ export default function WatchComponent() {
   }, [searchParams]);
 
 
+  const getTimeago = (date: string) => {
+      const videoDate = new Date(date);
+      const currentTime = new Date();
+      const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
+
+      if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+
+      if (timeAgo < 3600) { // MINUTE
+        const minutes = Math.floor(timeAgo / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } 
+      if (timeAgo < 86400) { // HOUR
+        const hours = Math.floor(timeAgo/3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } 
+      if (timeAgo < 604800) { // DAY
+        const days = Math.floor(timeAgo / 86400);
+        return `${days} day${days > 1 ? 's' : '' } ago`;
+      } 
+      if (timeAgo < 2592000) { // WEEK
+        const weeks = Math.floor(timeAgo / 604800);
+        return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
+      } 
+      if (timeAgo < 31536000) { // MONTH
+        const months = Math.floor(timeAgo / 2592000);
+        return `${months} month${months > 1 ? 's' : '' } ago`;
+      }  
+      //YEAR
+      const years = Math.floor(timeAgo / 31536000);
+      return `${years} year${years > 1 ? 's' : '' } ago`;
+    }
+
+  const getView = (view: string) => {
+    const totalView: number = Number(view);
+    if(totalView < 1000) {
+      return `${view} views`
+    }
+    if(totalView < 1000000) { // < 1M view 
+      const views: number = Math.floor(totalView/1000);
+      return `${views}K views`;
+    }
+    if(totalView < 1000000000) {
+      const views: number = Math.floor(totalView/1000000);
+      return `${views}M views`;
+    }
+    if(totalView < 1000000000000) {
+      const views: number = Math.floor(totalView/1000000000);
+      return `${views}B views`; 
+    }
+  }
+
+  const getTimeDescription = (date: string) => {
+    const videoDate = new Date(date);
+    const dayandmonth: string = videoDate.toDateString().slice(4,10);
+    const year: string = videoDate.toDateString().slice(11,16);
+    return `${dayandmonth}, ${year}`;
+    }
+
+
   return (
     // 
   <div className="max-w-[1440px] mx-auto px-4 py-6 mt-14 flex flex-col lg:flex-row gap-6 text-[#f1f1f1]">
@@ -148,7 +207,7 @@ export default function WatchComponent() {
             {/* Save (Watch Later) */}
             
 
-            {/* Share */}
+            {/* SHARE */}
             <button
               onClick={handleShareClick}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
@@ -164,18 +223,33 @@ export default function WatchComponent() {
           </div>
         </div>
 
-        {/* Expandable Description Card */}
+        {/* DESCRIPTION CARD */}
         <div
           onClick={() => setisExpandedDecription(true)} 
           className={`bg-[#212121] hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed ${!isExpandedDecription ? 'cursor-pointer' : ''}`}
         >
           {/* VIEW  */}
-          <div className="flex items-center gap-3 font-semibold text-xs text-gray-200 mb-1">
-            <span>{video?.statistics?.viewCount} views</span>
+          <div className="flex items-center gap-3 font-semibold text-l text-gray-200 mb-1">
+
+            {isExpandedDecription ? (
+              <>
+              <span>{video?.statistics?.viewCount}</span>
+              <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
+              </>
+            ) : (
+              <>
+                  {/* {getView(video?.statistics?.viewCount)} */}
+                  {/* {video?.statistics?.viewCount} */}
+                <span>{getView(video?.statistics?.viewCount)}</span>
+                <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+              </>
+            )}
           </div>
-        {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
+
+          {/* DESCRIPTION */}
+          {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
           <p className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
-            {video?.snippet?.description || "Loading..."} 
+            {video?.snippet?.description || <div className="italic">No description has been added to this video</div>} 
           </p>
 
           <button
@@ -187,18 +261,17 @@ export default function WatchComponent() {
           >
             {isExpandedDecription ? (
               <>
-                <button className="w-3.5 h-3.5 cursor-pointer hover:underline text-white cursor-pointer">Less</button>
+                <button className="w-15 h-7 cursor-pointer hover:bg-gray-700 rounded text-white transition cursor-pointer">Show less</button>
               </>
             ) : (
               <>
-                <div className="cursor-pointer">more...</div>
+                <div className="cursor-pointer">...more</div>
               </>
             )}
           </button>
-
         </div>
         
-        {/* Comments */}
+      {/* COMMENTS */}
       <div className="mt-6">
 
         <div className="flex items-center gap-2 mb-6">
@@ -206,48 +279,42 @@ export default function WatchComponent() {
           {video?.statistics?.commentCount || "Loading..."} Comments
           </h1>
         </div>
-        
+        {/* MY COMMENT */}
         <form className="flex gap-3 mb-6">
           <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
               Q
           </div>
-                      <div className="flex-1 flex flex-col gap-2">
 
-          <input
-            onClick={() => setIsAddComment(true)}
-            type="text"
-            placeholder="Add a comment..."
-            className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
-          />
-
-
-            <div className="flex justify-end gap-2 animate-in fade-in duration-100">
-              {isAddComment &&
-              <>
-              <button 
-                onClick={() => setIsAddComment(false)}
-                className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
-                >
-                cancel
-              </button>
-              
-              <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
-                Comment
-              </button>
-              </>
-                }
-  
-            </div>    
+          <div className="flex-1 flex flex-col gap-2">
+            <input
+              onClick={() => setIsAddComment(true)}
+              type="text"
+              placeholder="Add a comment..."
+              className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
+            />
+              <div className="flex justify-end gap-2 animate-in fade-in duration-100">
+                {isAddComment &&
+                <>
+                <button 
+                  onClick={() => setIsAddComment(false)}
+                  className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
+                  >
+                  Cancel
+                </button>
+                {/* type="submit" */}
+                <button className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
+                  Comment
+                </button>
+                </>
+                  }
+              </div>    
           </div>
         </form>
       </div>
 
-
-
-
     </div>
     
-      {/* Right Column (Recommended Sidebar Feed) */}
+      {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-full lg:w-[400px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
 
