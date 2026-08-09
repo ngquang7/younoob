@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from '../components/Header';
 import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/LeftBar'

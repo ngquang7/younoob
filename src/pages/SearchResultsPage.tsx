@@ -114,6 +114,7 @@ const SearchResultsPage = () => {
       {/*Use this to render video  */}
         {videos.map((video) => (
         <VideoGrid
+        key={typeof video.id === 'string' ? video.id : video.id.videoId}        
         video={video}
         goWatch={goWatch}
         />

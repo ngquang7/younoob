@@ -3,8 +3,9 @@ import {useState, useEffect} from 'react';
 import { video } from 'motion/react-m';
 import type { YoutubeVideo } from '../api/youtubeSearch';
 import {getVideosDetails} from "../api/videoWatchInformation";
+import { getChannelDetails } from '../api/channelData';
 
-import axios from 'axios'
+
 export default function WatchComponent() {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
@@ -26,37 +27,49 @@ export default function WatchComponent() {
       }
     };
 
-  if(isExpandedDecription === false){
-
-  }
 
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
 
 
-  const [video, setVideo] = useState<any>(null);
+  const [video, setVideo] = useState<any>(null); //Video
+  const [video1, setVideo1] = useState<any>(null); //Channel
   const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     if (!videoId) return;
-
     const fetchVideo = async () => {
       setLoading(true);
       try {
         const response = await getVideosDetails(videoId);
-
-        response.items.forEach(video => {
-          console.log("Title:", video.snippet.title);
-          console.log("Description:", video.snippet.description);
-          console.log("Channel:", video.snippet.channelTitle);
-          console.log("Views:", video.statistics?.viewCount);
-          console.log("Likes:", video.statistics?.likeCount);
-        });
-
+    //Video
+        // response.items.forEach(video => {
+        //   console.log("Title:", video.snippet.title);
+        //   console.log("Description:", video.snippet.description);
+        //   console.log("Channel:", video.snippet.channelTitle);
+        //   console.log("Views:", video.statistics?.viewCount);
+        //   console.log("ChannelId:", video.snippet.channelId);
+        // });
+    //Channel
         //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
-        if (response.items && response.items.length > 0) {
-          setVideo(response.items[0]);
+          if (response.items && response.items.length > 0) {
+            const videoItem = response.items[0];
+            setVideo(response.items[0]);          
+            
+            const idChannel = videoItem.snippet?.channelId;
+            const response1 = await getChannelDetails(idChannel);         
+            if (response1.items && response1.items.length > 0) {
+              // setVideo1(response1.items[0]);
+              // console.log("Subscriber Count:", video1.statistics.subscriberCount);
+            //SHOULD DO THIS METHOD INSTEAD OF THE METHOD ABOVE
+            //THIS IS BECAUSE video1 is a React state
+            //Calling setVideo1(...) does not instantly update the video1 variable on the next line.
+            //Because video1 is still null (or its previous value), trying to read video1.statistics will crash your app with a TypeError.
+              const channelItem = response1.items[0]; //Store in a local variable
+              setVideo1(channelItem); //Update state
+              console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
+
+          }
         }
-        
       } catch (error) {
         console.error("Failed to fetch video:", error);
       } finally {
@@ -67,6 +80,21 @@ export default function WatchComponent() {
     fetchVideo();
   }, [searchParams]);
 
+  const getSubcriber = (subcriber: string) => {
+    const totalSubcriber: number = Number(subcriber);
+    if(totalSubcriber < 1000) {
+      return `${totalSubcriber}`;
+      }
+    if(totalSubcriber < 1000000) {
+      const subcribers: number = totalSubcriber/1000;
+      return `${subcribers}K`;
+    }
+    if(totalSubcriber < 1000000000) {
+      const subcribers: number = totalSubcriber/1000000;
+      return `${subcribers}M`;
+    }
+  }
+
 
   const getTimeago = (date: string) => {
       const videoDate = new Date(date);
@@ -74,7 +102,6 @@ export default function WatchComponent() {
       const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
       if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-
       if (timeAgo < 3600) { // MINUTE
         const minutes = Math.floor(timeAgo / 60);
         return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
@@ -126,17 +153,36 @@ export default function WatchComponent() {
     return `${dayandmonth}, ${year}`;
     }
 
+  const getLike = (like: string) => {
+    const totalLike: number = Number(like);
+    if(totalLike < 1000) {
+      return `${like} likes`
+    }
+    if(totalLike < 1000000) { // < 1M view 
+      const likes: number = Math.floor(totalLike/1000);
+      return `${likes}K likes`;
+    }
+    if(totalLike < 1000000000) {
+      const likes: number = Math.floor(totalLike/1000000);
+      return `${likes}M likes`;
+    }
+    if(totalLike < 1000000000000) {
+      const likes: number = Math.floor(totalLike/1000000000);
+      return `${likes}B likes`; 
+    }
+  }
+
 
   return (
     // 
-  <div className="max-w-[1440px] mx-auto px-4 py-6 mt-14 flex flex-col lg:flex-row gap-6 text-[#f1f1f1]">
+  <div className="max-w-[1440px] mx-auto px-4 py-0 flex flex-col lg:flex-row gap-6 text-[#f1f1f1]">
       
       {/* Left Column (Video Player + Description + Comments) */}
       <div className="flex-1 min-w-0">
         
         {/* Responsive Video Container */}
-        {/* width video, */}
-        <div className="w-200 rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
+        {/* width video, w-full, it will be automatically suitable */}
+        <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
           <iframe
             src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
             className="w-full h-full border-none"
@@ -147,7 +193,7 @@ export default function WatchComponent() {
 
     {/* Video Title */}
         <h1 className="text-lg md:text-xl font-sans font-bold mt-4 leading-snug">
-          {video?.snippet?.title || "Loading"}
+          {video?.snippet?.title || "..Loading.."}
         </h1>
 
         {/* Action Controls & Channel Details Row */}
@@ -155,14 +201,14 @@ export default function WatchComponent() {
           {/* Channel Avatar & Subscribers & Subscribe Trigger */}
           <div className="flex items-center gap-3">
             <img
-              src={video?.Channel?.Avatar || "null"}
+              src={video1?.snippet?.thumbnails.medium?.url || "..Loading.."}
             //   alt={video.channelTitle}
               className="w-10 h-10 rounded-full object-cover border border-[#303030]"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
               <span className="font-sans font-semibold text-sm hover:text-white cursor-pointer">{video?.snippet?.channelTitle || "Loading..."}</span>
-              <span className="text-xs text-gray-400">n subscribers</span>
+              <span className="text-xs text-gray-400">{getSubcriber(video1?.statistics?.subscriberCount)} subscribers</span>
             </div>
             
             <button
@@ -188,7 +234,7 @@ export default function WatchComponent() {
                   isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
                 }`}
               >
-                {video?.statistics?.likeCount || "Loading..."}Like
+                {getLike(video?.statistics?.likeCount)}
               </button>
                 {/* dislike button */}
                   {/* Pay attention to hover */}
@@ -248,11 +294,11 @@ export default function WatchComponent() {
 
           {/* DESCRIPTION */}
           {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
-          <p className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
+          <div className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
             {video?.snippet?.description || <div className="italic">No description has been added to this video</div>} 
-          </p>
+          </div>
 
-          <button
+          <div
             onClick={(e) => {
               e.stopPropagation();
               setisExpandedDecription(!isExpandedDecription);
@@ -268,7 +314,7 @@ export default function WatchComponent() {
                 <div className="cursor-pointer">...more</div>
               </>
             )}
-          </button>
+          </div>
         </div>
         
       {/* COMMENTS */}
