@@ -124,14 +124,13 @@ export async function getChannelDetails(
     if (!apiKey) {
     throw new Error("YouTube API key is missing.");
     }
-
   // Convert array to a comma-separated string if necessary (YouTube allows up to 50 IDs)
     const idParam = Array.isArray(videoIds) ? videoIds.join(",") : videoIds;
 
     const { data } = await youtubeApi.get<YouTubeChannelResponse>("/channels", {
     params: {
     //if dont have snippet, it won't run
-        part: "snippet,statistics", // Requests both metadata and stats
+        part: "snippet,statistics",
         id: idParam,
         key: apiKey,
     },

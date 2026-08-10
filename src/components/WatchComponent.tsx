@@ -156,19 +156,19 @@ export default function WatchComponent() {
   const getLike = (like: string) => {
     const totalLike: number = Number(like);
     if(totalLike < 1000) {
-      return `${like} likes`
+      return `${like}`
     }
     if(totalLike < 1000000) { // < 1M view 
       const likes: number = Math.floor(totalLike/1000);
-      return `${likes}K likes`;
+      return `${likes}K`;
     }
     if(totalLike < 1000000000) {
       const likes: number = Math.floor(totalLike/1000000);
-      return `${likes}M likes`;
+      return `${likes}M`;
     }
     if(totalLike < 1000000000000) {
       const likes: number = Math.floor(totalLike/1000000000);
-      return `${likes}B likes`; 
+      return `${likes}B`; 
     }
   }
 
@@ -234,7 +234,7 @@ export default function WatchComponent() {
                   isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
                 }`}
               >
-                {getLike(video?.statistics?.likeCount)}
+                {getLike(video?.statistics?.likeCount)} likes
               </button>
                 {/* dislike button */}
                   {/* Pay attention to hover */}
