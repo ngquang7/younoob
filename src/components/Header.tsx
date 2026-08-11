@@ -1,4 +1,6 @@
-import {useState } from 'react'
+import {useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 interface HeaderProps {
   onToggleSidebar: () => void;
   onCustomClick: (message :string ) => void;
@@ -12,7 +14,13 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
   }
   // TEST
   // console.log(`${searchText}`);
-  
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
+
+  if(isLogin == true) {
+    navigate(`/login`);
+  }
+
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault(); // Ngăn trang refresh lại
     onCustomClick(searchText.trim()); // Pass searchText value into goToSearchResults
@@ -61,6 +69,14 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
         >
         </button>
       </form>
+
+      <div className="flex items-center gap-2 md:gap-3">
+        <button
+        onClick={() => setIsLogin(!isLogin)}
+        className="border-1 rounded-full border-[#0000ff] h-7 w-18 hover: flex items-center justify-center cursor-pointer transition">
+          
+        </button>
+      </div>
     </nav>
     );
 }
