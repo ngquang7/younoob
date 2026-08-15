@@ -3,7 +3,7 @@ import {useState, useEffect} from 'react';
 import { video } from 'motion/react-m';
 import type { YoutubeVideo } from '../api/youtubeSearch';
 import {getVideosDetails} from "../api/videoWatchInformation";
-import { getChannelDetails } from '../api/channelData';
+import {getChannelData} from '../api/channelData';
 
 
 export default function WatchComponent() {
@@ -56,7 +56,7 @@ export default function WatchComponent() {
             setVideo(response.items[0]);          
             
             const idChannel = videoItem.snippet?.channelId;
-            const response1 = await getChannelDetails(idChannel);         
+            const response1 = await getChannelData(idChannel);         
             if (response1.items && response1.items.length > 0) {
               // setVideo1(response1.items[0]);
               // console.log("Subscriber Count:", video1.statistics.subscriberCount);

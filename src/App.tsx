@@ -8,7 +8,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage  from './pages/HomePage.tsx';
 import  SearchResultsPage  from './pages/SearchResultsPage';
-import WatchPage from './pages/WatchPage.tsx';
+import WatchPage from './pages/WatchPage';
+import LoginPage from './pages/LoginPage';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       
       <Route path="/search" element={<SearchResultsPage />} />
       <Route path="/watch" element={<WatchPage />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
   </BrowserRouter>
 </>
