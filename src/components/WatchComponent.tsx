@@ -4,30 +4,31 @@ import { video } from 'motion/react-m';
 import type { YoutubeVideo } from '../api/youtubeSearch';
 import {getVideosDetails} from "../api/videoWatchInformation";
 import {getChannelData} from '../api/channelData';
-
-
+import { getCommentData } from '../api/commentData';
 export default function WatchComponent() {
-    const [isSubscribed, setIsSubscribed] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isdisLiked, setDisIsLiked] = useState(false);
-    const [isNotice, setisNotice] = useState(false);
-    const [isExpandedDecription, setisExpandedDecription] = useState(false);    
-    const [isAddComment, setIsAddComment] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isdisLiked, setDisIsLiked] = useState(false);
+  const [isNotice, setisNotice] = useState(false);
+  const [isExpandedDecription, setisExpandedDecription] = useState(false);    
+  const [isAddComment, setIsAddComment] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  //Share button
+  const handleShareClick = () => {
+  const shareUrl = `https://youtube.com/watch?v=${videoId}`;
+    try {
+      navigator.clipboard.writeText(shareUrl);
+      setisNotice(true);
+      setTimeout ( () => {
+        setisNotice(false);
+      }, 2300);
+    } catch (error) {
+      console.warn("Copy failed ", error);
+    }
+  };
 
-    const handleShareClick = () => {
-    const shareUrl = `https://youtube.com/watch?v=${videoId}`;
-      try {
-        navigator.clipboard.writeText(shareUrl);
-        setisNotice(true);
-        setTimeout ( () => {
-          setisNotice(false);
-        }, 2300);
-      } catch (error) {
-        console.warn("Copy failed ", error);
-      }
-    };
-
-
+  //Get videoID
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
 
@@ -41,15 +42,6 @@ export default function WatchComponent() {
       setLoading(true);
       try {
         const response = await getVideosDetails(videoId);
-    //Video
-        // response.items.forEach(video => {
-        //   console.log("Title:", video.snippet.title);
-        //   console.log("Description:", video.snippet.description);
-        //   console.log("Channel:", video.snippet.channelTitle);
-        //   console.log("Views:", video.statistics?.viewCount);
-        //   console.log("ChannelId:", video.snippet.channelId);
-        // });
-    //Channel
         //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
           if (response.items && response.items.length > 0) {
             const videoItem = response.items[0];
@@ -66,10 +58,14 @@ export default function WatchComponent() {
             //Because video1 is still null (or its previous value), trying to read video1.statistics will crash your app with a TypeError.
               const channelItem = response1.items[0]; //Store in a local variable
               setVideo1(channelItem); //Update state
-              console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
-
+              //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
           }
         }
+          const commentResponse = await getCommentData(videoId);
+          if(commentResponse.items) {
+            const commentItem = commentResponse.items[0];
+            setComments(commentResponse.items);
+          }
       } catch (error) {
         console.error("Failed to fetch video:", error);
       } finally {
@@ -79,6 +75,45 @@ export default function WatchComponent() {
 
     fetchVideo();
   }, [searchParams]);
+  const [commentText, setCommentText] = useState("");
+
+  const handlePostComment = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!commentText.trim()) return;
+
+  // 1. Tạo object bình luận giả (cấu trúc phải khớp với API)
+  const newComment = {
+    id: Date.now().toString(), // Tạo ID tạm thời
+    snippet: {
+      topLevelComment: {
+        snippet: {
+          authorDisplayName: "Quang (You)", 
+          authorProfileImageUrl: "/public/Q.png", // Ảnh avatar tạm
+          textDisplay: commentText,
+          publishedAt: new Date().toISOString(),
+          likeCount: 0
+        }
+      }
+    }
+  };
+
+  // 2. Cập nhật state (thêm vào đầu danh sách)
+  setComments([newComment, ...comments]);
+  //total comments + 1 
+  if (video && video.statistics) {
+    const currentCount = Number(video.statistics.commentCount || 0);
+    setVideo({
+      ...video,
+      statistics: {
+        ...video.statistics,
+        commentCount: String(currentCount + 1)
+      }
+    });
+  }
+  // 3. Reset input và đóng nút
+  setCommentText("");
+  setIsAddComment(false);
+};
 
   const getSubcriber = (subcriber: string) => {
     const totalSubcriber: number = Number(subcriber);
@@ -172,10 +207,9 @@ export default function WatchComponent() {
     }
   }
 
-
   return (
     // 
-  <div className="max-w-[1440px] mx-auto px-4 py-0 flex flex-col lg:flex-row gap-6 text-[#f1f1f1]">
+  <div className="w-full mx-auto px-4 py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
       
       {/* Left Column (Video Player + Description + Comments) */}
       <div className="flex-1 min-w-0">
@@ -326,15 +360,17 @@ export default function WatchComponent() {
           </h1>
         </div>
         {/* MY COMMENT */}
-        <form className="flex gap-3 mb-6">
+        <form onSubmit={handlePostComment} className="flex gap-3 mb-6">
           <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
               Q
           </div>
 
           <div className="flex-1 flex flex-col gap-2">
             <input
-              onClick={() => setIsAddComment(true)}
               type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)} // Lưu nội dung nhập
+              onClick={() => setIsAddComment(true)}
               placeholder="Add a comment..."
               className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
             />
@@ -342,13 +378,16 @@ export default function WatchComponent() {
                 {isAddComment &&
                 <>
                 <button 
-                  onClick={() => setIsAddComment(false)}
+                  onClick={() => {
+                    setIsAddComment(false);
+                    setCommentText("");
+                  }}
                   className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
                   >
                   Cancel
                 </button>
                 {/* type="submit" */}
-                <button className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
+                <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
                   Comment
                 </button>
                 </>
@@ -356,9 +395,44 @@ export default function WatchComponent() {
               </div>    
           </div>
         </form>
-      </div>
-
+        {comments.map((item) => {
+          const comment = item.snippet.topLevelComment.snippet;
+          return (
+              <div key={item.id} className="flex gap-4">
+                  <img 
+                      src={comment.authorProfileImageUrl} 
+                      className="w-10 h-10 rounded-full cursor-pointer" 
+                      alt="avatar"
+                      onClick={() => setPreviewImage(comment.authorProfileImageUrl)}
+                  />
+                  <div className="flex flex-col mb-8">
+                      <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
+                          <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
+                      </div>
+                      <p className="text-sm mt-1 text-gray-200">{comment.textDisplay}</p>
+                      <div className="flex items-center gap-4 mt-2">
+                          <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
+                      </div>
+                  </div>
+                  {previewImage && (
+                    <div 
+                      className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                      onClick={() => setPreviewImage(null)}
+                    >
+                        {/* Want preview bigger ? Modify w-64 h-64 */}
+                        <img 
+                          src={previewImage} 
+                          alt="Preview Large" 
+                          className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
+                        />
+                      </div>
+                  )}
+              </div>
+          );
+      })}
     </div>
+  </div>
     
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-full lg:w-[400px] shrink-0 flex flex-col gap-4">
