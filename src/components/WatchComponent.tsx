@@ -31,8 +31,6 @@ export default function WatchComponent() {
   //Get videoID
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
-
-
   const [video, setVideo] = useState<any>(null); //Video
   const [video1, setVideo1] = useState<any>(null); //Channel
   const [loading, setLoading] = useState<boolean>(false);
@@ -77,6 +75,34 @@ export default function WatchComponent() {
   }, [searchParams]);
   const [commentText, setCommentText] = useState("");
 
+  const handleSubscribeToggle = () => {
+    const nextState = !isSubscribed;
+    setIsSubscribed(nextState);
+
+    // 1. Lấy danh sách kênh đã đăng ký cũ từ localStorage
+    const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+    
+    // 2. Gom thông tin của kênh hiện tại
+    const currentChannel = {
+      id: video?.snippet?.channelId || 'unknown_id',
+      title: video?.snippet?.channelTitle || 'Channel Name',
+      thumbnail: video1?.snippet?.thumbnails?.medium?.url || '', // Ảnh đại diện kênh
+    };
+
+    if (nextState) {
+      // NẾU BẤM ĐĂNG KÝ (Subscribe): Thêm kênh vào mảng nếu chưa có
+      const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
+      if (!exists) {
+        const updatedSubs = [...savedSubs, currentChannel];
+        localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
+      }
+    } else {
+      // NẾU BẤM HỦY ĐĂNG KÝ (Unsubscribe): Lọc bỏ kênh này ra khỏi mảng
+      const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
+      localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
+    }
+  };
+
   const handlePostComment = (e: React.FormEvent) => {
   e.preventDefault();
   if (!commentText.trim()) return;
@@ -96,8 +122,7 @@ export default function WatchComponent() {
       }
     }
   };
-
-  // 2. Cập nhật state (thêm vào đầu danh sách)
+  //cập nhật state (thêm vào đầu danh sách)
   setComments([newComment, ...comments]);
   //total comments + 1 
   if (video && video.statistics) {
@@ -114,6 +139,36 @@ export default function WatchComponent() {
   setCommentText("");
   setIsAddComment(false);
 };
+  //History video
+  useEffect(() => {
+    if (video && video.id) {
+      // Get the list of history, if it's null, intialize it with empty list
+      //JSON.parse convert watch_history from string to array, if it's null, then intialize empty list 
+      const existingHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
+      
+      // Filter out videos that have already been watched (to avoid repeating the same video)
+      const filteredHistory = existingHistory.filter((v: any) => v.id !== video.id);
+      
+      // Push new video to the top of the list
+      const updatedHistory = [video, ...filteredHistory];
+      
+      // Store in localStorage, convert array to string
+      localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
+    }
+  }, [video]);
+
+//Khi vao lai video của channel đó, mà channel đó đã subcribe thì nó sẽ check, subcribe rồi thì sẽ được giữ nguyên
+  useEffect(() => {
+    if (video && video.snippet?.channelId) {
+      const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+      
+      // Kiểm tra xem ID của kênh hiện tại có nằm trong danh sách đã đăng ký không
+      const isSubbed = savedSubs.some((sub: any) => sub.id === video.snippet.channelId);
+      
+      // Cập nhật lại state của nút Subscribe cho khớp
+      setIsSubscribed(isSubbed);
+    }
+  }, [video]);
 
   const getSubcriber = (subcriber: string) => {
     const totalSubcriber: number = Number(subcriber);
@@ -225,7 +280,7 @@ export default function WatchComponent() {
           ></iframe>
         </div>
 
-    {/* Video Title */}
+      {/* Video Title */}
         <h1 className="text-lg md:text-xl font-sans font-bold mt-4 leading-snug">
           {video?.snippet?.title || "..Loading.."}
         </h1>
@@ -246,7 +301,7 @@ export default function WatchComponent() {
             </div>
             
             <button
-              onClick={() => setIsSubscribed(!isSubscribed)}
+              onClick={handleSubscribeToggle}
               className={`gap-1 ml-3 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
                 isSubscribed 
                   ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]' 
@@ -295,11 +350,11 @@ export default function WatchComponent() {
 
               <span>Share</span>
             </button>
-                        {isNotice && (
-        <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
-          Copy link Successfull !
-        </div>
-      )}
+            {isNotice && (
+              <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
+                Copy link Successfull !
+              </div>
+            )}
           </div>
         </div>
 
@@ -395,6 +450,7 @@ export default function WatchComponent() {
               </div>    
           </div>
         </form>
+        {/* Insert a comment into comments list */}
         {comments.map((item) => {
           const comment = item.snippet.topLevelComment.snippet;
           return (
@@ -429,13 +485,13 @@ export default function WatchComponent() {
                       </div>
                   )}
               </div>
-          );
-      })}
+            );
+        })}
     </div>
   </div>
     
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
-      <div className="w-full lg:w-[400px] shrink-0 flex flex-col gap-4">
+      <div className="w-200 lg:w-[300px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
 
             {/* Mini Thumbnail */}
@@ -443,8 +499,6 @@ export default function WatchComponent() {
             {/* Mini details */}
       </div>
   </div>
-
-
 
     );
 }

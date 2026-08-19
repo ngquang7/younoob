@@ -5,6 +5,8 @@ body {
   color: #ffffff;
   font-family: system-ui, sans-serif;
   display: block;
-    min-height: 100vh;
+  min-height: 100vh;
+  /* If we dont have overflow-x, when we watch video, then there is some flaws */
+  overflow-x: hidden;
 }
 

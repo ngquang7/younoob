@@ -7,7 +7,7 @@ import {searchYouTube, type YouTubeSearchItem} from "../api/youtubeSearch.ts";
 import type { YouTubeListResponse} from "../type";
 import axios from "axios";
 import type { YouTubeVideo}  from "../type";
-import {videoDetailApi} from "../api/videoData.ts"
+import {videoDetailApi} from  "../api/videoData.ts"
 
 const SearchResultsPage = () => {
   const navigate = useNavigate();
@@ -23,6 +23,9 @@ const SearchResultsPage = () => {
   const goHome = () => {
     navigate(`/`);
   }
+    const goHistory = () => {
+        navigate(`/history`);
+    }
 
   const goWatch = (videoidd: string) => {
     navigate(`/watch?v=${videoidd}`);
@@ -106,6 +109,7 @@ const SearchResultsPage = () => {
         onCustomClick={handleSearchAgain}
     />
     <LeftBar
+        goHistory={goHistory}
         goHome={goHome}
         expanded={sidebarExpanded}
     />

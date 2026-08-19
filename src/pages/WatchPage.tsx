@@ -11,6 +11,9 @@ export default function WatchPage() {
     const goHome = () => {
     navigate(`/`);
     }    
+    const goHistory = () => {
+        navigate(`/history`);
+    }
     const goToSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
@@ -30,6 +33,7 @@ export default function WatchPage() {
         />
 
         <LeftBar
+            goHistory={goHistory}
             goHome={goHome}
             expanded={sidebarExpanded}
         />
