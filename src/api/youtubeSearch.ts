@@ -50,8 +50,9 @@ const youtubeApi = axios.create({
 });
 
 export async function searchYouTube(
-  query: string,
-  pageToken?: string
+  query?: string,
+  pageToken?: string,
+  channelId?: string
 ): Promise<YouTubeSearchResponse> {
   // const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
@@ -59,15 +60,38 @@ export async function searchYouTube(
     throw new Error("YouTube API key is missing.");
   }
 
-  const { data } = await youtubeApi.get<YouTubeSearchResponse>("/search", {
-    params: {
-      part: "snippet",
-      q: query,
-      type: "video",
-      maxResults: 1000,
-      pageToken,
-      key: apiKey,
-    },
-  });
+  // const { data } = await youtubeApi.get<YouTubeSearchResponse>("/search", {
+  //   params: {
+  //     part: "snippet",
+  //     q: query,
+  //     type: "video",
+  //     maxResults: 100,
+  //     pageToken,
+  //     key: apiKey,
+  //   },
+  // });
+
+  // 1. Tạo object params cơ bản
+  const params: any = {
+    part: "snippet",
+    type: "video",
+    maxResults: 100,
+    pageToken,
+    key: apiKey,
+  };
+
+  // 2. Chỉ thêm q vào params nếu query có giá trị
+  if (query) {
+    params.q = query;
+  }
+
+  // 3. Chỉ thêm channelId vào params nếu channelId có giá trị (Dùng biến channelId truyền vào)
+  if (channelId) {
+    params.channelId = channelId;
+  }
+
+  // 4. Gọi API với object params đã xây dựng
+  const { data } = await youtubeApi.get<YouTubeSearchResponse>("/search", { params });
+  
   return data;
 }

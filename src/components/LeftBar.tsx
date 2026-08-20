@@ -8,6 +8,18 @@ interface SidebarProps {
 
 }
 export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
+  const navigate = useNavigate();
+  const goChannel = (chanelId: string) => {
+    navigate(`/channel/${chanelId}`);
+  }
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+
+  // Read the list that is subcribed in localStorage when Sidebar turn on
+  useEffect(() => {
+    const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+    setSubscriptions(savedSubs);
+  }, []);
+  
   if (!expanded) {
     return (
       <aside className="fixed top-14 left-0 bottom-0 w-18 bg-neutral-1000 hidden sm:flex flex-col items-center py-2 gap-4 z-40 select-none border-r border-[#212121]/50">
@@ -32,13 +44,7 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
       </aside>
     );
   }
-  const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
-  // Đọc danh sách kênh đã đăng ký từ localStorage khi Sidebar được bật lên
-  useEffect(() => {
-    const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-    setSubscriptions(savedSubs);
-  }, []);
     return(
       <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1]">         
       {/* Main Section */}
@@ -52,43 +58,45 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
               >
                 <img src="/public/home.png" className="h-8 w-8"/>
                 <div
-                  className="ml--30 text-base">
+                  className="text-base">
                     Home
                 </div>
               </button>
         </div>
       {/* Subcription button */}
         <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
-              <button className="flex flex items-left px-4 py-1.5 text-xxl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
+              <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
                 Subcriptions &gt;
               </button>
-        {subscriptions.length === 0 ? (
-          <p className="px-3 text-xs text-gray-500 italic">No subscriptions yet</p>
-        ) : (
-          subscriptions.map((channel) => (
-            <div 
-              key={channel.id}
-              className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#272727] cursor-pointer transition group"
-            >
-              {/* Ảnh đại diện + Tên kênh */}
-              <div className="flex items-center gap-3 overflow-hidden">
-                <img 
-                  src={channel.thumbnail} 
-                  alt={channel.title} 
-                  className="w-7 h-7 rounded-full object-cover shrink-0"
-                />
-                <span className="text-sm truncate text-gray-200 group-hover:text-white">
-                  {channel.title}
-                </span>
+          {subscriptions.length === 0 ? (
+            <p className="px-3 text-xs text-gray-500 italic">No subscriptions yet</p>
+          ) : (
+            subscriptions.map((channel) => (
+              <div onClick={() => goChannel(channel.id)}
+                key={channel.id}
+                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#272727] cursor-pointer transition group"
+              
+              >
+                {/* Avatar + channel name */}
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <img 
+                    src={channel.thumbnail} 
+                    alt={channel.title} 
+                    className="w-7 h-7 rounded-full object-cover shrink-0"
+                  />
+                  <span className="text-sm truncate text-gray-200 group-hover:text-white">
+                    {channel.title}
+                    {/* {channel.id} */}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
         </div>
 
       {/* YOU button */}
         <div className="flex flex-col gap-0.5 ">
-              <button className="flex flex items-left px-4 py-1.5 text-xxl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
+              <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
                 you &gt;
               </button>
           {/* History button */}

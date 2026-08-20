@@ -63,6 +63,9 @@ export interface YouTubeChannel {
         backgroundColor?: string;
         featuredPlaylistId?: string;
     };
+    image?: {
+            bannerExternalUrl?: string;
+    };
     };
     auditDetails?: {
     overallGoodStanding: boolean;
@@ -130,7 +133,7 @@ export async function getChannelData(
     const { data } = await youtubeApi.get<YouTubeChannelResponse>("/channels", {
     params: {
     //if dont have snippet, it won't run
-        part: "snippet,statistics",
+        part: "snippet,statistics, brandingSettings",
         id: idParam,
         key: apiKey,
     },

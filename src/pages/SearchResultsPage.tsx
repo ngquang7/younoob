@@ -114,7 +114,7 @@ const SearchResultsPage = () => {
         expanded={sidebarExpanded}
     />
     {/* Video search */}
-    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 bg-black grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3`}>
+    <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3`}>
       {/*Use this to render video  */}
         {videos.map((video) => (
         <VideoGrid

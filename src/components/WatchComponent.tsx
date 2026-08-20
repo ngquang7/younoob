@@ -1,10 +1,13 @@
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import { video } from 'motion/react-m';
-import type { YoutubeVideo } from '../api/youtubeSearch';
+import { searchYouTube, type YoutubeVideo } from '../api/youtubeSearch';
 import {getVideosDetails} from "../api/videoWatchInformation";
 import {getChannelData} from '../api/channelData';
 import { getCommentData } from '../api/commentData';
+import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
+
+
 export default function WatchComponent() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -27,7 +30,9 @@ export default function WatchComponent() {
       console.warn("Copy failed ", error);
     }
   };
-
+  const goWatch = (videoidd: string) => {
+    navigate(`/watch?v=${videoidd}`);
+  }
   //Get videoID
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
@@ -73,8 +78,35 @@ export default function WatchComponent() {
 
     fetchVideo();
   }, [searchParams]);
-  const [commentText, setCommentText] = useState("");
 
+  //Up next
+  const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]);
+  const currenVideoTitle = video?.snippet?.title || "loading...";
+  useEffect(() => {
+    //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
+    if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
+    const fetchUpNext = async () => {
+      try{
+        const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
+        const dataUpNext = await searchYouTube(cleanVideoTitle);
+        setUpNextVideos(dataUpNext.items);
+      } catch (error) {
+        console.log("Error: ", error);
+      };
+    }
+    fetchUpNext();
+  },[currenVideoTitle]);
+
+
+
+
+  const channelId = video?.snippet?.channelId || "loading...";
+  const navigate = useNavigate();
+  const goChannel = () => {
+    navigate(`/channel/${channelId}`);
+  }
+
+  const [commentText, setCommentText] = useState("");
   const handleSubscribeToggle = () => {
     const nextState = !isSubscribed;
     setIsSubscribed(nextState);
@@ -109,7 +141,7 @@ export default function WatchComponent() {
 
   // 1. Tạo object bình luận giả (cấu trúc phải khớp với API)
   const newComment = {
-    id: Date.now().toString(), // Tạo ID tạm thời
+    id: Date.now().toString(), // create a temporary ID 
     snippet: {
       topLevelComment: {
         snippet: {
@@ -135,7 +167,7 @@ export default function WatchComponent() {
       }
     });
   }
-  // 3. Reset input và đóng nút
+  //Reset input và close button
   setCommentText("");
   setIsAddComment(false);
 };
@@ -293,10 +325,9 @@ export default function WatchComponent() {
               src={video1?.snippet?.thumbnails.medium?.url || "..Loading.."}
             //   alt={video.channelTitle}
               className="w-10 h-10 rounded-full object-cover border border-[#303030]"
-              referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
-              <span className="font-sans font-semibold text-sm hover:text-white cursor-pointer">{video?.snippet?.channelTitle || "Loading..."}</span>
+              <span onClick={goChannel} className="font-sans font-semibold text-sm hover:text-white cursor-pointer">{video?.snippet?.channelTitle || "Loading..."}</span>
               <span className="text-xs text-gray-400">{getSubcriber(video1?.statistics?.subscriberCount)} subscribers</span>
             </div>
             
@@ -363,7 +394,7 @@ export default function WatchComponent() {
           onClick={() => setisExpandedDecription(true)} 
           className={`bg-[#212121] hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed ${!isExpandedDecription ? 'cursor-pointer' : ''}`}
         >
-          {/* VIEW  */}
+          {/* VIEW in description */}
           <div className="flex items-center gap-3 font-semibold text-l text-gray-200 mb-1">
 
             {isExpandedDecription ? (
@@ -493,10 +524,43 @@ export default function WatchComponent() {
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-200 lg:w-[300px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
-
+        {upNextVideos.map((video) => (
+          <div
+          onClick={() => {
+            if (video.id.videoId) {
+              goWatch(video.id.videoId);
+            }
+          }}
+            className="flex gap-3 group cursor-pointer hover:bg-[#272727]"
+          >
             {/* Mini Thumbnail */}
-            
+            <div className="relative w-40 aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
+              <img
+                src={video?.snippet?.thumbnails.default?.url || "null"}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              {/* Duration */}
+              {/* <span className="absolute bottom-1 right-1 bg-black/80 px-1 py-0.5 rounded text-[10px] font-medium text-white">
+                duration
+              </span> */}
+            </div>
+
             {/* Mini details */}
+            <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
+              <h4 className="text-xs font-semibold leading-snug line-clamp-2 text-[#f1f1f1] group-hover:text-white transition-colors">
+                {video?.snippet?.title || "Loading"}
+              </h4>
+              <div className="flex flex-col gap-0.5 text-[11px] text-gray-400">
+                <span className="truncate hover:text-white">{video?.snippet?.channelTitle || "Loading"}</span>
+                <div className="flex items-center truncate">
+                  {/* <span>views</span> */}
+                  {/* <span className="mx-1 text-[6px]">•</span> */}
+                  <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
   </div>
 

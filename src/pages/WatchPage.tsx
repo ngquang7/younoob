@@ -38,7 +38,7 @@ export default function WatchPage() {
             expanded={sidebarExpanded}
         />
         
-        <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
+        <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-18'} p-4`}>
             <WatchComponent />
         </main>
     </>

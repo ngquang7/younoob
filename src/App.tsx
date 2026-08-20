@@ -11,7 +11,7 @@ import  SearchResultsPage  from './pages/SearchResultsPage';
 import WatchPage from './pages/WatchPage';
 import LoginPage from './pages/LoginPage';
 import HistoryPage from './pages/HistoryPage.tsx';
-
+import ChannelPage from './pages/ChannelPage.tsx';
 
 function App() {
 
@@ -24,6 +24,7 @@ function App() {
       <Route path="/watch" element={<WatchPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/history" element={<HistoryPage/>} />
+      <Route path="/channel/:channelId" element={<ChannelPage />} />
     </Routes>
   </BrowserRouter>
 </>
