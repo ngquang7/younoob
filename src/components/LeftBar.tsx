@@ -9,10 +9,9 @@ interface SidebarProps {
 }
 export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
   const navigate = useNavigate();
-  const goChannel = (chanelId: string) => {
-    navigate(`/channel/${chanelId}`);
-  }
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+
+  const goChannel = (chanelId: string) => navigate(`/channel/${chanelId}`);
 
   // Read the list that is subcribed in localStorage when Sidebar turn on
   useEffect(() => {
@@ -23,19 +22,19 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
   if (!expanded) {
     return (
       <aside className="fixed top-14 left-0 bottom-0 w-18 bg-neutral-1000 hidden sm:flex flex-col items-center py-2 gap-4 z-40 select-none border-r border-[#212121]/50">
-          
+            {/* Home */}
             <button
               className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
             >
                 <img src="/public/home.png" className="h-8 w-8"/>
             </button>
-
+            {/* Subcription */}
             <button
               className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
             >
                 <img src="/public/subcribe.png" className="h-8 w-8"/>
             </button>
-
+            {/* Profile */}
             <button
               className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
             >
@@ -45,29 +44,30 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
     );
   }
 
-    return(
-      <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1]">         
-      {/* Main Section */}
+  return(
+    <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1]">         
+      {/* MAIN section */}
         <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
-            {/* Home button */}
-              <button
-                className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
-                //Never put goHome button in div, put it in button card
-                onClick={goHome}
-                title="Home"
-              >
-                <img src="/public/home.png" className="h-8 w-8"/>
-                <div
-                  className="text-base">
-                    Home
-                </div>
-              </button>
+          {/* Home button */}
+            <button
+              className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+              //Never put goHome button in div, put it in button card
+              onClick={goHome}
+              title="Home"
+            >
+              <img src="/public/home.png" className="h-8 w-8"/>
+              <div
+                className="text-base">
+                  Home
+              </div>
+            </button>
         </div>
-      {/* Subcription button */}
+
+        {/* SUBCRIPTION section */}
         <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
-              <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
-                Subcriptions &gt;
-              </button>
+          <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
+            Subcriptions &gt;
+          </button>
           {subscriptions.length === 0 ? (
             <p className="px-3 text-xs text-gray-500 italic">No subscriptions yet</p>
           ) : (
@@ -94,13 +94,13 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
           )}
         </div>
 
-      {/* YOU button */}
+        {/* YOU section */}
         <div className="flex flex-col gap-0.5 ">
-              <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
+            <button className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
                 you &gt;
-              </button>
+            </button>
           {/* History button */}
-              <button
+            <button
               className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
               title="History"
               onClick={goHistory}
@@ -109,15 +109,14 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
               <div className="ml--30 text-base">History</div>
             </button>
 
-              <button
+            <button
                 className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
                 title="Subcription"
-              >
-                <img src="/public/subcribe.png" className="h-8 w-8"/>
-                <div className="ml--30 text-base">Subcription</div>
-              </button>
-
+            >
+              <img src="/public/subcribe.png" className="h-8 w-8"/>
+              <div className="ml--30 text-base">Subcription</div>
+            </button>
         </div>
     </aside>
-    );
+  );
 }

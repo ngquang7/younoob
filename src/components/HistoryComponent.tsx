@@ -3,20 +3,19 @@ import { useNavigate } from 'react-router-dom';
 
 
 export default function HistoryComponent () {
-const [historyList, setHistoryList] = useState<any[]>([]);
+  const [historyList, setHistoryList] = useState<any[]>([]);
   const navigate = useNavigate();
 
   // Load history when go to this page
   useEffect(() => {
-        //Get string string
-
+    //Get string string
     const savedHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
     setHistoryList(savedHistory);
   }, []);
 
   // Delete 1 video from history
   const removeFromHistory = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Chặn sự kiện click chuyển trang
+    e.stopPropagation(); // Stop event click that navigating page
     const updated = historyList.filter(v => v.id !== id);
     setHistoryList(updated);
     localStorage.setItem('watch_history', JSON.stringify(updated));
@@ -30,24 +29,14 @@ const [historyList, setHistoryList] = useState<any[]>([]);
 
   const getView = (view: string) => {
     const totalView: number = Number(view);
-    if(totalView < 1000) {
-      return `${view} views`
-    }
-    if(totalView < 1000000) { // < 1M view 
-      const views: number = Math.floor(totalView/1000);
-      return `${views}K views`;
-    }
-    if(totalView < 1000000000) {
-      const views: number = Math.floor(totalView/1000000);
-      return `${views}M views`;
-    }
-    if(totalView < 1000000000000) {
-      const views: number = Math.floor(totalView/1000000000);
-      return `${views}B views`; 
-    }
+    if(totalView < 1000) return `${view}`;
+    if(totalView < 1000000) return `${Math.floor(totalView/1000)}K`; //  K views
+    if(totalView < 1000000000) return `${Math.floor(totalView/1000000)}M`; // M views
+    if(totalView < 1000000000000) return `${Math.floor(totalView/1000000000)}B`; // B views
   }
-    return(
-<div className=" mx-auto px-10 py-2 text-white min-h-screen">
+
+  return(
+    <div className=" mx-auto px-10 py-2 text-white min-h-screen">
       
       {/* Header and clear button */}
       <div className="flex justify-between items-center mb-6">
@@ -109,5 +98,5 @@ const [historyList, setHistoryList] = useState<any[]>([]);
         </div>
       )}
     </div>
-    );
+  );
 }

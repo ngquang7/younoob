@@ -8,25 +8,18 @@ interface HeaderProps {
 }
 export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: HeaderProps ) {
   const [searchText, setSearchText] = useState('');
-  
-  const handleChange =  (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchText(e.target.value);
-  }
-  // TEST
-  // console.log(`${searchText}`);
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
 
-  if(isLogin == true) {
-    navigate(`/login`);
-  }
+  const handleChange =  (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);  /* TEST console.log(`${searchText}`); */
+  
+  const handleLoginClick = () => navigate('/login');
 
   const handleSubmit = (e: React.SubmitEvent) => {
-    e.preventDefault(); // Ngăn trang refresh lại
-    onCustomClick(searchText.trim()); // Pass searchText value into goToSearchResults
+    e.preventDefault(); // Stop page refresh
+    onCustomClick(searchText.trim()); // Pass searchText value into goSearchResults
   };
 
-    return (
+  return (
     <nav className="fixed top-0 left-0 right-0 h-14 bg-[#0f0f0f] flex items-center justify-between px-4 z-50 select-none border-b border-[#212121]">
       {/* Left Area: SidebarButton & Logo */}
       <div className="flex items-center gap-4">
@@ -42,14 +35,13 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
           id="nav-logo"
           className="flex items-center gap-1.5 cursor-pointer active:scale-98 transition group"
         >
-
           <span onClick={goHome} title="Youtube Home" className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
             <img src="/public/logo-white.png" className="w-30 h-8"/>
           </span>
         </div>
       </div>
 
-  { /* Search bar */}
+      { /* Middle area: Search bar */}
       <form onSubmit={handleSubmit} className="flex-1 max-2xl mx-4 hidden md:flex items-center ml-60 mr-100 " >
         <div className="flex flex-1 items-center bg-[#121212] border border-[#303030] rounded-l-full px-4 py-1.5 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
           <input
@@ -61,7 +53,7 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
           />
         </div>
 
-      {/* Submit (Finding) button */}
+        {/* Submit (Finding) button */}
         <button
           onClick={() => onCustomClick(searchText)} 
           type="submit"
@@ -72,11 +64,12 @@ export default function Header ( {  onToggleSidebar, onCustomClick, goHome}: Hea
 
       <div className="flex items-center gap-2 md:gap-3">
         <button
-        onClick={() => setIsLogin(!isLogin)}
-        className="border-1 rounded-full border-[#0000ff] h-7 w-18 hover: flex items-center justify-center cursor-pointer transition">
-          
+        onClick={handleLoginClick}
+        className="border-1 rounded-full border-[#0000ff] h-7 w-18 hover: flex items-center justify-center cursor-pointer transition"
+        >
+          Login
         </button>
       </div>
     </nav>
-    );
+  );
 }

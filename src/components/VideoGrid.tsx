@@ -6,15 +6,13 @@ interface VideoGridProps {
   goWatch: (videoId: string) => void;
 }
 export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
+  const [isHovered, setIsHovered] = useState(false);
 
-  const [isHovered, setIsHovered] = useState(false);  
   const getTimeago = (date: string) => {
     const videoDate = new Date(date);
     const currentTime = new Date();
     const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
-
     if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-
     if (timeAgo < 3600) { // MINUTE
       const minutes = Math.floor(timeAgo / 60);
       return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
@@ -40,14 +38,15 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
     return `${years} year${years > 1 ? 's' : '' } ago`;
   }
 
-    return (
+  return (
     <div
       className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
       onClick={() => {
         if (video.id.videoId) {
-        goWatch(video.id.videoId);
+          goWatch(video.id.videoId);
         }
-          }}      >
+      }}
+      >
       {/* Thumbnail with overlay duration */}
       {/* adjust size here --------------------
                                               | */}
@@ -57,26 +56,26 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
         >
         {isHovered ? (
           <iframe
-        className="w-full h-full pointer-events-none"
-        //mute=1 -> mute
-        src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1`}
-        title="YouTube video preview"
-        allow="autoplay"
-      />
+            className="w-full h-full pointer-events-none"
+            //mute=1 -> mute
+            src={`https://www.youtube.com/embed/${video.id.videoId}?autoplay=1&mute=0&controls=0&modestbranding=1`}
+            title="YouTube video preview"
+            allow="autoplay"
+          />
         ) : (
-        <img
-          src={video.snippet.thumbnails.medium?.url}
-          // alt={video.snippet.title}
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-        />
-        )}
-        {/* Video duration */}
-          {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
-            video duration
-          </span> */}
+          <img
+            src={video.snippet.thumbnails.medium?.url}
+            // alt={video.snippet.title}
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          />
+          )}
+          {/* Video duration */}
+            {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
+              video duration
+            </span> */}
       </div>
 
-      {/* Details (Avatar, Title, Channel, Stats) */}
+      {/* Details (Avatar, Title, Channel, Stats) PART */}
       <div className="flex gap-3 px-1">
         {/* Channel Avatar */}
         <div className="shrink-0">
@@ -88,11 +87,10 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
           />
         </div>
 
-        {/* Text descriptions */}
+        {/* Title video */}
         <div className="flex flex-col gap-1 flex-1 min-w-0">
           <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
             {video.snippet.title}
-            a.
           </h3>
           
           <div className="flex flex-col gap-0.5">
@@ -106,8 +104,9 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
               <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
             </div>
           </div>
+
         </div>
       </div>
     </div>
-    );
+  );
 }

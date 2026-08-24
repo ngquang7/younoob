@@ -9,14 +9,25 @@ import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
 
 
 export default function WatchComponent() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const videoId = searchParams.get('v');
+
+
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isdisLiked, setDisIsLiked] = useState(false);
   const [isNotice, setisNotice] = useState(false);
   const [isExpandedDecription, setisExpandedDecription] = useState(false);    
   const [isAddComment, setIsAddComment] = useState(false);
+
+  const [video, setVideo] = useState<any>(null); //Video
   const [comments, setComments] = useState<any[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]);
+  const [commentText, setCommentText] = useState("");
+
+
   //Share button
   const handleShareClick = () => {
   const shareUrl = `https://youtube.com/watch?v=${videoId}`;
@@ -33,19 +44,17 @@ export default function WatchComponent() {
   const goWatch = (videoidd: string) => {
     navigate(`/watch?v=${videoidd}`);
   }
-  //Get videoID
-  const [searchParams] = useSearchParams();
-  const videoId = searchParams.get('v');
-  const [video, setVideo] = useState<any>(null); //Video
+  // Get videoID
   const [video1, setVideo1] = useState<any>(null); //Channel
   const [loading, setLoading] = useState<boolean>(false);
+  /* RELATED VIDEO */
   useEffect(() => {
     if (!videoId) return;
     const fetchVideo = async () => {
       setLoading(true);
       try {
         const response = await getVideosDetails(videoId);
-        //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
+          //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
           if (response.items && response.items.length > 0) {
             const videoItem = response.items[0];
             setVideo(response.items[0]);          
@@ -62,8 +71,8 @@ export default function WatchComponent() {
               const channelItem = response1.items[0]; //Store in a local variable
               setVideo1(channelItem); //Update state
               //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
+            }
           }
-        }
           const commentResponse = await getCommentData(videoId);
           if(commentResponse.items) {
             const commentItem = commentResponse.items[0];
@@ -75,18 +84,17 @@ export default function WatchComponent() {
         setLoading(false);
       }
     };
-
     fetchVideo();
   }, [searchParams]);
 
-  //Up next
-  const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]);
+
+  /* UP NEXT */
   const currenVideoTitle = video?.snippet?.title || "loading...";
   useEffect(() => {
     //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
     if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
     const fetchUpNext = async () => {
-      try{
+      try {
         const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
         const dataUpNext = await searchYouTube(cleanVideoTitle);
         setUpNextVideos(dataUpNext.items);
@@ -97,39 +105,37 @@ export default function WatchComponent() {
     fetchUpNext();
   },[currenVideoTitle]);
 
-
-
-
+  /*GO TO CHANNEL PAGE*/
   const channelId = video?.snippet?.channelId || "loading...";
-  const navigate = useNavigate();
-  const goChannel = () => {
-    navigate(`/channel/${channelId}`);
-  }
-
-  const [commentText, setCommentText] = useState("");
+  const goChannel = () => navigate(`/channel/${channelId}`);
+  
   const handleSubscribeToggle = () => {
     const nextState = !isSubscribed;
     setIsSubscribed(nextState);
 
-    // 1. Lấy danh sách kênh đã đăng ký cũ từ localStorage
+    // get the old subcription list from localStorage
+    // convert string to array
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
     
-    // 2. Gom thông tin của kênh hiện tại
+    // Add this channel into this localstorage, this is hashmap(key, value)
     const currentChannel = {
       id: video?.snippet?.channelId || 'unknown_id',
       title: video?.snippet?.channelTitle || 'Channel Name',
-      thumbnail: video1?.snippet?.thumbnails?.medium?.url || '', // Ảnh đại diện kênh
+      thumbnail: video1?.snippet?.thumbnails?.medium?.url || '', // avatar channel
     };
 
     if (nextState) {
-      // NẾU BẤM ĐĂNG KÝ (Subscribe): Thêm kênh vào mảng nếu chưa có
+      // if click subcribe (Subscribe): Add channel to array if it is not in array
       const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
       if (!exists) {
+        //add object(hashmap) into an array
+        //we get the old subcription list and push this object to the end of array
         const updatedSubs = [...savedSubs, currentChannel];
+        //localstorage only save string, so we have to convert array to string
         localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
       }
     } else {
-      // NẾU BẤM HỦY ĐĂNG KÝ (Unsubscribe): Lọc bỏ kênh này ra khỏi mảng
+      // IF WE UNSUBCRIBE (Unsubscribe): remove it from array
       const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
       localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
     }
@@ -138,15 +144,14 @@ export default function WatchComponent() {
   const handlePostComment = (e: React.FormEvent) => {
   e.preventDefault();
   if (!commentText.trim()) return;
-
-  // 1. Tạo object bình luận giả (cấu trúc phải khớp với API)
+  // Create a fake comment (the structure must be the same API)
   const newComment = {
     id: Date.now().toString(), // create a temporary ID 
     snippet: {
       topLevelComment: {
         snippet: {
           authorDisplayName: "Quang (You)", 
-          authorProfileImageUrl: "/public/Q.png", // Ảnh avatar tạm
+          authorProfileImageUrl: "/public/Q.png", // Avatar
           textDisplay: commentText,
           publishedAt: new Date().toISOString(),
           likeCount: 0
@@ -154,7 +159,7 @@ export default function WatchComponent() {
       }
     }
   };
-  //cập nhật state (thêm vào đầu danh sách)
+  //Update state (add to the first array)
   setComments([newComment, ...comments]);
   //total comments + 1 
   if (video && video.statistics) {
@@ -167,11 +172,12 @@ export default function WatchComponent() {
       }
     });
   }
-  //Reset input và close button
-  setCommentText("");
-  setIsAddComment(false);
-};
-  //History video
+    //Reset input và close button
+    setCommentText("");
+    setIsAddComment(false);
+  };
+
+  /* History video */
   useEffect(() => {
     if (video && video.id) {
       // Get the list of history, if it's null, intialize it with empty list
@@ -219,35 +225,35 @@ export default function WatchComponent() {
 
 
   const getTimeago = (date: string) => {
-      const videoDate = new Date(date);
-      const currentTime = new Date();
-      const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
+    const videoDate = new Date(date);
+    const currentTime = new Date();
+    const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
-      if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-      if (timeAgo < 3600) { // MINUTE
-        const minutes = Math.floor(timeAgo / 60);
-        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-      } 
-      if (timeAgo < 86400) { // HOUR
-        const hours = Math.floor(timeAgo/3600);
-        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      } 
-      if (timeAgo < 604800) { // DAY
-        const days = Math.floor(timeAgo / 86400);
-        return `${days} day${days > 1 ? 's' : '' } ago`;
-      } 
-      if (timeAgo < 2592000) { // WEEK
-        const weeks = Math.floor(timeAgo / 604800);
-        return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
-      } 
-      if (timeAgo < 31536000) { // MONTH
-        const months = Math.floor(timeAgo / 2592000);
-        return `${months} month${months > 1 ? 's' : '' } ago`;
-      }  
-      //YEAR
-      const years = Math.floor(timeAgo / 31536000);
-      return `${years} year${years > 1 ? 's' : '' } ago`;
-    }
+    if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+    if (timeAgo < 3600) { // MINUTE
+      const minutes = Math.floor(timeAgo / 60);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    } 
+    if (timeAgo < 86400) { // HOUR
+      const hours = Math.floor(timeAgo/3600);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } 
+    if (timeAgo < 604800) { // DAY
+      const days = Math.floor(timeAgo / 86400);
+      return `${days} day${days > 1 ? 's' : '' } ago`;
+    } 
+    if (timeAgo < 2592000) { // WEEK
+      const weeks = Math.floor(timeAgo / 604800);
+      return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
+    } 
+    if (timeAgo < 31536000) { // MONTH
+      const months = Math.floor(timeAgo / 2592000);
+      return `${months} month${months > 1 ? 's' : '' } ago`;
+    }  
+    //YEAR
+    const years = Math.floor(timeAgo / 31536000);
+    return `${years} year${years > 1 ? 's' : '' } ago`;
+  }
 
   const getView = (view: string) => {
     const totalView: number = Number(view);
@@ -295,12 +301,10 @@ export default function WatchComponent() {
   }
 
   return (
-    // 
-  <div className="w-full mx-auto px-4 py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
-      
-      {/* Left Column (Video Player + Description + Comments) */}
+    <div className="w-full mx-auto px-4 py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+
+      {/* LEFT COLUMN (Video Player + Description + Comments) */}
       <div className="flex-1 min-w-0">
-        
         {/* Responsive Video Container */}
         {/* width video, w-full, it will be automatically suitable */}
         <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
@@ -312,18 +316,17 @@ export default function WatchComponent() {
           ></iframe>
         </div>
 
-      {/* Video Title */}
+        {/* Video Title */}
         <h1 className="text-lg md:text-xl font-sans font-bold mt-4 leading-snug">
           {video?.snippet?.title || "..Loading.."}
         </h1>
 
-        {/* Action Controls & Channel Details Row */}
+        {/* Action & Channel details row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-3 pb-4 border-b border-[#2d2d2d]">
-          {/* Channel Avatar & Subscribers & Subscribe Trigger */}
+          {/* Channel avatar & subscribers & subscribe trigger */}
           <div className="flex items-center gap-3">
             <img
               src={video1?.snippet?.thumbnails.medium?.url || "..Loading.."}
-            //   alt={video.channelTitle}
               className="w-10 h-10 rounded-full object-cover border border-[#303030]"
             />
             <div className="flex flex-col">
@@ -357,7 +360,7 @@ export default function WatchComponent() {
                 {getLike(video?.statistics?.likeCount)} likes
               </button>
                 {/* dislike button */}
-                  {/* Pay attention to hover */}
+                {/* Pay attention to hover */}
               <button
               onClick={() => setDisIsLiked(!isdisLiked)}
               className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] transition text-xs font-semibold cursor-pointer
@@ -437,93 +440,94 @@ export default function WatchComponent() {
           </div>
         </div>
         
-      {/* COMMENTS */}
-      <div className="mt-6">
-
-        <div className="flex items-center gap-2 mb-6">
-          <h1 className="text-base font-bold tracking-tight font-sans">
-          {video?.statistics?.commentCount || "Loading..."} Comments
-          </h1>
-        </div>
-        {/* MY COMMENT */}
-        <form onSubmit={handlePostComment} className="flex gap-3 mb-6">
-          <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
-              Q
+        {/* COMMENTS */}
+        <div className="mt-6">
+          <div className="flex items-center gap-2 mb-6">
+            <h1 className="text-base font-bold tracking-tight font-sans">
+            {video?.statistics?.commentCount || "Loading..."} Comments
+            </h1>
           </div>
+          {/* MY COMMENT */}
+          <form onSubmit={handlePostComment} className="flex gap-3 mb-6">
+            <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
+                Q
+            </div>
 
-          <div className="flex-1 flex flex-col gap-2">
-            <input
-              type="text"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)} // Lưu nội dung nhập
-              onClick={() => setIsAddComment(true)}
-              placeholder="Add a comment..."
-              className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
-            />
-              <div className="flex justify-end gap-2 animate-in fade-in duration-100">
-                {isAddComment &&
-                <>
-                <button 
-                  onClick={() => {
-                    setIsAddComment(false);
-                    setCommentText("");
-                  }}
-                  className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
-                  >
-                  Cancel
-                </button>
-                {/* type="submit" */}
-                <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
-                  Comment
-                </button>
-                </>
-                  }
-              </div>    
-          </div>
-        </form>
-        {/* Insert a comment into comments list */}
-        {comments.map((item) => {
-          const comment = item.snippet.topLevelComment.snippet;
-          return (
-              <div key={item.id} className="flex gap-4">
-                  <img 
-                      src={comment.authorProfileImageUrl} 
-                      className="w-10 h-10 rounded-full cursor-pointer" 
-                      alt="avatar"
-                      onClick={() => setPreviewImage(comment.authorProfileImageUrl)}
-                  />
-                  <div className="flex flex-col mb-8">
-                      <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
-                          <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
-                      </div>
-                      <p className="text-sm mt-1 text-gray-200">{comment.textDisplay}</p>
-                      <div className="flex items-center gap-4 mt-2">
-                          <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
-                      </div>
-                  </div>
-                  {previewImage && (
-                    <div 
-                      className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-                      onClick={() => setPreviewImage(null)}
+            <div className="flex-1 flex flex-col gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)} // Lưu nội dung nhập
+                onClick={() => setIsAddComment(true)}
+                placeholder="Add a comment..."
+                className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
+              />
+                <div className="flex justify-end gap-2 animate-in fade-in duration-100">
+                  {isAddComment &&
+                  <>
+                  <button 
+                    onClick={() => {
+                      setIsAddComment(false);
+                      setCommentText("");
+                    }}
+                    className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
                     >
-                        {/* Want preview bigger ? Modify w-64 h-64 */}
-                        <img 
-                          src={previewImage} 
-                          alt="Preview Large" 
-                          className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
-                        />
-                      </div>
-                  )}
+                    Cancel
+                  </button>
+                  {/* type="submit" */}
+                  <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
+                    Comment
+                  </button>
+                  </>
+                    }
+                </div>    
               </div>
-            );
-        })}
-    </div>
-  </div>
-    
+          </form>
+
+            {/* Insert a comment into comments list */}
+            {comments.map((item) => {
+              const comment = item.snippet.topLevelComment.snippet;
+              return (
+                  <div key={item.id} className="flex gap-4">
+                      <img 
+                          src={comment.authorProfileImageUrl} 
+                          className="w-10 h-10 rounded-full cursor-pointer" 
+                          alt="avatar"
+                          onClick={() => setPreviewImage(comment.authorProfileImageUrl)}
+                      />
+                      <div className="flex flex-col mb-8">
+                          <div className="flex items-center gap-2">
+                              <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
+                              <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
+                          </div>
+                          <p className="text-sm mt-1 text-gray-200">{comment.textDisplay}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                              <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
+                          </div>
+                      </div>
+                      {previewImage && (
+                        <div 
+                          className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                          onClick={() => setPreviewImage(null)}
+                        >
+                            {/* Want preview bigger ? Modify w-64 h-64 */}
+                            <img 
+                              src={previewImage} 
+                              alt="Preview Large" 
+                              className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
+                            />
+                        </div>
+                      )}
+                  </div>
+                );
+            })}
+        </div>
+      </div>
+      
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-200 lg:w-[300px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
+        
         {upNextVideos.map((video) => (
           <div
           onClick={() => {
@@ -562,7 +566,6 @@ export default function WatchComponent() {
           </div>
         ))}
       </div>
-  </div>
-
-    );
+    </div>
+  );
 }

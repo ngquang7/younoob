@@ -5,33 +5,30 @@ import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/LeftBar'
 
 const HomePage = () => {
-
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
-  const goHome = () => {
-    navigate(`/`);
-  }
-
-  const goHistory = () => {
-    navigate(`/history`);
-  }
-  const goToSearchResults = (search: String) => {
+  const goHome = () => navigate(`/`)
+  const goHistory = () => navigate(`/history`);
+  
+  const goSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
   };
-    useEffect(() => {
+
+  useEffect(() => {
       if (window.innerWidth < 768) {
-      setSidebarExpanded(false);
-    }
+        setSidebarExpanded(false);
+      }
     }, []);
   return (
-  <>
+    <>
       <Header
         goHome={goHome}
         onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
-        onCustomClick={goToSearchResults}
+        onCustomClick={goSearchResults}
       />
+
       <LeftBar
         goHome={goHome}
         goHistory={goHistory}
@@ -39,9 +36,9 @@ const HomePage = () => {
       />
       
       <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-          {/* <VideoGrid /> */}
+          {/* Component */}
       </main>
-  </>
-);
+    </>
+  );
 }
 export default HomePage;
