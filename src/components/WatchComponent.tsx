@@ -112,7 +112,6 @@ export default function WatchComponent() {
   const handleSubscribeToggle = () => {
     const nextState = !isSubscribed;
     setIsSubscribed(nextState);
-
     // get the old subcription list from localStorage
     // convert string to array
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
@@ -140,6 +139,28 @@ export default function WatchComponent() {
       localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
     }
   };
+
+  const handleLikeToggle = () => {
+    if (!video || !video.id) return;
+
+    const existingLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+    const isAlreadyLiked = existingLikedVideos.some((v: any) => v.id === video.id);
+
+    let updatedLikedVideos;
+    if (isAlreadyLiked) {
+      // Nếu đã like rồi -> Bấm lần nữa là UNLIKE (gỡ ra)
+      updatedLikedVideos = existingLikedVideos.filter((v: any) => v.id !== video.id);
+      setIsLiked(false); // Cập nhật lại state giao diện thành chưa like
+    } else {
+      // Nếu chưa like -> Thêm vào danh sách
+      updatedLikedVideos = [video, ...existingLikedVideos];
+      setIsLiked(true); // Cập nhật lại state giao diện thành đã like
+    }
+    
+    // Lưu lại vào localStorage
+    localStorage.setItem('like_video', JSON.stringify(updatedLikedVideos));
+  };
+
 
   const handlePostComment = (e: React.FormEvent) => {
   e.preventDefault();
@@ -195,7 +216,18 @@ export default function WatchComponent() {
     }
   }, [video]);
 
-//Khi vao lai video của channel đó, mà channel đó đã subcribe thì nó sẽ check, subcribe rồi thì sẽ được giữ nguyên
+  /* Like, check is it liked or not */ 
+  useEffect(() => {
+    if (video && video.id) {
+      const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+      
+      const isLiked = saveLikedVideos.some((v: any) => v.id === video.id);
+      
+      setIsLiked(isLiked);
+    }
+  }, [video]);
+
+  /* Subcribe, check is it subcribed or not */
   useEffect(() => {
     if (video && video.snippet?.channelId) {
       const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
@@ -351,7 +383,7 @@ export default function WatchComponent() {
             {/* Likes */}
             <div className="flex items-center bg-[#212121] rounded-full border border-[#303030]/50 shrink-0">
               <button
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={handleLikeToggle}
                 className={`flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer
                 ${
                   isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
@@ -381,7 +413,6 @@ export default function WatchComponent() {
               onClick={handleShareClick}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
             >
-
               <span>Share</span>
             </button>
             {isNotice && (
@@ -402,7 +433,7 @@ export default function WatchComponent() {
 
             {isExpandedDecription ? (
               <>
-              <span>{video?.statistics?.viewCount}</span>
+              <span>{video?.statistics?.viewCount} views</span>
               <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
               </>
             ) : (

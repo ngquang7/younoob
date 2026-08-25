@@ -18,9 +18,10 @@ const SearchResultsPage = () => {
   const controller = new AbortController();   // Cleanup Function 
 
   const goHome = () => navigate(`/`);
-  const goHistory = () => navigate(`/history`);
+  const goHistory = () => navigate(`/feed/history`);
   const goWatch = (videoidd: string) => navigate(`/watch?v=${videoidd}`);
-
+  const goChannel = (channelId: string) => navigate(`/channel/${channelId}`);
+  
   const handleSearchAgain = (searchTerm: string) => {
     navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
   };
@@ -107,6 +108,7 @@ const SearchResultsPage = () => {
           key={typeof video.id === 'string' ? video.id : video.id.videoId}        
           video={video}
           goWatch={goWatch}
+          goChannel={goChannel}
           />
           ))}
       </main>

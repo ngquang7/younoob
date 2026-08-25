@@ -9,7 +9,7 @@ const HomePage = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
   const goHome = () => navigate(`/`)
-  const goHistory = () => navigate(`/history`);
+  const goHistory = () => navigate(`/feed/history`);
   
   const goSearchResults = (search: String) => {
     // Navigate to a new route with query parameters

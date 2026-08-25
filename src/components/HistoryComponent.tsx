@@ -36,11 +36,11 @@ export default function HistoryComponent () {
   }
 
   return(
-    <div className=" mx-auto px-10 py-2 text-white min-h-screen">
+    <div className="mx-auto px-10 py-2 text-white min-h-screen">
       
       {/* Header and clear button */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold font-sans">Watch History</h1>
+        <h1 className="text-3xl font-bold font-sans mt-3 ml-3">Watch History</h1>
         {historyList.length > 0 && (
           <button 
             onClick={clearAllHistory}

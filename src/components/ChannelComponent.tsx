@@ -12,8 +12,7 @@ export default function ChannelComponent () {
     const goWatch = (videoidd: string) => {
         navigate(`/watch?v=${videoidd}`);
     }
-  const [isHovered, setIsHovered] = useState(false);  
-
+    const [isHovered, setIsHovered] = useState(false);  
     const [channel, setChannel] = useState<any>(null); //Channel
     const [channelVideo, setChannelVideo] = useState<YouTubeSearchItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -27,25 +26,12 @@ export default function ChannelComponent () {
             try {
                 const channelIn4 = await getChannelData(channelId);
                 const videoChannel = await searchYouTube(undefined, undefined, channelId);
-            if(channelIn4.items && channelIn4.items.length > 0) {
-                const channelItem = channelIn4.items[0];
-                setChannel(channelIn4.items);
-                
-                console.log("--- THÔNG TIN KÊNH ---");
-                    
-                console.log("Tên kênh (Title):", channelItem.snippet?.title);
-                console.log("Mô tả (Description):", channelItem.snippet?.description);
-                console.log("Custom URL:", channelItem.snippet?.customUrl);
-                console.log("Ảnh đại diện:", channelItem.snippet?.thumbnails?.default?.url);
-                console.log("Ảnh bìa (Banner):", channelItem.brandingSettings?.image?.bannerExternalUrl);
-                
-                // Phần thống kê (statistics)
-                console.log("Số người đăng ký:", channelItem.statistics?.subscriberCount);
-                console.log("Tổng số video:", channelItem.statistics?.videoCount);
-                console.log("Tổng lượt xem:", channelItem.statistics?.viewCount);
+                if(channelIn4.items && channelIn4.items.length > 0) {
+                    const channelItem = channelIn4.items[0];
+                    setChannel(channelIn4.items);
                 }
                 setChannelVideo(videoChannel.items);
-            }  catch (error) {
+            } catch (error) {
                 console.error("Failed to fetch video:", error);
             } finally {
                 setLoading(false);
@@ -54,35 +40,35 @@ export default function ChannelComponent () {
         fetchVideo();
     }, [channelId]);
     
-const getTimeago = (date: string) => {
-      const videoDate = new Date(date);
-      const currentTime = new Date();
-      const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
+    const getTimeago = (date: string) => {
+        const videoDate = new Date(date);
+        const currentTime = new Date();
+        const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
-      if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-      if (timeAgo < 3600) { // MINUTE
+        if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+        if (timeAgo < 3600) { // MINUTE
         const minutes = Math.floor(timeAgo / 60);
         return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-      } 
-      if (timeAgo < 86400) { // HOUR
+        } 
+        if (timeAgo < 86400) { // HOUR
         const hours = Math.floor(timeAgo/3600);
         return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      } 
-      if (timeAgo < 604800) { // DAY
+        } 
+        if (timeAgo < 604800) { // DAY
         const days = Math.floor(timeAgo / 86400);
         return `${days} day${days > 1 ? 's' : '' } ago`;
-      } 
-      if (timeAgo < 2592000) { // WEEK
+        } 
+        if (timeAgo < 2592000) { // WEEK
         const weeks = Math.floor(timeAgo / 604800);
         return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
-      } 
-      if (timeAgo < 31536000) { // MONTH
+        } 
+        if (timeAgo < 31536000) { // MONTH
         const months = Math.floor(timeAgo / 2592000);
         return `${months} month${months > 1 ? 's' : '' } ago`;
-      }  
-      //YEAR
-      const years = Math.floor(timeAgo / 31536000);
-      return `${years} year${years > 1 ? 's' : '' } ago`;
+        }  
+        //YEAR
+        const years = Math.floor(timeAgo / 31536000);
+        return `${years} year${years > 1 ? 's' : '' } ago`;
     }
 
     return(
@@ -102,8 +88,7 @@ const getTimeago = (date: string) => {
 
                     <div
                         className="flex flex-col items-top"
-                        
-                        >
+                    >
                         <h1 className="text-4xl font-bold text-white">
                             {channel?.[0]?.snippet?.title}
                         </h1>
@@ -126,8 +111,7 @@ const getTimeago = (date: string) => {
                             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
                         >
                             {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
-                            <div onClick={(e) => e.stopPropagation()} className="bg-[#212121] text-white w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative border border-gray-700">
-                                
+                            <div onClick={(e) => e.stopPropagation()} className="bg-[#212121] text-white w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative border border-gray-700 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
                                 {/* Nút Đóng (Dấu X góc trên bên phải) */}
                                 <button 
                                     onClick={() => setIsModalOpen(false)}
@@ -181,16 +165,15 @@ const getTimeago = (date: string) => {
             className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
             onClick={() => {
                 if (video.id.videoId) {
-                goWatch(video.id.videoId);
+                    goWatch(video.id.videoId);
                 }
-                }}      >
+            }}      
+        >
 
             <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                >
-
-            
+            >
                 <img
                 src={video.snippet.thumbnails.medium?.url}
                 // alt={video.snippet.title}

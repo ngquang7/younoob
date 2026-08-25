@@ -1,28 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import VideoGrid from '../components/VideoGrid';
-import LeftBar from '../components/LeftBar'
-import HistoryComponent from '../components/HistoryComponent';
+import LeftBar from '../components/LeftBar';
+import LikedVideoComponent from '../components/LikedVideoComponent';
 
-const HistoryPage = () => {
+const LikedVideoPage = () => {
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
-  const goHome = () => navigate(`/`);
+  const goHome = () => navigate(`/`)
   const goHistory = () => navigate(`/feed/history`);
-    
+  
   const goSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
   };
-  
+
   useEffect(() => {
       if (window.innerWidth < 768) {
         setSidebarExpanded(false);
-    }
+      }
     }, []);
-
   return (
     <>
       <Header
@@ -32,15 +30,15 @@ const HistoryPage = () => {
       />
 
       <LeftBar
-        goHistory={goHistory}
         goHome={goHome}
+        goHistory={goHistory}
         expanded={sidebarExpanded}
       />
       
       <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-          <HistoryComponent />
+          <LikedVideoComponent/>
       </main>
     </>
   );
 }
-export default HistoryPage;
+export default LikedVideoPage;

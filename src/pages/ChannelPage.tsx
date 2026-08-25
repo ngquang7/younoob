@@ -10,7 +10,7 @@ const ChannelPage = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   
   const goHome = () => navigate(`/`);
-  const goHistory = () => navigate(`/history`);
+  const goHistory = () => navigate(`/feed/history`);
 
   const goSearchResults = (search: string) => {
     // Navigate to a new route with query parameters

@@ -1,13 +1,30 @@
+import { useNavigate } from "react-router-dom";
 import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
-import {useState} from 'react';
+import {useState, useRef} from 'react';
 // Interface
 interface VideoGridProps {
   video: YouTubeSearchItem;
   goWatch: (videoId: string) => void;
-}
-export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
-  const [isHovered, setIsHovered] = useState(false);
+  goChannel: (channelId: string) => void;
 
+}
+export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
+
+  const handleMouseEnter = () => {
+    timerRef.current = setTimeout(() => {
+        setIsHovered(true);
+    }, 1100);
+  };
+
+  const handleMouseLeave = () => {
+    if (timerRef.current) {
+        clearTimeout(timerRef.current); // Hủy đếm giờ nếu rời chuột trước 3s
+    }
+    setIsHovered(false);
+  };
   const getTimeago = (date: string) => {
     const videoDate = new Date(date);
     const currentTime = new Date();
@@ -51,9 +68,9 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
       {/* adjust size here --------------------
                                               | */}
       <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        >
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {isHovered ? (
           <iframe
             className="w-full h-full pointer-events-none"
@@ -81,7 +98,6 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
         <div className="shrink-0">
           <img
             src={video.snippet.thumbnails.default?.url}
-            alt={video.snippet.channelTitle}
             className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
             referrerPolicy="no-referrer"
           />
@@ -94,7 +110,13 @@ export default function VideoGrid ( {video, goWatch}: VideoGridProps) {
           </h3>
           
           <div className="flex flex-col gap-0.5">
-            <span className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate">
+            <span 
+              onClick={(e) => {
+                e.stopPropagation();
+                goChannel(video.snippet.channelId);
+              }}
+              className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate"
+            >
               {video.snippet.channelTitle}
             </span>
             {/* View */}

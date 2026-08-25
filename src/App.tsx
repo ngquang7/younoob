@@ -1,9 +1,6 @@
 import './App.css'
-import React, { useState } from "react";
-import Header from './components/Header';
 // import YoutubeGrid from './components/YoutubeGrid'
-import LeftBar from './components/LeftBar'
-import { useEffect } from 'react';
+
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage  from './pages/HomePage.tsx';
@@ -12,6 +9,8 @@ import WatchPage from './pages/WatchPage';
 import LoginPage from './pages/LoginPage';
 import HistoryPage from './pages/HistoryPage.tsx';
 import ChannelPage from './pages/ChannelPage.tsx';
+import SubcriptionPage from './pages/SubcriptionPage.tsx';
+import LikedVideoPage from './pages/LikedVideoPage.tsx';
 
 function App() {
 
@@ -23,8 +22,11 @@ function App() {
       <Route path="/search" element={<SearchResultsPage />} />
       <Route path="/watch" element={<WatchPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/history" element={<HistoryPage/>} />
+      <Route path="/feed/history" element={<HistoryPage/>} />
       <Route path="/channel/:channelId" element={<ChannelPage />} />
+      <Route path ="/feed/channels" element={<SubcriptionPage />} />
+      <Route path ="/feed/channels" element={<SubcriptionPage />} />
+      <Route path ="/likedvideo" element={<LikedVideoPage />} />
     </Routes>
   </BrowserRouter>
 </>
