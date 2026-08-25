@@ -14,6 +14,7 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
   const goChannel = (chanelId: string) => navigate(`/channel/${chanelId}`);
   const goSubcriptionChannel = () => navigate(`/feed/channels`);
   const goLikeVideo = () => navigate(`/likedvideo`);
+  const goYou = () => navigate(`/feed/you`);
   // Read the list that is subcribed in localStorage when Sidebar turn on
   useEffect(() => {
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
@@ -40,6 +41,7 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
             {/* Profile */}
             <button
               className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+              onClick={goYou}
             >
                 <img src="/public/avatar.png" className="h-8 w-8"/>
             </button>
@@ -102,8 +104,11 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
 
         {/* YOU section */}
         <div className="flex flex-col gap-0.5 ">
-            <button className="mb-1 flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white">
-                you &gt;
+            <button 
+              className="mb-1 flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+              onClick={goYou}
+            >
+              you &gt;
             </button>
           {/* History button */}
             <button

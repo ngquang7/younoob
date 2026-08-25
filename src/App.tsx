@@ -11,6 +11,7 @@ import HistoryPage from './pages/HistoryPage.tsx';
 import ChannelPage from './pages/ChannelPage.tsx';
 import SubcriptionPage from './pages/SubcriptionPage.tsx';
 import LikedVideoPage from './pages/LikedVideoPage.tsx';
+import YouPage from './pages/YouPage.tsx';
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
       <Route path ="/feed/channels" element={<SubcriptionPage />} />
       <Route path ="/feed/channels" element={<SubcriptionPage />} />
       <Route path ="/likedvideo" element={<LikedVideoPage />} />
+      <Route path ="/feed/you" element={<YouPage />} />
     </Routes>
   </BrowserRouter>
 </>

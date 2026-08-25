@@ -1,11 +1,8 @@
-import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {useState, useEffect} from 'react';
-import { video } from 'motion/react-m';
-import type { YoutubeVideo } from '../api/youtubeSearch';
-import {getVideosDetails} from "../api/videoWatchInformation";
 import {getChannelData} from '../api/channelData';
-import { getCommentData } from '../api/commentData';
 import {searchYouTube, type YouTubeSearchItem} from "../api/youtubeSearch.ts";
+
 export default function ChannelComponent () {
 
     const navigate = useNavigate();
@@ -77,8 +74,6 @@ export default function ChannelComponent () {
                 src={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl || "Loading..."}
                 className="w-full h-45 object-cover rounded-2xl"
             />
-        
-            
                 <div className="flex gap-4 mt-10 items-start">
                     <img 
                     src={channel?.[0]?.snippet?.thumbnails?.medium?.url} 
