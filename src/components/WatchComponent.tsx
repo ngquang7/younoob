@@ -415,12 +415,21 @@ export default function WatchComponent() {
             >
               <span>Share</span>
             </button>
+
+            <button 
+              onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')}
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
+            >
+              Open on Youtube
+            </button>
             {isNotice && (
               <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
                 Copy link Successfull !
               </div>
             )}
           </div>
+
+
         </div>
 
         {/* DESCRIPTION CARD */}

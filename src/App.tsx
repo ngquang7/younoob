@@ -26,7 +26,6 @@ function App() {
       <Route path="/feed/history" element={<HistoryPage/>} />
       <Route path="/channel/:channelId" element={<ChannelPage />} />
       <Route path ="/feed/channels" element={<SubcriptionPage />} />
-      <Route path ="/feed/channels" element={<SubcriptionPage />} />
       <Route path ="/likedvideo" element={<LikedVideoPage />} />
       <Route path ="/feed/you" element={<YouPage />} />
     </Routes>
@@ -34,5 +33,4 @@ function App() {
 </>
   );
 }
-
 export default App
