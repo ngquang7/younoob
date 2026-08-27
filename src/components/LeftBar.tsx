@@ -13,8 +13,9 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
 
   const goChannel = (chanelId: string) => navigate(`/channel/${chanelId}`);
   const goSubcriptionChannel = () => navigate(`/feed/channels`);
-  const goLikeVideo = () => navigate(`/likedvideo`);
+  const goLikeVideo = () => navigate(`/playlist?list=LL`);
   const goYou = () => navigate(`/feed/you`);
+  const goPlayList = () => navigate(`/feed/playlists`);
   // Read the list that is subcribed in localStorage when Sidebar turn on
   useEffect(() => {
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
@@ -140,6 +141,7 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
             <button
                 className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
                 title="Playlist"
+                onClick={goPlayList}
             >
               <img src="/public/playlist.png" className="h-7.5 w-7.5"/>
               <div className="text-base">Playlist</div>

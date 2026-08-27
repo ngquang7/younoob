@@ -25,6 +25,8 @@ export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps)
     }
     setIsHovered(false);
   };
+
+  
   const getTimeago = (date: string) => {
     const videoDate = new Date(date);
     const currentTime = new Date();

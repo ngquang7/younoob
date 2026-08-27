@@ -5,7 +5,7 @@ export default function LikedVideoComponent () {
     const [likedVideoList, setlikedVideoList] = useState<any[]>([]);
     const navigate = useNavigate();
 
-    // Load history when go to this page
+    // Load like_video when go to this page
     useEffect(() => {
         const savedLikedVideo = JSON.parse(localStorage.getItem('like_video') || '[]');
         setlikedVideoList(savedLikedVideo);
@@ -53,6 +53,7 @@ export default function LikedVideoComponent () {
     return(
     <>
         <div className="flex items-start gap-6 p-6">  
+            {/* Left */}
             <aside className="fixed ml-65 mb-5 left-0 top-18 bottom-0 w-100 bg-zinc-900 z-40 border-r border-zinc-800 rounded-[15px]">
                 {likedVideoList.length > 0 ? (
                 <>
@@ -81,6 +82,7 @@ export default function LikedVideoComponent () {
                 )}
             </aside>
 
+            {/* Right */}
             <div className="flex-1 ml-100 flex flex-col h-1000 gap-4">
                 {likedVideoList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
