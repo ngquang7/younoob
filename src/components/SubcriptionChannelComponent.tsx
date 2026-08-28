@@ -45,7 +45,7 @@ export default function SubcriptionChannel () {
             return subId !== channelToUnsub.id;
         });
 
-        // Cập nhật lại localStorage
+        // Update localStorage again
         localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
 
         // Cập nhật lại state giao diện để mất kênh này đi ngay lập tức
