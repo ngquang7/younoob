@@ -49,7 +49,7 @@ export async function getCommentData(
         part: "snippet",
         videoId: idParam,
         key: apiKey,
-        maxResults: 10000,
+        maxResults: 3,
     },
     });
 

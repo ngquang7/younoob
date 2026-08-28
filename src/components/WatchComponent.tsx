@@ -87,12 +87,24 @@ export default function WatchComponent() {
     fetchVideo();
   }, [searchParams]);
 
+  const listId = searchParams.get('list');
+  const [playListVideo, setPlayListVideo] = useState<any[]>([]);
+
+  useEffect(() => {
+    if(listId === 'LL') {
+      const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+      setPlayListVideo(savedLikedVideos);
+    } else {
+      return;
+    }
+  },[])
 
   /* UP NEXT */
   const currenVideoTitle = video?.snippet?.title || "loading...";
   useEffect(() => {
     //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
     if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
+    if (listId === 'LL') return;
     const fetchUpNext = async () => {
       try {
         const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
@@ -565,10 +577,53 @@ export default function WatchComponent() {
       </div>
       
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
-      <div className="w-200 lg:w-[300px] shrink-0 flex flex-col gap-4">
+      <div className="w-200 lg:w-[350px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
-        
-        {upNextVideos.map((video) => (
+        {listId === 'LL' ? (
+          <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
+            {/* Header của Playlist ở sidebar */}
+            <div className="bg-[#212121] p-3 rounded-xl border border-[#303030]">
+              <h3 className="font-sans font-bold text-sm text-white">Liked videos</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Private • Playlist • {playListVideo.length} videos</p>
+            </div>
+
+            {/* List video in playlist */}
+            {playListVideo.map((item, index) => (
+              <div
+                key={item.id}
+                onClick={() => navigate(`/watch?v=${item.id}&list=${listId}&index=${index + 1}`)}
+                className={`flex gap-3 group cursor-pointer p-1.5 transition ${
+                  item.id === videoId ? 'bg-[#3f3f3f]' : 'hover:bg-[#272727]'
+                }`}
+              >
+                <span className="text-xs text-gray-400 flex items-center justify-center w-4 shrink-0 font-medium">
+                  {index + 1}
+                </span>
+                
+                <div className="relative w-25 aspect-video rounded-md overflow-hidden shrink-0 bg-[#212121]">
+                  <img
+                    src={item?.snippet?.thumbnails?.medium?.url || item?.snippet?.thumbnails?.default?.url}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
+                  <h4 className="text-xs font-semibold leading-snug line-clamp-2 text-[#f1f1f1] group-hover:text-white">
+                    {item?.snippet?.title}
+                  </h4>
+                  <span className="text-[11px] text-gray-400 truncate">
+                    {item?.snippet?.channelTitle}
+                  </span>
+                </div>
+              </div>
+            ))}
+            <div className="text-s text-gray-400 mt-0.5 flex items-center justify-center">
+              Nghe nhac free, ko quang cao !
+            </div>
+          </div>
+        ) : (
+          <>
+          {upNextVideos.map((video) => (
           <div
           onClick={() => {
             if (video.id.videoId) {
@@ -605,6 +660,8 @@ export default function WatchComponent() {
             </div>
           </div>
         ))}
+        </>
+      )}
       </div>
     </div>
   );

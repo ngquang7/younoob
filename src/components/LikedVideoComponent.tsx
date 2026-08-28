@@ -54,10 +54,10 @@ export default function LikedVideoComponent () {
     <>
         <div className="flex items-start gap-6 p-6">  
             {/* Left */}
-            <aside className="fixed ml-65 mb-5 left-0 top-18 bottom-0 w-100 bg-zinc-900 z-40 border-r border-zinc-800 rounded-[15px]">
-                {likedVideoList.length > 0 ? (
+            <aside className="fixed w-100 h-180 shrink-0 bg-zinc-900 border-r border-zinc-800 rounded-[15px] overflow-hidden">
+                    {likedVideoList.length > 0 ? (
                 <>
-                <div className="absolute inset-0 overflow-hidden rounded-xl ">
+                <div className="absolute inset-0 overflow-hidden rounded-xl">
                     <img
                         src={likedVideoList[0]?.snippet?.thumbnails?.medium?.url}
                         className="absolute inset-0 w-full h-full object-cover filter blur-lg opacity-60 pointer-events-none"
@@ -65,15 +65,34 @@ export default function LikedVideoComponent () {
                     </div>
                     {/* Darker background */}
                     <div className="absolute inset-0 bg-black/30"></div>
+                    <div
+                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)}
+                        className="relative group inline-block ml-5 mt-5 cursor-pointer">
                     <img 
                         src={likedVideoList[0]?.snippet?.thumbnails?.medium?.url} 
                         alt={likedVideoList[0]?.snippet?.title} 
-                        className="ml-5 w-90 h-50 mt-5 object-cover rounded-[10px] z-10 flex relative cursor-pointer hover:brightness-40 transition duration-300"
-                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}`)}
+                        className="w-90 h-50 object-cover rounded-[10px] flex relative cursor-pointer group-hover:brightness-40 transition duration-300"
                     />
+                        <div className="rounded-[10px] absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                            {/* Icon Play */}
+                            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                <path d="M6 4l15 8-15 8z" />
+                            </svg>
+                            <span className="font-semibold">Play all</span>
+                        </div>
+                    </div>
                     <h1 className="text-2xl font-bold font-sans mt-5 ml-5 z-10 flex relative">Liked Videos</h1>                
                     <p className="text-l font-bold font-sans mt-5 ml-5 z-10 flex relative">Quang playList</p>
                     <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative">{getTotalLikedVideo} videos</p>
+                    <button 
+                        className=" cursor-pointer bg-white h-[40px] w-[150px] mt-5 ml-5 z-10 flex relative rounded-[20px] flex items-center justify-center hover:bg-gray-300"
+                                                onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)}
+                        >
+                        <svg className="w-5 h-5 fill-current text-black" viewBox="0 0 20 20">
+                                <path d="M6 4l15 8-15 8z" />
+                            </svg>
+                    <div className="text-2sm font-bold font-sans ml-2 z-10 flex relative text-black">Play all</div>
+                    </button>
                 </>
                 ) : (
                     <div className="flex items-center justify-center h-full text-gray-500 bg-gradient-to-b from-[#5c241c] via-[#241517] to-[#121212]">
@@ -81,9 +100,8 @@ export default function LikedVideoComponent () {
                     </div>
                 )}
             </aside>
-
             {/* Right */}
-            <div className="flex-1 ml-100 flex flex-col h-1000 gap-4">
+            <div className="flex-1 ml-105 flex flex-col h-full gap-4">
                 {likedVideoList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
                 <p className="text-lg font-medium">You have no liked video yet.</p>
@@ -92,10 +110,10 @@ export default function LikedVideoComponent () {
                 ) : (
                 /* Video in column */
                 <div className="flex flex-col gap-3">
-                {likedVideoList.map((video) => (
+                {likedVideoList.map((video, index) => (
                     <div 
                     key={video.id} 
-                    onClick={() => navigate(`/watch?v=${video.id}`)} // Click it, it will navigate to watch page
+                    onClick={() => navigate(`/watch?v=${video.id}&list=LL&index=${index+1}`)} // Click it, it will navigate to watch page
                     className="flex gap-4 cursor-pointer group p-2 hover:bg-[#212121] rounded-xl transition items-start relative"
                     >
                     {/* Thumbnail */}
@@ -115,7 +133,7 @@ export default function LikedVideoComponent () {
                         <span className="text-xs text-gray-400 mt-1">
                             {video.snippet?.channelTitle}
                         </span>
-                                                <span className="text-xs text-gray-400 mt-1">
+                        <span className="text-xs text-gray-400 mt-1">
                             {video.statistics?.viewCount ? `${getView(video.statistics.viewCount)} views` : ''} • {getTimeago(video.snippet.publishedAt)}
                         </span>
                     </div>

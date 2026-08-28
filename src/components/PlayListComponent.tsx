@@ -24,12 +24,12 @@ export default function PlayListComponent () {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
 
                     <div 
-                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)}
+                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL&start_radio=1`)}
                         className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
                     >
                         <div className="relative group">
                             {/* The layer behind (hiệu ứng chồng layer) */}
-                            <div className="absolute -top-4  h-full w-60 left-6 right-3 bg-[#3e3e3e] rounded-xl z-0"></div>
+                            <div className="absolute -top-4  h-full left-6 right-5 bg-[#3e3e3e] rounded-xl z-0"></div>
                             <div className="absolute -top-2 left-3 right-3 h-full bg-[#656563] rounded-xl z-0"></div>
                             {/* The top layer */}
                             {likedVideoList.length > 0 ? (
@@ -47,8 +47,7 @@ export default function PlayListComponent () {
                                 <path d="M6 4l15 8-15 8z" />
                             </svg>
                             <span className="font-semibold">Play all</span>
-                    
-                    </div>
+                        </div>
                     
                                 <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded flex items-center gap-1.5 font-medium">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -67,7 +66,6 @@ export default function PlayListComponent () {
                             {/* The main thumbnail */}
 
                         </div>        
-
 
                         <div className="flex gap-3 px-1 mt-2">
 
