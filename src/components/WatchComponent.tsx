@@ -260,7 +260,7 @@ export default function WatchComponent() {
       
       setIsSaved(isSaved);
     }
-  }, []);
+  }, [video]);
 
   /* Like, check is it liked or not */ 
   useEffect(() => {
@@ -622,7 +622,7 @@ export default function WatchComponent() {
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-200 lg:w-[350px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
-        {listId === 'LL' || 'WL' ? (
+        {listId === 'LL' || listId === 'WL' ? (
           <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
             {/* Header của Playlist ở sidebar */}
             <div className="bg-[#212121] p-3 rounded-xl border border-[#303030]">
@@ -668,10 +668,11 @@ export default function WatchComponent() {
           <>
           {upNextVideos.map((video) => (
           <div
-          onClick={() => {
-            if (video.id.videoId) {
-              goWatch(video.id.videoId);
-            }
+            key={video.id.videoId}
+            onClick={() => {
+              if (video.id.videoId) {
+                goWatch(video.id.videoId);
+              }
           }}
             className="flex gap-3 group cursor-pointer hover:bg-[#272727]"
           >

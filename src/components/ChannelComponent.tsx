@@ -157,6 +157,7 @@ export default function ChannelComponent () {
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
     {channelVideo && channelVideo.map((video: YouTubeSearchItem) => (
         <div
+            key={video.id.videoId}
             className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
             onClick={() => {
                 if (video.id.videoId) {

@@ -1,14 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import {useState, useEffect, useRef} from 'react';
-import {Plus, Check } from 'lucide-react';
-
 
 export default function YouComponent () {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const navigate = useNavigate();
     const [historyList, setHistoryList] = useState<any[]>([]);
     const [likedList, setLikedList] = useState<any[]>([]);
-
+    const [savedList, setSavedList] = useState<any[]>([]);
     const [isHovered, setIsHovered] = useState(false);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,7 +23,10 @@ export default function YouComponent () {
         setLikedList(savedLike);
     }, []);
 
-
+    useEffect(() => {
+        const savedSaved = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        setSavedList(savedSaved);
+    }, []);
 
     const getView = (view: string) => {
     const totalView: number = Number(view);
@@ -244,69 +245,80 @@ export default function YouComponent () {
                             <span>Watch later</span>
                             <button 
                                 className="text-sm font-semibold text-white cursor-pointer h-[40px] w-[90px] rounded-[20px] border border-gray-300 hover:bg-gray-500"
-                                onClick={() => navigate(`/feed/history`)}
+                                onClick={() => navigate(`/playlist?list=WL`)}
                             >
                                 View all
                             </button>
                         </div>
-                        <span className="text-sm font-semibold text-gray-400 flex flex-row items-center justify-between w-full mb-5">videos</span>
+                        <span className="text-sm font-semibold text-gray-400 flex flex-row items-center justify-between w-full mb-5">{savedList.length} videos</span>
                     </div>
                     {/* Video History */}
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
-                    {historyList.slice(0, 4).map((video) => (
-                    
-                        <div 
-                            key={video.id} 
-                            onClick={() => navigate(`/watch?v=${video.id}`)}
-                            className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
-                        >
-                            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] mb-3">
-                                <img
-                                    src={video.snippet.thumbnails.medium?.url}
-                                    // alt={video.snippet.title}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                       
-                            {/* Details (Avatar, Title, Channel, Stats) PART */}
-                            <div className="flex gap-3 px-1">
-                                {/* Channel Avatar */}
-                                <div className="shrink-0">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        {savedList.length > 0 ? (
+                            <>
+                            {savedList.slice(0, 4).map((video) => (
+                        
+                            <div 
+                                key={video.id} 
+                                onClick={() => navigate(`/watch?v=${video.id}`)}
+                                className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
+                            >
+                                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] mb-3">
                                     <img
-
-                                        src={video.snippet.thumbnails.default?.url}
-                                        className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
-                                        referrerPolicy="no-referrer"
+                                        src={video.snippet.thumbnails.medium?.url}
+                                        // alt={video.snippet.title}
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
+                        
+                                {/* Details (Avatar, Title, Channel, Stats) PART */}
+                                <div className="flex gap-3 px-1">
+                                    {/* Channel Avatar */}
+                                    <div className="shrink-0">
+                                        <img
 
-                                {/* Title video */}
-                                <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                    <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
-                                        {video.snippet.title}
-                                    </h3>
-                                
-                                    <div className="flex flex-col gap-0.5">
-                                        <span 
-                                        onClick={(e) => {
-                                                e.stopPropagation();
-                                                goChannel(video.snippet.channelId);
-                                            }}
-                                            className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate"
-                                        >
-                                            {video.snippet.channelTitle}
-                                        </span>
-                                            {/* View */}
-                                        <div className="flex items-center text-xs font-sans text-gray-400">
-                                            <span className="text-gray-400">{getView(video?.statistics?.viewCount)} views</span>
-                                            <span className="mx-1.5 text-[8px]">•</span>
-                                            <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
+                                            src={video.snippet.thumbnails.default?.url}
+                                            className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    </div>
+
+                                    {/* Title video */}
+                                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                        <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
+                                            {video.snippet.title}
+                                        </h3>
+                                    
+                                        <div className="flex flex-col gap-0.5">
+                                            <span 
+                                            onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    goChannel(video.snippet.channelId);
+                                                }}
+                                                className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate"
+                                            >
+                                                {video.snippet.channelTitle}
+                                            </span>
+                                                {/* View */}
+                                            <div className="flex items-center text-xs font-sans text-gray-400">
+                                                <span className="text-gray-400">{getView(video?.statistics?.viewCount)} views</span>
+                                                <span className="mx-1.5 text-[8px]">•</span>
+                                                <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        ))}
+                            </>
+                    ) : (
+                        <>
+                        <div className="col-span-full text-sm font-semibold text-gray-400 flex flex-col items-center justify-center text-center w-full">       
+                            <p>No video yet</p>
+                            <p> Save videos to watch later. Your list shows up right here</p>   
                         </div>
-                    ))}
+                        </>
+                    )} 
                 </div> 
             </div>
 
