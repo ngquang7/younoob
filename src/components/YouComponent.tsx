@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import {useState, useEffect, useRef} from 'react';
+import {Plus, Check } from 'lucide-react';
 
 
 export default function YouComponent () {
@@ -329,7 +330,7 @@ export default function YouComponent () {
                     {likedList.slice(0, 4).map((video) => (
                         <div 
                             key={video.id} 
-                            onClick={() => navigate(`/watch?v=${video.id}`)}
+                            onClick={() => navigate(`/watch?v=${video.id}&list=LL`)}
                             className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
                         >
                             <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] mb-3">
@@ -338,7 +339,7 @@ export default function YouComponent () {
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                       
+                    
                             {/* Details (Avatar, Title, Channel, Stats) PART */}
                             <div className="flex gap-3 px-1">
                                 {/* Channel Avatar */}

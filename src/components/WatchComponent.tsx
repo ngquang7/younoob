@@ -6,16 +6,20 @@ import {getVideosDetails} from "../api/videoWatchInformation";
 import {getChannelData} from '../api/channelData';
 import { getCommentData } from '../api/commentData';
 import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
+import {Plus, Check } from 'lucide-react';
+
 
 
 export default function WatchComponent() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
+  const listType = searchParams.get('list') === 'WL';
 
 
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [isdisLiked, setDisIsLiked] = useState(false);
   const [isNotice, setisNotice] = useState(false);
   const [isExpandedDecription, setisExpandedDecription] = useState(false);    
@@ -94,7 +98,11 @@ export default function WatchComponent() {
     if(listId === 'LL') {
       const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
       setPlayListVideo(savedLikedVideos);
-    } else {
+    } else if(listId === 'WL') {
+      const savedSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      setPlayListVideo(savedSavedVideos);
+    } 
+    else {
       return;
     }
   },[])
@@ -152,6 +160,22 @@ export default function WatchComponent() {
     }
   };
 
+  const handleSaveToggle = () => {
+    if (!video || !video.id) return;
+    const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+    const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
+
+    let updatedSavedVideos;
+    if(isAlreadySaved) {
+      updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
+      setIsSaved(false);
+    } else {
+      updatedSavedVideos = [video, ...existingSavedVideos];
+      setIsSaved(true);
+    }
+    localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+  };
+
   const handleLikeToggle = () => {
     if (!video || !video.id) return;
 
@@ -168,10 +192,10 @@ export default function WatchComponent() {
       updatedLikedVideos = [video, ...existingLikedVideos];
       setIsLiked(true); // Cập nhật lại state giao diện thành đã like
     }
-    
     // Lưu lại vào localStorage
     localStorage.setItem('like_video', JSON.stringify(updatedLikedVideos));
   };
+
 
 
   const handlePostComment = (e: React.FormEvent) => {
@@ -227,6 +251,16 @@ export default function WatchComponent() {
       localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
     }
   }, [video]);
+
+  useEffect(() => {
+    if (video && video.id) {
+      const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      
+      const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
+      
+      setIsSaved(isSaved);
+    }
+  }, []);
 
   /* Like, check is it liked or not */ 
   useEffect(() => {
@@ -380,7 +414,7 @@ export default function WatchComponent() {
             
             <button
               onClick={handleSubscribeToggle}
-              className={`gap-1 ml-3 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
+              className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
                 isSubscribed 
                   ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]' 
                   : 'bg-white hover:bg-gray-200 text-black'
@@ -418,7 +452,16 @@ export default function WatchComponent() {
             </div> 
 
             {/* Save (Watch Later) */}
-            
+            <button
+              onClick={handleSaveToggle}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#303030]/50 transition text-xs font-semibold shrink-0 cursor-pointer 
+                ${                isSaved 
+                  ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80' 
+                  : 'bg-[#212121] hover:bg-[#303030]'}
+                `}
+            >
+              {isSaved ? 'Saved' : 'Watch Later'}
+            </button>
 
             {/* SHARE */}
             <button
@@ -440,7 +483,7 @@ export default function WatchComponent() {
               </div>
             )}
           </div>
-
+          
 
         </div>
 
@@ -579,11 +622,11 @@ export default function WatchComponent() {
       {/* RIGHT COLUMN (SIDEBAR FEED) */}
       <div className="w-200 lg:w-[350px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
-        {listId === 'LL' ? (
+        {listId === 'LL' || 'WL' ? (
           <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
             {/* Header của Playlist ở sidebar */}
             <div className="bg-[#212121] p-3 rounded-xl border border-[#303030]">
-              <h3 className="font-sans font-bold text-sm text-white">Liked videos</h3>
+              <h3 className="font-sans font-bold text-sm text-white">{listType ? 'Watch Later' :'Liked videos'}</h3>
               <p className="text-xs text-gray-400 mt-0.5">Private • Playlist • {playListVideo.length} videos</p>
             </div>
 
@@ -618,7 +661,7 @@ export default function WatchComponent() {
               </div>
             ))}
             <div className="text-s text-gray-400 mt-0.5 flex items-center justify-center">
-              Nghe nhac free, ko quang cao !
+              {listType ? 'Xem video da luu free, ko quang cao' : 'Nghe nhac free, ko quang cao !'}
             </div>
           </div>
         ) : (

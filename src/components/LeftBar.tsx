@@ -16,6 +16,7 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
   const goLikeVideo = () => navigate(`/playlist?list=LL`);
   const goYou = () => navigate(`/feed/you`);
   const goPlayList = () => navigate(`/feed/playlists`);
+  const goWatchLater = () => navigate(`/playlist?list=WL`);
   // Read the list that is subcribed in localStorage when Sidebar turn on
   useEffect(() => {
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
@@ -117,16 +118,26 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
               title="History"
               onClick={goHistory}
             >
-              <img src="/public/history.png" className="h-8 w-8"/>
+              <img src="/public/history.png" className="h-7.5 w-8"/>
               <div className=" text-base">History</div>
             </button>
 
             <button
-                className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
-                title="Subcription"
+              className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+              title="Playlist"
+              onClick={goPlayList}
             >
-              <img src="/public/subcribe.png" className="h-8 w-8"/>
-              <div className=" text-base">Subcription</div>
+              <img src="/public/playlist.png" className="h-7.5 w-7.5"/>
+              <div className="text-base">Playlist</div>
+            </button>
+
+            <button
+              className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+              title="Watch Later"
+              onClick={goWatchLater}
+            >
+              <img src="/public/watchlater.png" className="h-7.5 w-7.5"/>
+              <div className="text-base">Watch Later</div>
             </button>
 
             <button
@@ -140,12 +151,12 @@ export default function LeftBar({expanded, goHome, goHistory}: SidebarProps){
 
             <button
                 className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
-                title="Playlist"
-                onClick={goPlayList}
+                title="Subcription"
             >
-              <img src="/public/playlist.png" className="h-7.5 w-7.5"/>
-              <div className="text-base">Playlist</div>
+              <img src="/public/subcribe.png" className="h-8 w-8"/>
+              <div className=" text-base">Subcription</div>
             </button>
+
         </div>
     </aside>
   );

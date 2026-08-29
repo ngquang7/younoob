@@ -1,17 +1,21 @@
 import {useState,useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams} from 'react-router-dom';
 
 export default function LikedVideoComponent () {
-    const [likedVideoList, setlikedVideoList] = useState<any[]>([]);
+    const [videoList, seVideoList] = useState<any[]>([]);
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     // Load like_video when go to this page
+    const listType = searchParams.get('list') === 'WL' ? 'WL' : 'LL';
+    const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
+    const playlistTitle = listType === 'WL' ? 'Watch Later' : 'Liked Videos';
     useEffect(() => {
-        const savedLikedVideo = JSON.parse(localStorage.getItem('like_video') || '[]');
-        setlikedVideoList(savedLikedVideo);
-    }, []);
+        const savedLikedVideo = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        seVideoList(savedLikedVideo);
+    }, [listType]);
 
-    const getTotalLikedVideo = likedVideoList.length;
+    const getTotalLikedVideo = videoList.length;
     const getView = (view: string) => {
     const totalView: number = Number(view);
     if(totalView < 1000) return `${view}`;
@@ -55,22 +59,22 @@ export default function LikedVideoComponent () {
         <div className="flex items-start gap-6 p-6">  
             {/* Left */}
             <aside className="fixed w-100 h-180 shrink-0 bg-zinc-900 border-r border-zinc-800 rounded-[15px] overflow-hidden">
-                    {likedVideoList.length > 0 ? (
+                    {videoList.length > 0 ? (
                 <>
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                     <img
-                        src={likedVideoList[0]?.snippet?.thumbnails?.medium?.url}
+                        src={videoList[0]?.snippet?.thumbnails?.medium?.url}
                         className="absolute inset-0 w-full h-full object-cover filter blur-lg opacity-60 pointer-events-none"
                     />
                     </div>
                     {/* Darker background */}
                     <div className="absolute inset-0 bg-black/30"></div>
                     <div
-                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)}
+                        onClick={() => navigate(`/watch?v=${videoList[0]?.id}&list=${listType}`)}
                         className="relative group inline-block ml-5 mt-5 cursor-pointer">
                     <img 
-                        src={likedVideoList[0]?.snippet?.thumbnails?.medium?.url} 
-                        alt={likedVideoList[0]?.snippet?.title} 
+                        src={videoList[0]?.snippet?.thumbnails?.medium?.url} 
+                        alt={videoList[0]?.snippet?.title} 
                         className="w-90 h-50 object-cover rounded-[10px] flex relative cursor-pointer group-hover:brightness-40 transition duration-300"
                     />
                         <div className="rounded-[10px] absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
@@ -86,8 +90,8 @@ export default function LikedVideoComponent () {
                     <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative">{getTotalLikedVideo} videos</p>
                     <button 
                         className=" cursor-pointer bg-white h-[40px] w-[150px] mt-5 ml-5 z-10 flex relative rounded-[20px] flex items-center justify-center hover:bg-gray-300"
-                                                onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)}
-                        >
+                        onClick={() => navigate(`/watch?v=${videoList[0]?.id}&list=${listType}`)}
+                    >
                         <svg className="w-5 h-5 fill-current text-black" viewBox="0 0 20 20">
                                 <path d="M6 4l15 8-15 8z" />
                             </svg>
@@ -102,18 +106,18 @@ export default function LikedVideoComponent () {
             </aside>
             {/* Right */}
             <div className="flex-1 ml-105 flex flex-col h-full gap-4">
-                {likedVideoList.length === 0 ? (
+                {videoList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
-                <p className="text-lg font-medium">You have no liked video yet.</p>
-                <p className="text-sm">Videos you like will show up here so you can easily find them again.</p>
+                <p className="text-lg font-medium">You have no video in this playlist yet.</p>
+                <p className="text-sm">Videos you save in this playlist will show up here so you can easily find them again.</p>
                 </div>
                 ) : (
                 /* Video in column */
                 <div className="flex flex-col gap-3">
-                {likedVideoList.map((video, index) => (
+                {videoList.map((video, index) => (
                     <div 
                     key={video.id} 
-                    onClick={() => navigate(`/watch?v=${video.id}&list=LL&index=${index+1}`)} // Click it, it will navigate to watch page
+                    onClick={() => navigate(`/watch?v=${video.id}&list=${listType}&index=${index+1}`)} // Click it, it will navigate to watch page
                     className="flex gap-4 cursor-pointer group p-2 hover:bg-[#212121] rounded-xl transition items-start relative"
                     >
                     {/* Thumbnail */}
@@ -144,7 +148,7 @@ export default function LikedVideoComponent () {
             </div>
                 )}
             </div>
-        </div>
+        </div>  
     </>
     );
 }
