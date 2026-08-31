@@ -2,18 +2,63 @@ import {useState,useEffect } from 'react';
 import { useNavigate, useSearchParams} from 'react-router-dom';
 
 export default function LikedVideoComponent () {
-    const [videoList, seVideoList] = useState<any[]>([]);
+    const [videoList, setVideoList] = useState<any[]>([]);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [isControlOpen, setIsControlOpen] = useState(false);
+    const [activeMenuId, setActiveMenuId] = useState(null);
     // Load like_video when go to this page
     const listType = searchParams.get('list') === 'WL' ? 'WL' : 'LL';
     const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
+    const reverseStorageKey = listType === 'WL' ? 'like_video' : 'saved_video';
     const playlistTitle = listType === 'WL';
+    const [isShareModal, setIsShareModal] = useState(false);
+
     useEffect(() => {
         const savedLikedVideo = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        seVideoList(savedLikedVideo);
+        setVideoList(savedLikedVideo);
     }, [listType]);
+
+    const handleNativeShare = async (video: any) => {
+    const shareUrl = window.location.origin + `/watch?v=${video.id}`;
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: video.snippet?.title,
+                text: 'Hãy xem video này nhé!',
+                url: shareUrl,
+            });
+        } catch (error) {
+            console.log('User cancelled or error sharing', error);
+        }
+    } else {
+        // Fallback nếu trình duyệt không hỗ trợ Web Share API thì dùng Cách 1
+        shareToFacebook(video);
+    }
+    };
+
+
+const shareToFacebook = (video: any) => {
+    if (!video || !video.id) return;
+    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;    
+    window.open(facebookShareUrl, '_blank');
+};
+
+    const removeVideoFromList = (id: string) => {
+        const updated = videoList.filter(v => v.id !== id);
+        setVideoList(updated);
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+    };
+
+    const addVideoToList = (video: any) => {
+    if (!video.id || !video) return;
+        const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);    
+        if(!isAlreadyInList) {
+            const updateList = [video, ...existingListVideos];
+            localStorage.setItem('saved_video', JSON.stringify(updateList));
+        }
+    };
 
     const getTotalLikedVideo = videoList.length;
     const getView = (view: string) => {
@@ -56,7 +101,8 @@ export default function LikedVideoComponent () {
 
     return(
     <>
-        <div className="flex items-start gap-6 p-6">  
+        <div 
+            className="flex items-start gap-6 p-6">  
             {/* Left */}
             <aside className="fixed w-100 h-180 shrink-0 bg-zinc-900 border-r border-zinc-800 rounded-[15px] overflow-hidden">
                     {videoList.length > 0 ? (
@@ -142,26 +188,130 @@ export default function LikedVideoComponent () {
                             {video.snippet?.channelTitle}
                         </span>
                         <span className="text-xs text-gray-400 mt-1">
-                            {video.statistics?.viewCount ? `${getView(video.statistics.viewCount)} views` : ''} • {getTimeago(video.snippet.publishedAt)}
+                            {video.statistics?.viewCount ? `${getView(video.statistics.viewCount)} views` : ''} • {video.snippet?.publishedAt? `${getTimeago(video.snippet.publishedAt)}` : ''}
                         </span>
                     </div>
 
                     {/* control button*/}
                     <button
                         onClick={(e) => {
-                            e.stopPropagation();
-                            setIsControlOpen(!isControlOpen);
+                            e.stopPropagation();    
+                            setActiveMenuId(activeMenuId === video.id ? null : video.id);
                         }}
-                        className="text-2xl p-2 font-bold font-sans cursor-pointer hover:bg-neutral-700/60 rounded-full transition-colors"
+                        className="text-xl w-10 h-10 font-bold font-sans cursor-pointer hover:bg-neutral-700 rounded-full transition-colors"
                     >
                         ⋮
                     </button>
                     {/* Option modal */}
-                    {isControlOpen && (
-                        <div className="absolute right-0 mt-12 w-64 bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border border-neutral-700">
+                    {activeMenuId === video.id && (
+                        <>
+                        <div 
+                            className="fixed inset-0 z-40 cursor-default" 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenuId(null);
+                            }}
+                        />
+
+                        <div 
+                            onClick={(e) => e.stopPropagation()}
+                            className="overflow-hidden absolute right-0 mt-12 w-64 bg-[#282828] overflow-hidden text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
+                        >
+                        <button 
+                            className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
+                            <img
+                            alt="Add to queue"
+                            src="/public/addtoqueue.png" className="h-6 w-6 mr-3"
+                            />
+                            Add to queue
+                        </button>
+
+                        <button 
+                            onClick={(e) => {
+                                setActiveMenuId(null);
+                                addVideoToList(video);
+                            }}
+                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                            <img
+                            alt="Save to watch later"
+                            src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
+                            />
+                            Save to watch later
+                        </button>
                         
+                        <button 
+                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                            <img
+                            alt="Save to playlist"
+                            src="/public/savetoplaylist.png" className="h-6 w-5 mr-3"
+                            />
+                            Save to playlist
+                        </button>
+
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsShareModal(true);
+                            }}
+                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                            <img
+                            alt="Share"
+                            src="/public/share.png" className="h-5 w-5 mr-3"
+                            />
+                            Share
+                        </button>
+                        {isShareModal && (
+                        <div 
+                            onClick={() => setIsShareModal(false)}
+                            className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50 backdrop-blur-l"
+                        >
+                            {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
+                            <div 
+                                onClick={(e) => e.stopPropagation()} 
+                                className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                                {/* Nút Đóng (Dấu X góc trên bên phải) */}
+                                <button 
+                                    onClick={() => setIsShareModal(false)}
+                                    className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
+                                >
+                                    ✕
+                                </button>
+                                    <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
+                                        Share
+                                    </h2>
+                                    {/* onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')} */}
+                                    <button
+                                        onClick={() => shareToFacebook(video)}
+                                    >
+                                        <img
+        alt="Share"
+        src="/public/share.png" className="h-5 w-5 mr-3 cursor-pointer"
+    />
+                                    </button>
+
+
+                                </div>
+                            </div>
+                            )}
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                removeVideoFromList(video.id)} 
+                            }
+                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-b-xl"
+                            >
+                            <img
+                            alt="Add to queue"
+                            src="/public/bin.png" className="h-5 w-5 mr-3 pointer-events-none"
+                            />
+                            Remove from {playlistTitle ? 'Watch later' : 'Liked videos'}
+                        </button>
+
                         </div>
+                        </>
                     )}
+                    
                     </div>
                 ))}
             </div>

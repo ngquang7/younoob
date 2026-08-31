@@ -132,7 +132,6 @@ export default function YouComponent () {
                                 {/* Channel Avatar */}
                                 <div className="shrink-0">
                                     <img
-
                                         src={video.snippet.thumbnails.default?.url}
                                         className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
                                         referrerPolicy="no-referrer"
@@ -171,7 +170,7 @@ export default function YouComponent () {
                         <>
                             <div className="col-span-full text-sm font-semibold text-gray-400 flex flex-col items-center justify-center text-center w-full">       
                                 <p>No video yet</p>
-                                <p> Save videos to watch later. Your list shows up right here</p>   
+                                <p>Your watch history will be show up right here</p>   
                             </div>
                         </>
                     )}
@@ -295,7 +294,7 @@ export default function YouComponent () {
                         </div>
                         <span className="text-sm font-semibold text-gray-400 flex flex-row items-center justify-between w-full mb-5">{savedList.length} videos</span>
                     </div>
-                    {/* Video History */}
+                    {/* Watch Later Video */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                         {savedList.length > 0 ? (
                             <>
@@ -357,7 +356,7 @@ export default function YouComponent () {
                         <>
                         <div className="col-span-full text-sm font-semibold text-gray-400 flex flex-col items-center justify-center text-center w-full">       
                             <p>No video yet</p>
-                            <p> Save videos to watch later. Your list shows up right here</p>   
+                            <p>Your watch later videos will show up right here</p>   
                         </div>
                         </>
                     )} 
@@ -381,6 +380,8 @@ export default function YouComponent () {
                     
                     {/* Liked Video */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
+                    {likedList.length > 0 ? (
+                    <>
                     {likedList.slice(0, 4).map((video) => (
                         <div 
                             key={video.id} 
@@ -433,6 +434,15 @@ export default function YouComponent () {
                             </div>
                         </div>
                     ))}
+                    </>
+                    ) : (
+                        <>
+                        <div className="col-span-full text-sm font-semibold text-gray-400 flex flex-col items-center justify-center text-center w-full">       
+                            <p>No video yet</p>
+                            <p>Your liked video will show up right here</p>   
+                        </div>
+                        </>
+                    )}
                 </div> 
             </div>
         </div>

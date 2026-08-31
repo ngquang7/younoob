@@ -255,9 +255,7 @@ export default function WatchComponent() {
   useEffect(() => {
     if (video && video.id) {
       const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      
       const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
-      
       setIsSaved(isSaved);
     }
   }, [video]);
@@ -266,9 +264,7 @@ export default function WatchComponent() {
   useEffect(() => {
     if (video && video.id) {
       const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-      
       const isLiked = saveLikedVideos.some((v: any) => v.id === video.id);
-      
       setIsLiked(isLiked);
     }
   }, [video]);
