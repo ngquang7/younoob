@@ -30,7 +30,13 @@ export default function PlayListComponent () {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
 
                     <div 
-                        onClick={() => navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL&start_radio=1`)}
+                        onClick={() => {
+                            if(likedVideoList.length > 0) {
+                            navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL&start_radio=1`)
+                            } else {
+                                goLikeVideo();
+                            }
+                        }}
                         className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
                     >
                         <div className="relative group">
@@ -65,8 +71,17 @@ export default function PlayListComponent () {
                     </div>
                 </>
                 ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500 bg-gradient-to-b from-[#5c241c] via-[#241517] to-[#121212]">
-                        No thumbnail
+                    <div 
+                        className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] z-10">
+                        <img
+                            src="/public/loading1.png"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded flex items-center gap-1.5 font-medium">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22 7H2v1h20V7zm-9 5H2v-1h11v1zm0 4H2v-1h11v1zm7-5v7l6-3.5-6-3.5z"/>
+                            </svg>
+                            <span>No videos</span>
+                        </div>
                     </div>
                 )}
                 </div>        
@@ -136,6 +151,7 @@ export default function PlayListComponent () {
                                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                     <path d="M22 7H2v1h20V7zm-9 5H2v-1h11v1zm0 4H2v-1h11v1zm7-5v7l6-3.5-6-3.5z"/>
                                                 </svg>
+                    
                                                 <span>{savedVideoList.length} videos</span>
                                                 
                                             </div>
@@ -147,6 +163,12 @@ export default function PlayListComponent () {
                                     <img
                                         src="/public/loading1.png"
                                     />
+                                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded flex items-center gap-1.5 font-medium">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M22 7H2v1h20V7zm-9 5H2v-1h11v1zm0 4H2v-1h11v1zm7-5v7l6-3.5-6-3.5z"/>
+                                        </svg>
+                                        <span>No videos</span>
+                                    </div>
                                 </div>
                             )}
                         </div>

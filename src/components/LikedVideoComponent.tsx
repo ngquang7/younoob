@@ -5,11 +5,11 @@ export default function LikedVideoComponent () {
     const [videoList, seVideoList] = useState<any[]>([]);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-
+    const [isControlOpen, setIsControlOpen] = useState(false);
     // Load like_video when go to this page
     const listType = searchParams.get('list') === 'WL' ? 'WL' : 'LL';
     const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
-    const playlistTitle = listType === 'WL' ? 'Watch Later' : 'Liked Videos';
+    const playlistTitle = listType === 'WL';
     useEffect(() => {
         const savedLikedVideo = JSON.parse(localStorage.getItem(storageKey) || '[]');
         seVideoList(savedLikedVideo);
@@ -104,13 +104,17 @@ export default function LikedVideoComponent () {
                     </div>
                 )}
             </aside>
+
             {/* Right */}
             <div className="flex-1 ml-105 flex flex-col h-full gap-4">
                 {videoList.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
-                <p className="text-lg font-medium">You have no video in this playlist yet.</p>
-                <p className="text-sm">Videos you save in this playlist will show up here so you can easily find them again.</p>
-                </div>
+                    <>
+                    <h1 className="text-2xl font-bold font-sans mt-3 ml-3">{playlistTitle ? 'Watch Later' : 'Liked Videos'}</h1>
+                    <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
+                    <p className="text-lg font-medium">You have no video in this playlist yet.</p>
+                    <p className="text-sm">Videos you save in this playlist will show up here so you can easily find them again.</p>
+                    </div>
+                    </>
                 ) : (
                 /* Video in column */
                 <div className="flex flex-col gap-3">
@@ -142,8 +146,23 @@ export default function LikedVideoComponent () {
                         </span>
                     </div>
 
-                    {/* unlike button*/}
+                    {/* control button*/}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsControlOpen(!isControlOpen);
+                        }}
+                        className="text-2xl p-2 font-bold font-sans cursor-pointer hover:bg-neutral-700/60 rounded-full transition-colors"
+                    >
+                        ⋮
+                    </button>
+                    {/* Option modal */}
+                    {isControlOpen && (
+                        <div className="absolute right-0 mt-12 w-64 bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border border-neutral-700">
+                        
                         </div>
+                    )}
+                    </div>
                 ))}
             </div>
                 )}
