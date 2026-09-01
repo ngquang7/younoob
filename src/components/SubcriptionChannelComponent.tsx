@@ -54,7 +54,6 @@ export default function SubcriptionChannel () {
         // Đóng modal
         setSelectedChannel(null);
     };
-    if (loading) return <div className="px-10 py-10 text-white">Loading...</div>;
 
     return(
         <div className="mx-auto px-10 py-2 text-white min-h-screen">
@@ -89,6 +88,7 @@ export default function SubcriptionChannel () {
                                         {channel?.brandingSettings?.channel?.description.slice(0,320)}
                                     </div>
                                 </div>
+                            </div>
 
                                 {/* Subcribe button */}
                                 <button
@@ -105,7 +105,6 @@ export default function SubcriptionChannel () {
                                     {isSubscribed ? 'Subscribed' : 'Subscribe'}
                                 </button>
                             </div>                        
-                        </div>
                     ))
                 )}
                 {/* Table unsubcribe or cancle unsubcribe */}

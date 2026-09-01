@@ -32,7 +32,7 @@ export default function PlayListComponent () {
                     <div 
                         onClick={() => {
                             if(likedVideoList.length > 0) {
-                            navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL&start_radio=1`)
+                            navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL`)
                             } else {
                                 goLikeVideo();
                             }
@@ -119,7 +119,7 @@ export default function PlayListComponent () {
                     <div 
                         onClick={() => {
                             if(savedVideoList.length > 0) {
-                                navigate(`/watch?v=${savedVideoList[0]?.id}&list=WL&start_radio=1`);
+                                navigate(`/watch?v=${savedVideoList[0]?.id}&list=WL`);
                             } else {
                                 goWatchLaterVideo();
                             }

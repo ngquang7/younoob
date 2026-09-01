@@ -15,7 +15,7 @@ export default function ChannelComponent () {
     const [loading, setLoading] = useState<boolean>(false);
     const { channelId } = useParams();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    console.log(`${channelId}`);
+    const [isSubscribed, setIsSubscribed] = useState(false);
 
     useEffect(() => {
         if (!channelId) return;
@@ -36,7 +36,52 @@ export default function ChannelComponent () {
         };
         fetchVideo();
     }, [channelId]);
+
+    useEffect(() => {
+    if (channelId) {
+        const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+        
+        // Kiểm tra xem ID của kênh hiện tại có nằm trong danh sách đã đăng ký không
+        const isSubbed = savedSubs.some((sub: any) => sub.id === channelId);
+
+        // Cập nhật lại state của nút Subscribe cho khớp
+        setIsSubscribed(isSubbed);
+    }
+    }, []);
     
+      const handleSubscribeToggle = () => {
+        const nextState = !isSubscribed;
+        setIsSubscribed(nextState);
+        // get the old subcription list from localStorage
+        // convert string to array
+        const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+        
+        // Add this channel into this localstorage, this is hashmap(key, value)
+        const currentChannel = {
+        id: channelId || 'unknown_id',
+        title: channel?.[0]?.snippet?.title || 'Channel Name',
+        thumbnail: channel?.[0]?.snippet?.thumbnails?.medium?.url  || '', // avatar channel
+        };
+
+        if (nextState) {
+        // if click subcribe (Subscribe): Add channel to array if it is not in array
+        const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
+        if (!exists) {
+            //add object(hashmap) into an array
+            //we get the old subcription list and push this object to the end of array
+            const updatedSubs = [...savedSubs, currentChannel];
+            //localstorage only save string, so we have to convert array to string
+            localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
+        }
+        } else {
+        // IF WE UNSUBCRIBE (Unsubscribe): remove it from array
+        const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
+        localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
+        }
+    };
+
+    const [modalUnsubribe, setModalUnsubcribe] = useState(false); 
+
     const getTimeago = (date: string) => {
         const videoDate = new Date(date);
         const currentTime = new Date();
@@ -69,7 +114,8 @@ export default function ChannelComponent () {
     }
 
     return(
-        <div className="ml-25 flex mr-25 flex-col border-b border-gray-600 pb-3">
+        <div className="ml-25 flex mr-25 flex-col">
+            <div className="border-b border-gray-600 pb-3">
             <img
                 src={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl || "Loading..."}
                 className="w-full h-45 object-cover rounded-2xl"
@@ -98,7 +144,67 @@ export default function ChannelComponent () {
                                     {channel?.[0]?.brandingSettings?.channel?.description.slice(0,10)} <span className="font-semibold text-l text-white">...more</span>
                                 </button>
                             </div>
-                       
+                        <button
+                            onClick={() => {
+                                if(isSubscribed === false) {
+                                    handleSubscribeToggle();
+                                } else {
+                                setModalUnsubcribe(true);
+                                }
+                            }}
+                            className={`-ml-2 py-2 text-sm font-semibold w-30 mt-3 rounded-full cursor-pointer transition active:scale-95 ${
+                            isSubscribed 
+                            ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]' 
+                            : 'bg-white hover:bg-gray-200 text-black'
+                            }`}
+                            >
+                            {isSubscribed ? 
+                                <>                    
+                                    <img
+                                        src="/public/tick.png" 
+                                        className="h-3 w-3 ml-3 flex flex-row"
+                                    />
+                                    <div className="-mt-4 ml-3">Subscribed</div>
+                                </> 
+                                : 'Subcribe'}
+                        </button>
+                        {modalUnsubribe && (
+                                <div 
+                                    onClick={() => setModalUnsubcribe(false)}                                
+                                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px]"
+                                >
+                                    {/* Size of padding */}
+                                    <div 
+                                        onClick={(e) => e.stopPropagation()} 
+                                        className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
+                                    >
+                                        {/* Title: Unsubribe from {channel name} */}
+                                        <div className="text-gray-400 text-l">
+                                            Unsubscribe from <span className="text-white font-bold" >{channel?.[0]?.snippet?.title}</span> ?
+                                        </div>
+                                        {/* 2 buttons: Cancle and Unsubcribe */}
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => setModalUnsubcribe(false)}                                
+                                                className="px-4 py-2 mt-5 ml-15 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
+                                            >
+                                                Cancle                                
+                                            </button>
+                                            <button
+                                                className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
+                                                onClick={() => {
+                                                    handleSubscribeToggle();
+                                                    setModalUnsubcribe(false);
+                                                }}
+                                                
+                                            >
+                                                Unsubribe                     
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                           )
+                        }
                     </div>
                     {isModalOpen && (
                         <div 
@@ -120,7 +226,7 @@ export default function ChannelComponent () {
                                     {channel?.[0]?.snippet?.title}
                                 </h2>
 
-                                {/* Mục Description */}
+                                {/* Description */}
                                 <div className="mb-6">
                                     <h3 className="font-bold text-base mb-2">Description</h3>
                                     {/* whitespace-pre-wrap giúp giữ nguyên các khoảng xuống dòng của mô tả gốc */}
@@ -151,76 +257,67 @@ export default function ChannelComponent () {
                             </div>
                         </div>
                     )}
-</div>
-
-
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-    {channelVideo && channelVideo.map((video: YouTubeSearchItem) => (
-        <div
-            key={video.id.videoId}
-            className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
-            onClick={() => {
-                if (video.id.videoId) {
-                    goWatch(video.id.videoId);
-                }
-            }}      
-        >
-
-            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-            >
-                <img
-                src={video.snippet.thumbnails.medium?.url}
-                // alt={video.snippet.title}
-                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                />
-                
-                {/* Video duration */}
-                {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
-                    video duration
-                </span> */}
+                </div>
             </div>
 
-            {/* Details (Avatar, Title, Channel, Stats) */}
-            <div className="flex gap-3 px-1">
-                {/* Channel Avatar */}
-                <div className="shrink-0">
-                <img
-                    src={video.snippet.thumbnails.default?.url}
-                    alt={video.snippet.channelTitle}
-                    className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
-                    referrerPolicy="no-referrer"
-                />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+                {channelVideo && channelVideo.map((video: YouTubeSearchItem) => (
+                <div
+                    key={video.id.videoId}
+                    className="flex flex-col gap-3 group cursor-pointer transition-all duration-300 w-full hover:bg-[#272727]"
+                    onClick={() => {
+                        if (video.id.videoId) {
+                            goWatch(video.id.videoId);
+                        }
+                    }}      
+                >
 
-                {/* Text descriptions */}
-                <div className="flex flex-col gap-1 flex-1 min-w-0">
-                <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
-                    {video.snippet.title}
-                    a.
-                </h3>
-                
-                <div className="flex flex-col gap-0.5">
-                    {/* View */}
-                    <div className="flex items-center text-xs font-sans text-gray-400">
-                    {/* <span className="text-gray-400">view</span> */}
-                    <span className="mx-1.5 text-[8px]">•</span>
-                    <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#212121] transition-shadow duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.5)]"
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                    >
+                        <img
+                        src={video.snippet.thumbnails.medium?.url}
+                        // alt={video.snippet.title}
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                        />
+                        
+                        {/* Video duration */}
                     </div>
-                </div>
-                </div>
-            </div>
-            </div>
-            )
-            )}
-        </div>
-        </div>
-        
 
-        
-            
-        
+                    {/* Details (Avatar, Title, Channel, Stats) */}
+                    <div className="flex gap-3 px-1">
+                        {/* Channel Avatar */}
+                        <div className="shrink-0">
+                        <img
+                            src={video.snippet.thumbnails.default?.url}
+                            alt={video.snippet.channelTitle}
+                            className="w-9 h-9 rounded-full object-cover border border-[#303030] hover:ring-2 hover:ring-white/10 transition-all"
+                            referrerPolicy="no-referrer"
+                        />
+                        </div>
+
+                        {/* Text descriptions */}
+                        <div className="flex flex-col gap-1 flex-1 min-w-0">
+                        <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
+                            {video.snippet.title}
+                            a.
+                        </h3>
+                        
+                        <div className="flex flex-col gap-0.5">
+                            {/* View */}
+                            <div className="flex items-center text-xs font-sans text-gray-400">
+                            {/* <span className="text-gray-400">view</span> */}
+                            {/* <span className="mx-1.5 text-[8px]">•</span> */}
+                            <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    )
+                )}
+            </div>
+        </div>
     );
-
 }

@@ -591,7 +591,11 @@ export default function WatchComponent() {
                               <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
                               <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
                           </div>
-                          <p className="text-sm mt-1 text-gray-200">{comment.textDisplay}</p>
+                          <p
+                            dangerouslySetInnerHTML={{ __html: comment.textDisplay }} 
+                            className="text-sm mt-1 text-gray-200"
+                          />
+                            {/* {comment.textDisplay}</p> */}
                           <div className="flex items-center gap-4 mt-2">
                               <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
                           </div>

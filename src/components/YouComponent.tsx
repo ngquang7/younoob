@@ -86,12 +86,12 @@ export default function YouComponent () {
                     </p>
                     {/* whitespace-pre-wrap" */}
                     <div 
-                        className="flex items-center gap-3 text-l text-gray-200 mb-1 cursor-pointer w-fit"
-                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-3 text-l text-gray-200 mb-1 w-fit"
+                        
                     >
-                        <button className="text-gray-400 text-sm mt-3 items-start cursor-pointer">
+                        <p className="text-gray-400 text-sm mt-3 items-start">
                             Mr. Quang
-                        </button>
+                        </p>
                     </div>     
                 </div>
             </div>
