@@ -202,12 +202,9 @@ export default function ChannelComponent () {
                 </h3>
                 
                 <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-sans text-gray-400 hover:text-[#f1f1f1] transition-colors truncate">
-                    {video.snippet.channelTitle}
-                    </span>
                     {/* View */}
                     <div className="flex items-center text-xs font-sans text-gray-400">
-                    <span className="text-gray-400">view</span>
+                    {/* <span className="text-gray-400">view</span> */}
                     <span className="mx-1.5 text-[8px]">•</span>
                     <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
                     </div>

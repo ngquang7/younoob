@@ -12,38 +12,37 @@ export default function LikedVideoComponent () {
     const reverseStorageKey = listType === 'WL' ? 'like_video' : 'saved_video';
     const playlistTitle = listType === 'WL';
     const [isShareModal, setIsShareModal] = useState(false);
+    const [isNotice, setIsNotice] = useState(false);
+
 
     useEffect(() => {
         const savedLikedVideo = JSON.parse(localStorage.getItem(storageKey) || '[]');
         setVideoList(savedLikedVideo);
     }, [listType]);
 
-    const handleNativeShare = async (video: any) => {
-    const shareUrl = window.location.origin + `/watch?v=${video.id}`;
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: video.snippet?.title,
-                text: 'Hãy xem video này nhé!',
-                url: shareUrl,
-            });
-        } catch (error) {
-            console.log('User cancelled or error sharing', error);
-        }
-    } else {
-        // Fallback nếu trình duyệt không hỗ trợ Web Share API thì dùng Cách 1
-        shareToFacebook(video);
-    }
+
+    const shareToFacebook = (video: any) => {
+        if (!video || !video.id) return;
+        const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+        const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;    
+        window.open(facebookShareUrl, '_blank');
     };
 
-
-const shareToFacebook = (video: any) => {
+    const shareToX = (video: any) => {
     if (!video || !video.id) return;
     const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;    
-    window.open(facebookShareUrl, '_blank');
-};
+    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+    const text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+    const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`; 
+    window.open(xShareUrl, '_blank');
+    }
 
+    const shareToLinkedin = (video: any) => {
+        if (!video || !video.id) return;
+        const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+        const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;    
+        window.open(linkedinShareUrl, '_blank');
+    }
     const removeVideoFromList = (id: string) => {
         const updated = videoList.filter(v => v.id !== id);
         setVideoList(updated);
@@ -59,6 +58,19 @@ const shareToFacebook = (video: any) => {
             localStorage.setItem('saved_video', JSON.stringify(updateList));
         }
     };
+
+    const handleCopyURL = (video: any) => {
+    const shareUrl = `https://youtube.com/watch?v=${video.id}`;
+        try {
+        navigator.clipboard.writeText(shareUrl);
+        setIsNotice(true);
+        setTimeout ( () => {
+        setIsNotice(false);
+    }, 2300);
+    } catch (error) {
+      console.warn("Copy failed ", error);
+    }
+  };
 
     const getTotalLikedVideo = videoList.length;
     const getView = (view: string) => {
@@ -280,16 +292,66 @@ const shareToFacebook = (video: any) => {
                                         Share
                                     </h2>
                                     {/* onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')} */}
+                                    <div className="flex flex-row gap-3">
+
                                     <button
+                                        className="flex flex-col cursor-pointer"
                                         onClick={() => shareToFacebook(video)}
                                     >
+                                    <img
+                                        alt="Share"
+                                        src="/public/facebook.png" 
+                                        className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
+                                    />
+                                    facebook
+                                    </button>
+                                    <button
+                                        className="flex flex-col cursor-pointer"
+                                        onClick={() => {shareToX(video)}}
+                                    >
                                         <img
-        alt="Share"
-        src="/public/share.png" className="h-5 w-5 mr-3 cursor-pointer"
-    />
+                                            src="/public/X.png" 
+                                            className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                        />
+                                        X
                                     </button>
 
+                                    <button
+                                        className="flex flex-col cursor-pointer"
+                                        onClick={() => {shareToLinkedin(video)}}
+                                    >
+                                        <img
+                                            src="/public/linkedin.png" 
+                                            className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                        />
+                                        linked
+                                    </button>
+                                    </div>
+                                    <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
+                                    {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
+                                <input 
+                                type="text"  
+                                readOnly
+                                value={`https://youtube.com/watch?v=${video.id}`} 
+                                onClick={(e) => e.currentTarget.select()}
+                                className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
+                                />
 
+                                <button 
+                                
+                                    onClick={() => {
+                                        handleCopyURL(video)
+                                    }}
+                                    className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
+                                >
+                                    Copy
+                                </button>
+                                {isNotice && (
+                                <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
+                                    Copy link Successfull !
+                                </div>
+                                )}
+                                    </div>
                                 </div>
                             </div>
                             )}
@@ -307,7 +369,6 @@ const shareToFacebook = (video: any) => {
                             />
                             Remove from {playlistTitle ? 'Watch later' : 'Liked videos'}
                         </button>
-
                         </div>
                         </>
                     )}

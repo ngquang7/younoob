@@ -690,7 +690,7 @@ export default function WatchComponent() {
                 {video?.snippet?.title || "Loading"}
               </h4>
               <div className="flex flex-col gap-0.5 text-[11px] text-gray-400">
-                <span className="truncate hover:text-white">{video?.snippet?.channelTitle || "Loading"}</span>
+                <span className="truncate">{video?.snippet?.channelTitle || "Loading"}</span>
                 <div className="flex items-center truncate">
                   {/* <span>views</span> */}
                   {/* <span className="mx-1 text-[6px]">•</span> */}
