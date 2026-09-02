@@ -1,12 +1,12 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { video } from 'motion/react-m';
 import { searchYouTube, type YoutubeVideo } from '../api/youtubeSearch';
-import {getVideosDetails} from "../api/videoWatchInformation";
-import {getChannelData} from '../api/channelData';
+import { getVideosDetails } from "../api/videoWatchInformation";
+import { getChannelData } from '../api/channelData';
 import { getCommentData } from '../api/commentData';
-import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
-import {Plus, Check } from 'lucide-react';
+import type { YouTubeSearchItem, YouTubeVideo } from "../type";
+import { Plus, Check } from 'lucide-react';
 
 
 
@@ -22,23 +22,27 @@ export default function WatchComponent() {
   const [isSaved, setIsSaved] = useState(false);
   const [isdisLiked, setDisIsLiked] = useState(false);
   const [isNotice, setisNotice] = useState(false);
-  const [isExpandedDecription, setisExpandedDecription] = useState(false);    
+  const [isExpandedDecription, setisExpandedDecription] = useState(false);
   const [isAddComment, setIsAddComment] = useState(false);
-
+  const [isShareModal, setIsShareModal] = useState(false);
+  const [isShareModalUpNext, setIsShareModalUpNext] = useState(false);
+  
+  const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [video, setVideo] = useState<any>(null); //Video
   const [comments, setComments] = useState<any[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]);
   const [commentText, setCommentText] = useState("");
-
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
   //Share button
   const handleShareClick = () => {
-  const shareUrl = `https://youtube.com/watch?v=${videoId}`;
+    const shareUrl = `https://youtube.com/watch?v=${videoId}`;
     try {
       navigator.clipboard.writeText(shareUrl);
       setisNotice(true);
-      setTimeout ( () => {
+      setTimeout(() => {
         setisNotice(false);
       }, 2300);
     } catch (error) {
@@ -58,30 +62,30 @@ export default function WatchComponent() {
       setLoading(true);
       try {
         const response = await getVideosDetails(videoId);
-          //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
-          if (response.items && response.items.length > 0) {
-            const videoItem = response.items[0];
-            setVideo(response.items[0]);          
-            
-            const idChannel = videoItem.snippet?.channelId;
-            const response1 = await getChannelData(idChannel);         
-            if (response1.items && response1.items.length > 0) {
-              // setVideo1(response1.items[0]);
-              // console.log("Subscriber Count:", video1.statistics.subscriberCount);
+        //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
+        if (response.items && response.items.length > 0) {
+          const videoItem = response.items[0];
+          setVideo(response.items[0]);
+
+          const idChannel = videoItem.snippet?.channelId;
+          const response1 = await getChannelData(idChannel);
+          if (response1.items && response1.items.length > 0) {
+            // setVideo1(response1.items[0]);
+            // console.log("Subscriber Count:", video1.statistics.subscriberCount);
             //SHOULD DO THIS METHOD INSTEAD OF THE METHOD ABOVE
             //THIS IS BECAUSE video1 is a React state
             //Calling setVideo1(...) does not instantly update the video1 variable on the next line.
             //Because video1 is still null (or its previous value), trying to read video1.statistics will crash your app with a TypeError.
-              const channelItem = response1.items[0]; //Store in a local variable
-              setVideo1(channelItem); //Update state
-              //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
-            }
+            const channelItem = response1.items[0]; //Store in a local variable
+            setVideo1(channelItem); //Update state
+            //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
           }
-          const commentResponse = await getCommentData(videoId);
-          if(commentResponse.items) {
-            const commentItem = commentResponse.items[0];
-            setComments(commentResponse.items);
-          }
+        }
+        const commentResponse = await getCommentData(videoId);
+        if (commentResponse.items) {
+          const commentItem = commentResponse.items[0];
+          setComments(commentResponse.items);
+        }
       } catch (error) {
         console.error("Failed to fetch video:", error);
       } finally {
@@ -95,17 +99,17 @@ export default function WatchComponent() {
   const [playListVideo, setPlayListVideo] = useState<any[]>([]);
 
   useEffect(() => {
-    if(listId === 'LL') {
+    if (listId === 'LL') {
       const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
       setPlayListVideo(savedLikedVideos);
-    } else if(listId === 'WL') {
+    } else if (listId === 'WL') {
       const savedSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
       setPlayListVideo(savedSavedVideos);
-    } 
+    }
     else {
       return;
     }
-  },[])
+  }, [])
 
   /* UP NEXT */
   const currenVideoTitle = video?.snippet?.title || "loading...";
@@ -123,19 +127,19 @@ export default function WatchComponent() {
       };
     }
     fetchUpNext();
-  },[currenVideoTitle]);
+  }, [currenVideoTitle]);
 
   /*GO TO CHANNEL PAGE*/
   const channelId = video?.snippet?.channelId || "loading...";
   const goChannel = () => navigate(`/channel/${channelId}`);
-  
+
   const handleSubscribeToggle = () => {
     const nextState = !isSubscribed;
     setIsSubscribed(nextState);
     // get the old subcription list from localStorage
     // convert string to array
     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-    
+
     // Add this channel into this localstorage, this is hashmap(key, value)
     const currentChannel = {
       id: video?.snippet?.channelId || 'unknown_id',
@@ -166,7 +170,7 @@ export default function WatchComponent() {
     const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
 
     let updatedSavedVideos;
-    if(isAlreadySaved) {
+    if (isAlreadySaved) {
       updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
       setIsSaved(false);
     } else {
@@ -199,39 +203,116 @@ export default function WatchComponent() {
 
 
   const handlePostComment = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!commentText.trim()) return;
-  // Create a fake comment (the structure must be the same API)
-  const newComment = {
-    id: Date.now().toString(), // create a temporary ID 
-    snippet: {
-      topLevelComment: {
-        snippet: {
-          authorDisplayName: "Quang (You)", 
-          authorProfileImageUrl: "/public/Q.png", // Avatar
-          textDisplay: commentText,
-          publishedAt: new Date().toISOString(),
-          likeCount: 0
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    // Create a fake comment (the structure must be the same API)
+    const newComment = {
+      id: Date.now().toString(), // create a temporary ID 
+      snippet: {
+        topLevelComment: {
+          snippet: {
+            authorDisplayName: "Quang (You)",
+            authorProfileImageUrl: "/public/Q.png", // Avatar
+            textDisplay: commentText,
+            publishedAt: new Date().toISOString(),
+            likeCount: 0
+          }
         }
       }
+    };
+    //Update state (add to the first array)
+    setComments([newComment, ...comments]);
+    //total comments + 1 
+    if (video && video.statistics) {
+      const currentCount = Number(video.statistics.commentCount || 0);
+      setVideo({
+        ...video,
+        statistics: {
+          ...video.statistics,
+          commentCount: String(currentCount + 1)
+        }
+      });
     }
-  };
-  //Update state (add to the first array)
-  setComments([newComment, ...comments]);
-  //total comments + 1 
-  if (video && video.statistics) {
-    const currentCount = Number(video.statistics.commentCount || 0);
-    setVideo({
-      ...video,
-      statistics: {
-        ...video.statistics,
-        commentCount: String(currentCount + 1)
-      }
-    });
-  }
     //Reset input và close button
     setCommentText("");
     setIsAddComment(false);
+  };
+  const showNotice = (message: string) => {
+    setNoticeMessage(message);
+    setTimeout(() => {
+      setNoticeMessage(null);
+    }, 2300);
+  };
+  const handleCopyURL = (video: any) => {
+    const shareUrl = `https://youtube.com/watch?v=${video.id}`;
+    try {
+      navigator.clipboard.writeText(shareUrl);
+      showNotice("Copy successfully");
+    } catch (error) {
+      console.warn("Copy failed ", error);
+    }
+  };
+
+  const handleOpenSaveModal = () => {
+    if (video && video.id) {
+      const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
+      setIsSaved(isSaved);
+    }
+  };
+
+  const shareToFacebook = (videoId: string) => {
+    if (!video || !video.id) return;
+    let youtubeUrl;
+    if(videoId) {
+    youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    } else {
+    youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    }
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
+    window.open(facebookShareUrl, '_blank');
+  };
+
+  const shareToX = (videoId: string, videoTitle: string) => {
+    if (!video || !video.id) return;
+    let youtubeUrl;
+    let text;
+    if(videoId) {
+      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
+    } else{
+      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+      text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+    }
+    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+    const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`;
+    window.open(xShareUrl, '_blank');
+  }
+
+  const shareToLinkedin = () => {
+    if (!video || !video.id) return;
+    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
+    window.open(linkedinShareUrl, '_blank');
+  }
+
+  const shareToReddit = () => {
+    if (!video || !video.id) return;
+    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+    const text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+    const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
+    window.open(redditShareUrl, '_blank');
+  }
+  const addVideoToList = (video: any) => {
+      if (!video.id || !video) return;
+      const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
+      if (!isAlreadyInList) {
+          const updateList = [video, ...existingListVideos];
+          localStorage.setItem('saved_video', JSON.stringify(updateList));
+      }
+      showNotice("Saved to Watch Later");
   };
 
   /* History video */
@@ -240,13 +321,13 @@ export default function WatchComponent() {
       // Get the list of history, if it's null, intialize it with empty list
       //JSON.parse convert watch_history from string to array, if it's null, then intialize empty list 
       const existingHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
-      
+
       // Filter out videos that have already been watched (to avoid repeating the same video)
       const filteredHistory = existingHistory.filter((v: any) => v.id !== video.id);
-      
+
       // Push new video to the top of the list
       const updatedHistory = [video, ...filteredHistory];
-      
+
       // Store in localStorage, convert array to string
       localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
     }
@@ -260,7 +341,7 @@ export default function WatchComponent() {
     }
   }, [video]);
 
-  /* Like, check is it liked or not */ 
+  /* Like, check is it liked or not */
   useEffect(() => {
     if (video && video.id) {
       const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
@@ -273,10 +354,10 @@ export default function WatchComponent() {
   useEffect(() => {
     if (video && video.snippet?.channelId) {
       const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-      
+
       // Kiểm tra xem ID của kênh hiện tại có nằm trong danh sách đã đăng ký không
       const isSubbed = savedSubs.some((sub: any) => sub.id === video.snippet.channelId);
-      
+
       // Cập nhật lại state của nút Subscribe cho khớp
       setIsSubscribed(isSubbed);
     }
@@ -284,15 +365,15 @@ export default function WatchComponent() {
 
   const getSubcriber = (subcriber: string) => {
     const totalSubcriber: number = Number(subcriber);
-    if(totalSubcriber < 1000) {
+    if (totalSubcriber < 1000) {
       return `${totalSubcriber}`;
-      }
-    if(totalSubcriber < 1000000) {
-      const subcribers: number = totalSubcriber/1000;
+    }
+    if (totalSubcriber < 1000000) {
+      const subcribers: number = totalSubcriber / 1000;
       return `${subcribers}K`;
     }
-    if(totalSubcriber < 1000000000) {
-      const subcribers: number = totalSubcriber/1000000;
+    if (totalSubcriber < 1000000000) {
+      const subcribers: number = totalSubcriber / 1000000;
       return `${subcribers}M`;
     }
   }
@@ -303,74 +384,74 @@ export default function WatchComponent() {
     const currentTime = new Date();
     const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
 
-    if(timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+    if (timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
     if (timeAgo < 3600) { // MINUTE
       const minutes = Math.floor(timeAgo / 60);
       return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    } 
+    }
     if (timeAgo < 86400) { // HOUR
-      const hours = Math.floor(timeAgo/3600);
+      const hours = Math.floor(timeAgo / 3600);
       return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } 
+    }
     if (timeAgo < 604800) { // DAY
       const days = Math.floor(timeAgo / 86400);
-      return `${days} day${days > 1 ? 's' : '' } ago`;
-    } 
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
     if (timeAgo < 2592000) { // WEEK
       const weeks = Math.floor(timeAgo / 604800);
-      return `${weeks} week${weeks > 1 ? 's' : '' } ago`;
-    } 
+      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    }
     if (timeAgo < 31536000) { // MONTH
       const months = Math.floor(timeAgo / 2592000);
-      return `${months} month${months > 1 ? 's' : '' } ago`;
-    }  
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    }
     //YEAR
     const years = Math.floor(timeAgo / 31536000);
-    return `${years} year${years > 1 ? 's' : '' } ago`;
+    return `${years} year${years > 1 ? 's' : ''} ago`;
   }
 
   const getView = (view: string) => {
     const totalView: number = Number(view);
-    if(totalView < 1000) {
+    if (totalView < 1000) {
       return `${view} views`
     }
-    if(totalView < 1000000) { // < 1M view 
-      const views: number = Math.floor(totalView/1000);
+    if (totalView < 1000000) { // < 1M view 
+      const views: number = Math.floor(totalView / 1000);
       return `${views}K views`;
     }
-    if(totalView < 1000000000) {
-      const views: number = Math.floor(totalView/1000000);
+    if (totalView < 1000000000) {
+      const views: number = Math.floor(totalView / 1000000);
       return `${views}M views`;
     }
-    if(totalView < 1000000000000) {
-      const views: number = Math.floor(totalView/1000000000);
-      return `${views}B views`; 
+    if (totalView < 1000000000000) {
+      const views: number = Math.floor(totalView / 1000000000);
+      return `${views}B views`;
     }
   }
 
   const getTimeDescription = (date: string) => {
     const videoDate = new Date(date);
-    const dayandmonth: string = videoDate.toDateString().slice(4,10);
-    const year: string = videoDate.toDateString().slice(11,16);
+    const dayandmonth: string = videoDate.toDateString().slice(4, 10);
+    const year: string = videoDate.toDateString().slice(11, 16);
     return `${dayandmonth}, ${year}`;
-    }
+  }
 
   const getLike = (like: string) => {
     const totalLike: number = Number(like);
-    if(totalLike < 1000) {
+    if (totalLike < 1000) {
       return `${like}`
     }
-    if(totalLike < 1000000) { // < 1M view 
-      const likes: number = Math.floor(totalLike/1000);
+    if (totalLike < 1000000) { // < 1M view 
+      const likes: number = Math.floor(totalLike / 1000);
       return `${likes}K`;
     }
-    if(totalLike < 1000000000) {
-      const likes: number = Math.floor(totalLike/1000000);
+    if (totalLike < 1000000000) {
+      const likes: number = Math.floor(totalLike / 1000000);
       return `${likes}M`;
     }
-    if(totalLike < 1000000000000) {
-      const likes: number = Math.floor(totalLike/1000000000);
-      return `${likes}B`; 
+    if (totalLike < 1000000000000) {
+      const likes: number = Math.floor(totalLike / 1000000000);
+      return `${likes}B`;
     }
   }
 
@@ -407,19 +488,18 @@ export default function WatchComponent() {
               <span onClick={goChannel} className="font-sans font-semibold text-sm hover:text-white cursor-pointer">{video?.snippet?.channelTitle || "Loading..."}</span>
               <span className="text-xs text-gray-400">{getSubcriber(video1?.statistics?.subscriberCount)} subscribers</span>
             </div>
-            
+
             <button
               onClick={handleSubscribeToggle}
-              className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
-                isSubscribed 
-                  ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]' 
+              className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
+                  ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
                   : 'bg-white hover:bg-gray-200 text-black'
-              }`}
+                }`}
             >
               {isSubscribed ? 'Subscribed' : 'Subscribe'}
             </button>
           </div>
-          
+
           {/* Action buttons (Likes, Share, Save) */}
           <div className="flex items-center gap-2 overflow-x-auto py-0">
             {/* Likes */}
@@ -427,32 +507,30 @@ export default function WatchComponent() {
               <button
                 onClick={handleLikeToggle}
                 className={`flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer
-                ${
-                  isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-                }`}
+                ${isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
+                  }`}
               >
                 {getLike(video?.statistics?.likeCount)} likes
               </button>
-                {/* dislike button */}
-                {/* Pay attention to hover */}
+              {/* dislike button */}
+              {/* Pay attention to hover */}
               <button
-              onClick={() => setDisIsLiked(!isdisLiked)}
-              className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] transition text-xs font-semibold cursor-pointer
-              ${
-                isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-              }`}
+                onClick={() => setDisIsLiked(!isdisLiked)}
+                className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] transition text-xs font-semibold cursor-pointer
+              ${isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
+                  }`}
               >
                 dislike
               </button>
-              
-            </div> 
+
+            </div>
 
             {/* Save (Watch Later) */}
             <button
               onClick={handleSaveToggle}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#303030]/50 transition text-xs font-semibold shrink-0 cursor-pointer 
-                ${                isSaved 
-                  ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80' 
+                ${isSaved
+                  ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80'
                   : 'bg-[#212121] hover:bg-[#303030]'}
                 `}
             >
@@ -461,13 +539,106 @@ export default function WatchComponent() {
 
             {/* SHARE */}
             <button
-              onClick={handleShareClick}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
-            >
-              <span>Share</span>
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsShareModal(true);
+              }}
+              className="flex items-center px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
+            >                                                   
+             <img
+                alt="Share"
+                src="/public/share.png" className="h-5 w-5 mr-2"
+              />
+              Share
             </button>
+            {isShareModal && (
+              <div
+                onClick={() => setIsShareModal(false)}
+                className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
+              >
+                {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                  {/* Nút Đóng (Dấu X góc trên bên phải) */}
+                  <button
+                    onClick={() => setIsShareModal(false)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                  <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
+                    Share
+                  </h2>
+                  <div className="flex flex-row gap-3">
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={() => shareToFacebook("")}
+                    >
+                      <img
+                        alt="Share"
+                        src="/public/facebook.png"
+                        className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
+                      />
+                      Facebook
+                    </button>
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={() => shareToX("", "")}
+                    >
+                      <img
+                        src="/public/X.png"
+                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                      />
+                      X
+                    </button>
 
-            <button 
+                    <button
+                      className="flex flex-col cursor-pointer -ml-2"
+                      onClick={shareToLinkedin}
+                    >
+                      <img
+                        src="/public/linkedin.png"
+                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                      />
+                      Linked
+                    </button>
+
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={shareToReddit}
+                    >
+                      <img
+                        src="/public/reddit.png"
+                        className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
+                      />
+                      Reddit
+                    </button>
+                  </div>
+                  <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
+                    {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
+                    <input
+                      type="text"
+                      readOnly
+                      value={`https://youtube.com/watch?v=${video.id}`}
+                      onClick={(e) => e.currentTarget.select()}
+                      className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
+                    />
+
+                    <button
+                      onClick={() => {
+                        handleCopyURL(video)
+                      }}
+                      className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
               onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
             >
@@ -479,13 +650,13 @@ export default function WatchComponent() {
               </div>
             )}
           </div>
-          
+
 
         </div>
 
         {/* DESCRIPTION CARD */}
         <div
-          onClick={() => setisExpandedDecription(true)} 
+          onClick={() => setisExpandedDecription(true)}
           className={`bg-[#212121] hover:bg-[#282828] rounded-xl p-4 mt-4 transition border border-[#2d2d2d]/30 text-sm leading-relaxed ${!isExpandedDecription ? 'cursor-pointer' : ''}`}
         >
           {/* VIEW in description */}
@@ -493,13 +664,13 @@ export default function WatchComponent() {
 
             {isExpandedDecription ? (
               <>
-              <span>{video?.statistics?.viewCount} views</span>
-              <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
+                <span>{video?.statistics?.viewCount} views</span>
+                <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
               </>
             ) : (
               <>
-                  {/* {getView(video?.statistics?.viewCount)} */}
-                  {/* {video?.statistics?.viewCount} */}
+                {/* {getView(video?.statistics?.viewCount)} */}
+                {/* {video?.statistics?.viewCount} */}
                 <span>{getView(video?.statistics?.viewCount)}</span>
                 <span>{getTimeago(video?.snippet?.publishedAt)}</span>
               </>
@@ -509,7 +680,7 @@ export default function WatchComponent() {
           {/* DESCRIPTION */}
           {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
           <div className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
-            {video?.snippet?.description || <div className="italic">No description has been added to this video</div>} 
+            {video?.snippet?.description || <div className="italic">No description has been added to this video</div>}
           </div>
 
           <div
@@ -530,18 +701,18 @@ export default function WatchComponent() {
             )}
           </div>
         </div>
-        
+
         {/* COMMENTS */}
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-6">
             <h1 className="text-base font-bold tracking-tight font-sans">
-            {video?.statistics?.commentCount || "Loading..."} Comments
+              {video?.statistics?.commentCount || "Loading..."} Comments
             </h1>
           </div>
           {/* MY COMMENT */}
           <form onSubmit={handlePostComment} className="flex gap-3 mb-6">
             <div className="w-9 h-9 rounded-full bg-[#392937] overflow-hidden shrink-0 flex items-center justify-center font-sans font-bold text-sm text-white">
-                Q
+              Q
             </div>
 
             <div className="flex-1 flex flex-col gap-2">
@@ -553,80 +724,80 @@ export default function WatchComponent() {
                 placeholder="Add a comment..."
                 className="w-full bg-transparent border-b border-[#303030] focus:border-white focus:outline-none py-1.5 text-sm text-[#f1f1f1] transition-colors placeholder-gray-500"
               />
-                <div className="flex justify-end gap-2 animate-in fade-in duration-100">
-                  {isAddComment &&
+              <div className="flex justify-end gap-2 animate-in fade-in duration-100">
+                {isAddComment &&
                   <>
-                  <button 
-                    onClick={() => {
-                      setIsAddComment(false);
-                      setCommentText("");
-                    }}
-                    className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
+                    <button
+                      onClick={() => {
+                        setIsAddComment(false);
+                        setCommentText("");
+                      }}
+                      className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
                     >
-                    Cancel
-                  </button>
-                  {/* type="submit" */}
-                  <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
-                    Comment
-                  </button>
+                      Cancel
+                    </button>
+                    {/* type="submit" */}
+                    <button type="submit" className="px-3.5 py-1.5 text-xs font-semibold bg-blue-500 hover:bg-blue-600 rounded-full text-white transition cursor-pointer">
+                      Comment
+                    </button>
                   </>
-                    }
-                </div>    
+                }
               </div>
+            </div>
           </form>
 
-            {/* Insert a comment into comments list */}
-            {comments.map((item) => {
-              const comment = item.snippet.topLevelComment.snippet;
-              return (
-                  <div key={item.id} className="flex gap-4">
-                      <img 
-                          src={comment.authorProfileImageUrl} 
-                          className="w-10 h-10 rounded-full cursor-pointer" 
-                          alt="avatar"
-                          onClick={() => setPreviewImage(comment.authorProfileImageUrl)}
-                      />
-                      <div className="flex flex-col mb-8">
-                          <div className="flex items-center gap-2">
-                              <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
-                              <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
-                          </div>
-                          <p
-                            dangerouslySetInnerHTML={{ __html: comment.textDisplay }} 
-                            className="text-sm mt-1 text-gray-200"
-                          />
-                            {/* {comment.textDisplay}</p> */}
-                          <div className="flex items-center gap-4 mt-2">
-                              <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
-                          </div>
-                      </div>
-                      {previewImage && (
-                        <div 
-                          className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-                          onClick={() => setPreviewImage(null)}
-                        >
-                            {/* Want preview bigger ? Modify w-64 h-64 */}
-                            <img 
-                              src={previewImage} 
-                              alt="Preview Large" 
-                              className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
-                            />
-                        </div>
-                      )}
+          {/* Insert a comment into comments list */}
+          {comments.map((item) => {
+            const comment = item.snippet.topLevelComment.snippet;
+            return (
+              <div key={item.id} className="flex gap-4">
+                <img
+                  src={comment.authorProfileImageUrl}
+                  className="w-10 h-10 rounded-full cursor-pointer"
+                  alt="avatar"
+                  onClick={() => setPreviewImage(comment.authorProfileImageUrl)}
+                />
+                <div className="flex flex-col mb-8">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
+                    <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
                   </div>
-                );
-            })}
+                  <p
+                    dangerouslySetInnerHTML={{ __html: comment.textDisplay }}
+                    className="text-sm mt-1 text-gray-200"
+                  />
+                  {/* {comment.textDisplay}</p> */}
+                  <div className="flex items-center gap-4 mt-2">
+                    <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
+                  </div>
+                </div>
+                {previewImage && (
+                  <div
+                    className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    onClick={() => setPreviewImage(null)}
+                  >
+                    {/* Want preview bigger ? Modify w-64 h-64 */}
+                    <img
+                      src={previewImage}
+                      alt="Preview Large"
+                      className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
-      
-      {/* RIGHT COLUMN (SIDEBAR FEED) */}
+
+      {/* RIGHT COLUMN (SIDEBAR FEED), UP NEXT */}
       <div className="w-200 lg:w-[350px] shrink-0 flex flex-col gap-4">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
         {listId === 'LL' || listId === 'WL' ? (
           <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
-            {/* Header của Playlist ở sidebar */}
+            {/* Header of Playlist */}
             <div className="bg-[#212121] p-3 rounded-xl border border-[#303030]">
-              <h3 className="font-sans font-bold text-sm text-white">{listType ? 'Watch Later' :'Liked videos'}</h3>
+              <h3 className="font-sans font-bold text-sm text-white">{listType ? 'Watch Later' : 'Liked videos'}</h3>
               <p className="text-xs text-gray-400 mt-0.5">Private • Playlist • {playListVideo.length} videos</p>
             </div>
 
@@ -635,14 +806,13 @@ export default function WatchComponent() {
               <div
                 key={item.id}
                 onClick={() => navigate(`/watch?v=${item.id}&list=${listId}&index=${index + 1}`)}
-                className={`flex gap-3 group cursor-pointer p-1.5 transition ${
-                  item.id === videoId ? 'bg-[#3f3f3f]' : 'hover:bg-[#272727]'
-                }`}
+                className={`flex gap-3 group cursor-pointer p-1.5 transition ${item.id === videoId ? 'bg-[#3f3f3f]' : 'hover:bg-[#272727]'
+                  }`}
               >
                 <span className="text-xs text-gray-400 flex items-center justify-center w-4 shrink-0 font-medium">
                   {index + 1}
                 </span>
-                
+
                 <div className="relative w-25 aspect-video rounded-md overflow-hidden shrink-0 bg-[#212121]">
                   <img
                     src={item?.snippet?.thumbnails?.medium?.url || item?.snippet?.thumbnails?.default?.url}
@@ -651,7 +821,7 @@ export default function WatchComponent() {
                 </div>
 
                 <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
-                  <h4 className="text-xs font-semibold leading-snug line-clamp-2 text-[#f1f1f1] group-hover:text-white">
+                  <h4 className="text-xs font-semibold leading-snug line-clamp-3 text-[#f1f1f1] group-hover:text-white">
                     {item?.snippet?.title}
                   </h4>
                   <span className="text-[11px] text-gray-400 truncate">
@@ -666,46 +836,222 @@ export default function WatchComponent() {
           </div>
         ) : (
           <>
-          {upNextVideos.map((video) => (
-          <div
-            key={video.id.videoId}
-            onClick={() => {
-              if (video.id.videoId) {
-                goWatch(video.id.videoId);
-              }
-          }}
-            className="flex gap-3 group cursor-pointer hover:bg-[#272727]"
-          >
-            {/* Mini Thumbnail */}
-            <div className="relative w-40 aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
-              <img
-                src={video?.snippet?.thumbnails.default?.url || "null"}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              {/* Duration */}
-              {/* <span className="absolute bottom-1 right-1 bg-black/80 px-1 py-0.5 rounded text-[10px] font-medium text-white">
-                duration
-              </span> */}
-            </div>
+            {upNextVideos.map((video) => (
+              <div
+                key={video.id.videoId}
+                onClick={() => {
+                  if (video.id.videoId) {
+                    goWatch(video.id.videoId);
+                  }
+                }}
+                className="flex gap-3 group cursor-pointer hover:bg-gray-900"
+              >
+                {/* Mini Thumbnail */}
+                <div className="relative w-50 aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
+                  <img
+                    src={video?.snippet?.thumbnails.default?.url || "null"}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {/* Duration */}
+                  {/* <span className="absolute bottom-1 right-1 bg-black/80 px-1 py-0.5 rounded text-[10px] font-medium text-white">
+                    duration
+                  </span> */}
+                </div>
 
-            {/* Mini details */}
-            <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
-              <h4 className="text-xs font-semibold leading-snug line-clamp-2 text-[#f1f1f1] group-hover:text-white transition-colors">
-                {video?.snippet?.title || "Loading"}
-              </h4>
-              <div className="flex flex-col gap-0.5 text-[11px] text-gray-400">
-                <span className="truncate">{video?.snippet?.channelTitle || "Loading"}</span>
-                <div className="flex items-center truncate">
-                  {/* <span>views</span> */}
-                  {/* <span className="mx-1 text-[6px]">•</span> */}
-                  <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+                {/* Mini details */}
+                <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
+                  <h4 className="text-xs font-semibold leading-snug line-clamp-3 w-full text-[#f1f1f1] group-hover:text-white transition-colors">
+                    {video?.snippet?.title || "Loading"}
+                  </h4>
+                  <div className="flex flex-col gap-0.5 text-[10px] text-gray-400">
+                    <span className="truncate">{video?.snippet?.channelTitle || "Loading"}</span>
+                    <div className="flex items-center truncate">
+                      {/* <span>views</span> */}
+                      {/* <span className="mx-1 text-[6px]">•</span> */}
+                      <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const vidId = video.id?.videoId ?? null;
+                    setActiveMenuId(activeMenuId === vidId ? null : vidId);
+                  }}
+
+                  className="mt-20 mr-1 text-xl h-[30px] w-[30px] cursor-pointer hover:bg-neutral-700 rounded-full transition-colors"
+                >
+                  ⋮
+                </button>
+                {activeMenuId === video.id.videoId && (
+                  <>
+                    <div
+                        className="fixed inset-0 z-40 cursor-default"
+                        onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMenuId(null);
+                      }}
+                    />
+
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="overflow-hidden absolute right-0 mt-[110px] w-[200px] bg-[#282828] overflow-hidden text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
+                    >
+                      <button
+                          className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
+                          <img
+                              alt="Add to queue"
+                              src="/public/addtoqueue.png" className="h-6 w-6 mr-3"
+                          />
+                          Add to queue
+                      </button>
+                        <button
+                        onClick={(e) => {
+                            setActiveMenuId(null);
+                            addVideoToList(video);
+                        }}
+                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                        <img
+                            alt="Save to watch later"
+                            src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
+                        />
+                        Save to watch later
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenuId(null);
+                            // setSelectedVideo(video);
+                            // handleOpenSaveModal(video);
+                        }}
+                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                        <img
+                            alt="Save to playlist"
+                            src="/public/savetoplaylist.png" className="h-6 w-5 mr-3"
+                        />
+                        Save to playlist
+                    </button>
+                    <button
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          setIsShareModalUpNext(true);
+                      }}
+                      className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                      <img
+                          alt="Share"
+                          src="/public/share.png" className="h-5 w-5 mr-3"
+                      />
+                      Share
+                    </button>
+                                {isShareModalUpNext && (
+              <div
+                onClick={() => setIsShareModalUpNext(false)}
+                className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
+              >
+                {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                  {/* Nút Đóng (Dấu X góc trên bên phải) */}
+                  <button
+                    onClick={() => setIsShareModalUpNext(false)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                  <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
+                    Share
+                  </h2>
+                  <div className="flex flex-row gap-3">
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={() => {
+                        const videoId = video.id.videoId || "";
+                        shareToFacebook(videoId);
+                      }}
+                    >
+                      <img
+                        alt="Share"
+                        src="/public/facebook.png"
+                        className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
+                      />
+                      Facebook
+                    </button>
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={() => {
+                        const videoId = video.id.videoId || "";
+                        const title = video.snippet.title || "";
+                        shareToX(videoId, title);
+                      }}
+                    >
+                      <img
+                        src="/public/X.png"
+                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                      />
+                      X
+                    </button>
+
+                    <button
+                      className="flex flex-col cursor-pointer -ml-2"
+                      onClick={shareToLinkedin}
+                    >
+                      <img
+                        src="/public/linkedin.png"
+                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                      />
+                      Linked
+                    </button>
+
+                    <button
+                      className="flex flex-col cursor-pointer"
+                      onClick={shareToReddit}
+                    >
+                      <img
+                        src="/public/reddit.png"
+                        className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
+                      />
+                      Reddit
+                    </button>
+                  </div>
+                  <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
+                    {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
+                    <input
+                      type="text"
+                      readOnly
+                      value={`https://youtube.com/watch?v=${video.id}`}
+                      onClick={(e) => e.currentTarget.select()}
+                      className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
+                    />
+
+                    <button
+                      onClick={() => {
+                        handleCopyURL(video)
+                      }}
+                      className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
+                    >
+                      Copy
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+
+                    </div>
+                  </>
+                )}
+                                                    
+              </div>
+            ))}
+          </>
+        )}
+        {noticeMessage && (
+          <div className="fixed bottom-6 z-[100] left-1/2 -translate-x-1/2 px-4 py-2 bg-white border border-neutral-700 text-black text-sm font-semibold rounded-xl shadow-2xl transition-all animate-fade-in flex items-center gap-2">
+            <span>{noticeMessage}</span>
           </div>
-        ))}
-        </>
-      )}
+        )}
       </div>
     </div>
   );

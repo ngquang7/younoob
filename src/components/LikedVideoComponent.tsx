@@ -1,3 +1,4 @@
+import { li } from 'motion/react-m';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -9,14 +10,16 @@ export default function LikedVideoComponent() {
 
     const [selectedVideo, setSelectedVideo] = useState<any>(null);
     const [activeMenuId, setActiveMenuId] = useState(null);
-    
+
     const listType = searchParams.get('list') === 'WL' ? 'WL' : 'LL';
     const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
     const playlistTitle = listType === 'WL';
+    const title = listType === 'WL' ? 'Watch Later' : 'Liked Video';
+    const reverseTitle = listType === 'WL' ? 'Liked Video' : 'Watch Later';
 
     const [isShareModal, setIsShareModal] = useState(false);
-    const [isNotice, setIsNotice] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
@@ -28,6 +31,12 @@ export default function LikedVideoComponent() {
         setVideoList(savedLikedVideo);
     }, [listType]);
 
+    const showNotice = (message: string) => {
+        setNoticeMessage(message);
+        setTimeout(() => {
+            setNoticeMessage(null);
+        }, 2300);
+    };
 
     const handleOpenSaveModal = (video: any) => {
         if (video && video.id) {
@@ -73,6 +82,7 @@ export default function LikedVideoComponent() {
         const updated = videoList.filter(v => v.id !== id);
         setVideoList(updated);
         localStorage.setItem(storageKey, JSON.stringify(updated));
+        showNotice(`Removed from ${title}`);
     };
 
     const addVideoToList = (video: any) => {
@@ -83,6 +93,7 @@ export default function LikedVideoComponent() {
             const updateList = [video, ...existingListVideos];
             localStorage.setItem('saved_video', JSON.stringify(updateList));
         }
+        showNotice(`Saved to ${reverseTitle}`);
     };
 
     const handleSaveToggle = (video: any) => {
@@ -94,9 +105,11 @@ export default function LikedVideoComponent() {
         if (isAlreadySaved) {
             updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
             setIsSaved(false);
+            showNotice(`Removed from ${reverseTitle}`);
         } else {
             updatedSavedVideos = [video, ...existingSavedVideos];
             setIsSaved(true);
+            showNotice(`Saved to ${reverseTitle}`);
         }
         localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
     };
@@ -105,10 +118,7 @@ export default function LikedVideoComponent() {
         const shareUrl = `https://youtube.com/watch?v=${video.id}`;
         try {
             navigator.clipboard.writeText(shareUrl);
-            setIsNotice(true);
-            setTimeout(() => {
-                setIsNotice(false);
-            }, 2300);
+            showNotice("Copy successfully")
         } catch (error) {
             console.warn("Copy failed ", error);
         }
@@ -323,7 +333,7 @@ export default function LikedVideoComponent() {
                                                 {isShareModal && (
                                                     <div
                                                         onClick={() => setIsShareModal(false)}
-                                                        className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50 backdrop-blur-md"
+                                                        className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
                                                     >
                                                         {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
                                                         <div
@@ -383,7 +393,6 @@ export default function LikedVideoComponent() {
                                                                     />
                                                                     Reddit
                                                                 </button>
-
                                                             </div>
                                                             <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
                                                                 {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
@@ -403,12 +412,6 @@ export default function LikedVideoComponent() {
                                                                 >
                                                                     Copy
                                                                 </button>
-
-                                                                {isNotice && (
-                                                                    <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
-                                                                        Copy link Successfull !
-                                                                    </div>
-                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -417,9 +420,8 @@ export default function LikedVideoComponent() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        removeVideoFromList(video.id)
-                                                    }
-                                                    }
+                                                        removeVideoFromList(video.id);
+                                                    }}
                                                     className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-b-xl"
                                                 >
                                                     <img
@@ -506,7 +508,7 @@ export default function LikedVideoComponent() {
                                                                         {isSaved ?
                                                                             <>
                                                                                 <img
-                                                                                    src="/public/share.png" className="h-6 w-5"
+                                                                                    src="/public/saved.png" className="h-6 w-5"
                                                                                 />
                                                                             </>
                                                                             :
@@ -520,16 +522,21 @@ export default function LikedVideoComponent() {
                                                                     </div>
                                                                 </div>
                                                             </>
-                                                        )} //watchLaterVideoList, render the first element and check whether this video has been saved
+                                                        )} {/* watchLaterVideoList, render the first element and check whether this video has been saved */}
                                                     </div>
                                                 </div>
                                             </div>
                                         </>
-                                    )} //Selected Video 
+                                    )}  {/*Selected Video*/}
                                 </div>
-                            ))} //Video in list
+                            ))} {/*Video in list */}
                         </div>
-                    )} //Check if this list has any video
+                    )} {/*Check if this list has any video */}
+                    {noticeMessage && (
+                        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 bg-white border border-neutral-700 text-black text-sm font-semibold rounded-xl shadow-2xl transition-all animate-fade-in flex items-center gap-2">
+                            <span>{noticeMessage}</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </>
