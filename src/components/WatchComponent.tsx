@@ -26,7 +26,8 @@ export default function WatchComponent() {
   const [isAddComment, setIsAddComment] = useState(false);
   const [isShareModal, setIsShareModal] = useState(false);
   const [isShareModalUpNext, setIsShareModalUpNext] = useState(false);
-  
+
+  const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [video, setVideo] = useState<any>(null); //Video
   const [comments, setComments] = useState<any[]>([]);
@@ -243,8 +244,9 @@ export default function WatchComponent() {
       setNoticeMessage(null);
     }, 2300);
   };
-  const handleCopyURL = (video: any) => {
-    const shareUrl = `https://youtube.com/watch?v=${video.id}`;
+  const handleCopyURL = (id: string) => {
+    console.log(`id video: ${id}`);
+    const shareUrl = `https://youtube.com/watch?v=${id}`;
     try {
       navigator.clipboard.writeText(shareUrl);
       showNotice("Copy successfully");
@@ -253,7 +255,7 @@ export default function WatchComponent() {
     }
   };
 
-  const handleOpenSaveModal = () => {
+  const handleOpenSaveModal = (video: any) => {
     if (video && video.id) {
       const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
       const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
@@ -264,10 +266,10 @@ export default function WatchComponent() {
   const shareToFacebook = (videoId: string) => {
     if (!video || !video.id) return;
     let youtubeUrl;
-    if(videoId) {
-    youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    if (videoId) {
+      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
     } else {
-    youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
     }
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
     window.open(facebookShareUrl, '_blank');
@@ -277,10 +279,10 @@ export default function WatchComponent() {
     if (!video || !video.id) return;
     let youtubeUrl;
     let text;
-    if(videoId) {
+    if (videoId) {
       youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
       text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
-    } else{
+    } else {
       youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
       text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
     }
@@ -289,31 +291,50 @@ export default function WatchComponent() {
     window.open(xShareUrl, '_blank');
   }
 
-  const shareToLinkedin = () => {
+  const shareToLinkedin = (videoId: string) => {
     if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    let youtubeUrl;
+    if (videoId) {
+      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    } else {
+      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+    }
     const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
     window.open(linkedinShareUrl, '_blank');
   }
 
-  const shareToReddit = () => {
+  const shareToReddit = (videoId: string, videoTitle: string) => {
     if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
-    const text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+    let youtubeUrl;
+    let text;
+    if (videoId) {
+      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
+    } else {
+      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+      // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+      text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+    }
     const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
     window.open(redditShareUrl, '_blank');
   }
+
   const addVideoToList = (video: any) => {
-      if (!video.id || !video) return;
-      const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
-      if (!isAlreadyInList) {
-          const updateList = [video, ...existingListVideos];
-          localStorage.setItem('saved_video', JSON.stringify(updateList));
-      }
-      showNotice("Saved to Watch Later");
+    if (!video.id || !video) return;
+    const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+    const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
+    if (!isAlreadyInList) {
+      const updateList = [video, ...existingListVideos];
+      localStorage.setItem('saved_video', JSON.stringify(updateList));
+    }
+    showNotice("Saved to Watch Later");
   };
+
+  useEffect(() => {
+    const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
+    setWatchLaterVideoList(savedWatchLaterVideo);
+  }, []);
+
 
   /* History video */
   useEffect(() => {
@@ -492,8 +513,8 @@ export default function WatchComponent() {
             <button
               onClick={handleSubscribeToggle}
               className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
-                  ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
-                  : 'bg-white hover:bg-gray-200 text-black'
+                ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
+                : 'bg-white hover:bg-gray-200 text-black'
                 }`}
             >
               {isSubscribed ? 'Subscribed' : 'Subscribe'}
@@ -544,10 +565,10 @@ export default function WatchComponent() {
                 setIsShareModal(true);
               }}
               className="flex items-center px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
-            >                                                   
-             <img
+            >
+              <img
                 alt="Share"
-                src="/public/share.png" className="h-5 w-5 mr-2"
+                src="/public/share.png" className="h-4 w-4 mr-2"
               />
               Share
             </button>
@@ -595,7 +616,7 @@ export default function WatchComponent() {
 
                     <button
                       className="flex flex-col cursor-pointer -ml-2"
-                      onClick={shareToLinkedin}
+                      onClick={() => shareToLinkedin("")}
                     >
                       <img
                         src="/public/linkedin.png"
@@ -606,7 +627,7 @@ export default function WatchComponent() {
 
                     <button
                       className="flex flex-col cursor-pointer"
-                      onClick={shareToReddit}
+                      onClick={() => shareToReddit("", "")}
                     >
                       <img
                         src="/public/reddit.png"
@@ -627,7 +648,7 @@ export default function WatchComponent() {
 
                     <button
                       onClick={() => {
-                        handleCopyURL(video)
+                        handleCopyURL(video.id);
                       }}
                       className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
                     >
@@ -644,11 +665,6 @@ export default function WatchComponent() {
             >
               Open on Youtube
             </button>
-            {isNotice && (
-              <div className="fixed bottom-5 left-1/2 px-4 py-2 bg-green-800 text-white text-xs font-semibold rounded-lg shadow-lg transition-all animate-fade-in">
-                Copy link Successfull !
-              </div>
-            )}
           </div>
 
 
@@ -886,8 +902,8 @@ export default function WatchComponent() {
                 {activeMenuId === video.id.videoId && (
                   <>
                     <div
-                        className="fixed inset-0 z-40 cursor-default"
-                        onClick={(e) => {
+                      className="fixed inset-0 z-40 cursor-default"
+                      onClick={(e) => {
                         e.stopPropagation();
                         setActiveMenuId(null);
                       }}
@@ -898,153 +914,159 @@ export default function WatchComponent() {
                       className="overflow-hidden absolute right-0 mt-[110px] w-[200px] bg-[#282828] overflow-hidden text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
                     >
                       <button
-                          className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
-                          <img
-                              alt="Add to queue"
-                              src="/public/addtoqueue.png" className="h-6 w-6 mr-3"
-                          />
-                          Add to queue
+                        className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
+                        <img
+                          alt="Add to queue"
+                          src="/public/addtoqueue.png" className="h-6 w-6 mr-3"
+                        />
+                        Add to queue
                       </button>
-                        <button
+                      <button
                         onClick={(e) => {
-                            setActiveMenuId(null);
-                            addVideoToList(video);
+                          setActiveMenuId(null);
+                          addVideoToList(video);
                         }}
                         className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
                         <img
-                            alt="Save to watch later"
-                            src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
+                          alt="Save to watch later"
+                          src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
                         />
                         Save to watch later
                       </button>
 
                       <button
                         onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMenuId(null);
-                            // setSelectedVideo(video);
-                            // handleOpenSaveModal(video);
+                          e.stopPropagation();
+                          setActiveMenuId(null);
+                          setSelectedVideo(video);
+                          handleOpenSaveModal(video);
                         }}
                         className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
                         <img
-                            alt="Save to playlist"
-                            src="/public/savetoplaylist.png" className="h-6 w-5 mr-3"
+                          alt="Save to playlist"
+                          src="/public/savetoplaylist.png" className="h-6 w-5 mr-3"
                         />
                         Save to playlist
-                    </button>
-                    <button
-                      onClick={(e) => {
+                      </button>
+                      <button
+                        onClick={(e) => {
                           e.stopPropagation();
                           setIsShareModalUpNext(true);
-                      }}
-                      className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
-                      <img
+                        }}
+                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                        <img
                           alt="Share"
                           src="/public/share.png" className="h-5 w-5 mr-3"
-                      />
-                      Share
-                    </button>
-                                {isShareModalUpNext && (
-              <div
-                onClick={() => setIsShareModalUpNext(false)}
-                className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
-              >
-                {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
-                  {/* Nút Đóng (Dấu X góc trên bên phải) */}
-                  <button
-                    onClick={() => setIsShareModalUpNext(false)}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                  <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
-                    Share
-                  </h2>
-                  <div className="flex flex-row gap-3">
-                    <button
-                      className="flex flex-col cursor-pointer"
-                      onClick={() => {
-                        const videoId = video.id.videoId || "";
-                        shareToFacebook(videoId);
-                      }}
-                    >
-                      <img
-                        alt="Share"
-                        src="/public/facebook.png"
-                        className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
-                      />
-                      Facebook
-                    </button>
-                    <button
-                      className="flex flex-col cursor-pointer"
-                      onClick={() => {
-                        const videoId = video.id.videoId || "";
-                        const title = video.snippet.title || "";
-                        shareToX(videoId, title);
-                      }}
-                    >
-                      <img
-                        src="/public/X.png"
-                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
-                      />
-                      X
-                    </button>
+                        />
+                        Share
+                      </button>
+                      {isShareModalUpNext && (
+                        <div
+                          onClick={() => setIsShareModalUpNext(false)}
+                          className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
+                        >
+                          {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                            {/* Nút Đóng (Dấu X góc trên bên phải) */}
+                            <button
+                              onClick={() => setIsShareModalUpNext(false)}
+                              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                            <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
+                              Share
+                            </h2>
+                            <div className="flex flex-row gap-3">
+                              <button
+                                className="flex flex-col cursor-pointer"
+                                onClick={() => {
+                                  const videoId = video.id.videoId || "";
+                                  shareToFacebook(videoId);
+                                }}
+                              >
+                                <img
+                                  alt="Share"
+                                  src="/public/facebook.png"
+                                  className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
+                                />
+                                Facebook
+                              </button>
+                              <button
+                                className="flex flex-col cursor-pointer"
+                                onClick={() => {
+                                  const videoId = video.id.videoId || "";
+                                  const title = video.snippet.title || "";
+                                  shareToX(videoId, title);
+                                }}
+                              >
+                                <img
+                                  src="/public/X.png"
+                                  className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                />
+                                X
+                              </button>
 
-                    <button
-                      className="flex flex-col cursor-pointer -ml-2"
-                      onClick={shareToLinkedin}
-                    >
-                      <img
-                        src="/public/linkedin.png"
-                        className="rounded-full object-cover h-17 w-18 cursor-pointer"
-                      />
-                      Linked
-                    </button>
+                              <button
+                                className="flex flex-col cursor-pointer -ml-2"
+                                onClick={() => {
+                                  const videoId = video.id.videoId || "";
+                                  shareToLinkedin(videoId);
+                                }}
+                              >
+                                <img
+                                  src="/public/linkedin.png"
+                                  className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                />
+                                Linked
+                              </button>
 
-                    <button
-                      className="flex flex-col cursor-pointer"
-                      onClick={shareToReddit}
-                    >
-                      <img
-                        src="/public/reddit.png"
-                        className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
-                      />
-                      Reddit
-                    </button>
-                  </div>
-                  <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
-                    {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
-                    <input
-                      type="text"
-                      readOnly
-                      value={`https://youtube.com/watch?v=${video.id}`}
-                      onClick={(e) => e.currentTarget.select()}
-                      className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
-                    />
+                              <button
+                                className="flex flex-col cursor-pointer"
+                                onClick={() => {
+                                  const videoId = video.id.videoId || "";
+                                  const title = video.snippet.title || "";
+                                  shareToReddit(videoId, title);
+                                }}
+                              >
+                                <img
+                                  src="/public/reddit.png"
+                                  className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
+                                />
+                                Reddit
+                              </button>
+                            </div>
+                            <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
+                              {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
+                              <input
+                                type="text"
+                                readOnly
+                                value={`https://youtube.com/watch?v=${video.id.videoId}`}
+                                onClick={(e) => e.currentTarget.select()}
+                                className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
+                              />
 
-                    <button
-                      onClick={() => {
-                        handleCopyURL(video)
-                      }}
-                      className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
+                              <button
+                                onClick={() => {
+                                  const videoId = video.id.videoId;
+                                  handleCopyURL(videoId);
+                                }}
+                                className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                     </div>
-                  </>
+                  </> /* Menu of up next video */
                 )}
-                                                    
               </div>
-            ))}
+            ))} {/* Up next video, RIGHT COLUMN*/}
           </>
         )}
         {noticeMessage && (
