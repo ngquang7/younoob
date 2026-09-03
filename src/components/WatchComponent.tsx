@@ -20,6 +20,7 @@ export default function WatchComponent() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSavedUpNext, setIsSavedUpNext] = useState(false);
   const [isdisLiked, setDisIsLiked] = useState(false);
   const [isNotice, setisNotice] = useState(false);
   const [isExpandedDecription, setisExpandedDecription] = useState(false);
@@ -167,6 +168,8 @@ export default function WatchComponent() {
 
   const handleSaveToggle = () => {
     if (!video || !video.id) return;
+
+
     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
     const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
 
@@ -178,6 +181,32 @@ export default function WatchComponent() {
       updatedSavedVideos = [video, ...existingSavedVideos];
       setIsSaved(true);
     }
+    localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+  };
+
+  const handleSaveToggleUpNext = (videoUpNext: any) => {
+    if (!videoUpNext || !videoUpNext.id) return;
+
+    const currentId = typeof videoUpNext.id === 'object' ? videoUpNext.id.videoId : videoUpNext.id;
+    const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+
+    const isAlreadySaved = existingSavedVideos.some((v: any) => {
+      const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+      return vId === currentId;
+    });
+
+    let updatedSavedVideos;
+    if (isAlreadySaved) {
+      updatedSavedVideos = existingSavedVideos.filter((v: any) => {
+        const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+        return vId !== currentId;
+      });
+      setIsSavedUpNext(false);
+    } else {
+      updatedSavedVideos = [videoUpNext, ...existingSavedVideos];
+      setIsSavedUpNext(true);
+    }
+
     localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
   };
 
@@ -238,12 +267,14 @@ export default function WatchComponent() {
     setCommentText("");
     setIsAddComment(false);
   };
+
   const showNotice = (message: string) => {
     setNoticeMessage(message);
     setTimeout(() => {
       setNoticeMessage(null);
     }, 2300);
   };
+
   const handleCopyURL = (id: string) => {
     console.log(`id video: ${id}`);
     const shareUrl = `https://youtube.com/watch?v=${id}`;
@@ -255,11 +286,20 @@ export default function WatchComponent() {
     }
   };
 
-  const handleOpenSaveModal = (video: any) => {
-    if (video && video.id) {
-      const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
-      setIsSaved(isSaved);
+  const handleOpenSaveModal = (videoUpNext: any) => {
+    if (videoUpNext && videoUpNext.id) {
+
+      const currentId = typeof videoUpNext.id === 'object' ? videoUpNext.id.videoId : videoUpNext.id;
+
+      const savedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+
+
+      const isSaved = savedVideos.some((v: any) => {
+        const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+        return vId === currentId;
+      });
+
+      setIsSavedUpNext(isSaved);
     }
   };
 
@@ -383,6 +423,76 @@ export default function WatchComponent() {
       setIsSubscribed(isSubbed);
     }
   }, [video]);
+
+  const linkifyDescription = (text: string) => {
+  if (!text) return null;
+
+  // Regex indentify link YouTube (youtube.com and youtu.be)
+  const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;  
+  // Regex of other link
+  const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
+  //Hash tage
+  const hashtagRegex = /#(?!\d)[\w]+/g;
+  //seperate string by space to check each element
+  const words = text.split(/(\s+)/);
+
+  return words.map((word, index) => {
+    // Check whether youtube link
+    if (word.match(youtubeRegex)) {
+      return (
+        <a
+          key={index}
+          href={word}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
+          onClick={(e) => e.stopPropagation()}
+          title={word}
+        >
+          <img 
+          src="/public/logo.png"
+          className="w[15px] h-[15px]"
+          />
+          <span className="text-gray-300">•</span>
+          <span className="truncate max-w-[180px]">YouTube Video</span>
+        </a>
+      );
+    } 
+    // if other link
+    else if (word.match(generalUrlRegex)) {
+      const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
+      return (
+        <a
+          key={index}
+          href={word}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#3ea6ff] hover:underline inline-block"
+          onClick={(e) => e.stopPropagation()}
+          title={word}
+        >
+          {displayUrl}
+        </a>
+      );
+    } else if (word.match(hashtagRegex)) {
+      const cleanWord = word.replace('#', '');
+      return (
+        <a
+          key={index}
+          href={`/search?q=${cleanWord}`} // Navigate to youtube hashtag
+          className="text-[#3ea6ff] hover:underline font-medium inline-block"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          {word}
+        </a>
+      );
+    }
+    return word;
+  });
+};
+
 
   const getSubcriber = (subcriber: string) => {
     const totalSubcriber: number = Number(subcriber);
@@ -685,8 +795,6 @@ export default function WatchComponent() {
               </>
             ) : (
               <>
-                {/* {getView(video?.statistics?.viewCount)} */}
-                {/* {video?.statistics?.viewCount} */}
                 <span>{getView(video?.statistics?.viewCount)}</span>
                 <span>{getTimeago(video?.snippet?.publishedAt)}</span>
               </>
@@ -696,7 +804,10 @@ export default function WatchComponent() {
           {/* DESCRIPTION */}
           {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
           <div className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
-            {video?.snippet?.description || <div className="italic">No description has been added to this video</div>}
+            {video?.snippet?.description ? 
+            (linkifyDescription(video.snippet.description))
+            : 
+            (<div className="italic">No description has been added to this video</div>)}
           </div>
 
           <div
@@ -748,6 +859,7 @@ export default function WatchComponent() {
                         setIsAddComment(false);
                         setCommentText("");
                       }}
+                      type="button"
                       className="px-3.5 py-1.5 text-xs font-semibold bg-black-500 hover:bg-gray-800 rounded-full text-white transition cursor-pointer"
                     >
                       Cancel
@@ -860,7 +972,7 @@ export default function WatchComponent() {
                     goWatch(video.id.videoId);
                   }
                 }}
-                className="flex gap-3 group cursor-pointer hover:bg-gray-900"
+                className="flex gap-3 group cursor-pointer hover:bg-gray-900 relative"
               >
                 {/* Mini Thumbnail */}
                 <div className="relative w-50 aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
@@ -894,8 +1006,7 @@ export default function WatchComponent() {
                     const vidId = video.id?.videoId ?? null;
                     setActiveMenuId(activeMenuId === vidId ? null : vidId);
                   }}
-
-                  className="mt-20 mr-1 text-xl h-[30px] w-[30px] cursor-pointer hover:bg-neutral-700 rounded-full transition-colors"
+                  className="hidden group-hover:block absolute right-1 cursor-pointer top-20 w-[30px] h-[30px] bg-[#212121] hover:bg-[#383838] rounded-full text-white shadow-md transition"
                 >
                   ⋮
                 </button>
@@ -1061,9 +1172,101 @@ export default function WatchComponent() {
                           </div>
                         </div>
                       )}
-
                     </div>
+
                   </> /* Menu of up next video */
+                )}
+                {selectedVideo === video && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40 cursor-default"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedVideo(null);
+                      }}
+                    />
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="overflow-hidden absolute right-0 mt-12 w-[400px] cursor-default bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm"
+                    >
+                      <div className="px-4 py-2 text-[17px] font-bold mb-6">Save to...</div>
+
+                      {/* Phần danh sách Watch Later / Playlist của bạn */}
+                      <div className="w-full px-5 py-2 flex items-center -mt-4 cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                        <div onClick={() => handleSaveToggleUpNext(video)} className="relative group">
+                          {watchLaterVideoList.length > 0 ? (
+                            <>
+                              <div className="flex flex-row">
+                                <div className="relative w-28 h-8 flex-shrink-0">
+                                  {/* Layer behind watch list */}
+                                  <div className="absolute -top-1 left-3 right-2 h-8 w-[55px] bg-[#737373] rounded-md"></div>
+
+                                  <img
+                                    src={watchLaterVideoList[0]?.snippet?.thumbnails?.medium?.url}
+                                    className="h-[35px] w-[65px] absolute ml-2 inset-0 rounded-md overflow-hidden border border-black/40 flex items-center justify-center"
+                                  />
+                                </div>
+
+                                <div className="flex flex-col -ml-6 -mt-1">
+                                  <span className="text-sm font-medium">Watch later</span>
+                                  <span className="text-xs text-neutral-400">Private</span>
+                                </div>
+                                <div className="ml-[170px] text-neutral-300">
+                                  {isSavedUpNext ?
+                                    <>
+                                      <img
+                                        src="/public/savedVideo.png" className="h-6 w-5"
+                                      />
+                                    </>
+                                    :
+                                    <>
+                                      <img
+                                        src="/public/savetoplaylist.png" className="h-6 w-5"
+                                      />
+                                    </>
+                                  }
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex flex-row">
+                                <div className="relative w-28 h-8 flex-shrink-0">
+                                  <div className="absolute -top-2 left-3 right-2 h-8 w-[55px] bg-[#737373] rounded-md"></div>
+                                  <img
+                                    src="/loading1.png"
+                                    className="h-[35px] w-[65px] absolute ml-2 inset-0 rounded-md overflow-hidden border border-black/40 flex items-center justify-center"
+                                  />
+                                </div>
+
+
+                                <div className="flex flex-col -ml-6 -mt-1">
+                                  <span className="text-sm font-medium">Watch later</span>
+                                  <span className="text-xs text-neutral-400">Private</span>
+                                </div>
+                                <div className="ml-[170px] text-neutral-300">
+                                  {isSavedUpNext ?
+                                    <>
+                                      <img
+                                        src="/public/saved.png" className="h-6 w-5"
+                                      />
+                                    </>
+                                    :
+                                    <>
+                                      <img
+                                        src="/public/savetoplaylist.png" className="h-6 w-5"
+                                      />
+                                    </>
+                                  }
+
+                                </div>
+                              </div>
+                            </>
+                          )}         
+                          </div>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             ))} {/* Up next video, RIGHT COLUMN*/}

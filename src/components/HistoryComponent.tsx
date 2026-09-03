@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
+  const [isClearAllHis, setIsClearAllHis] = useState(false);
   const navigate = useNavigate();
 
   // Load history when go to this page
@@ -43,14 +44,63 @@ export default function HistoryComponent() {
         <h1 className="text-3xl font-bold font-sans mt-3 ml-3">Watch History</h1>
         {historyList.length > 0 && (
           <button
-            onClick={clearAllHistory}
+            onClick={() => setIsClearAllHis(true)}
+            // onClick={clearAllHistory}
             className="px-4 py-2 text-xs font-semibold bg-[#212121] hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
           >
             Clear all watch history
           </button>
         )}
       </div>
+      {isClearAllHis && (
+        <div
+          onClick={() => setIsClearAllHis(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        >
+          {/* Size of padding */}
+          <div onClick={(e) => e.stopPropagation()}
+            className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
+          >
+            {/* Title: Unsubribe from {channel name} */}
+            <div className="text-white text-xl w-full mb-5 text-left">
+              Clear watch history?
+            </div>
+            <p className="text-gray-400 text-sm text-left flex w-full mb-5">
+              Your YouTube watch history will be cleared from all YouTube apps on all devices.</p>
+            <p className="text-gray-400 text-sm text-left leading-relaxed">
+              Your video recommendations will be reset, but may still be influenced by activity on other Google products. To learn more, visit{' '}
+              <a
+                href="https://myactivity.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#3ea6ff] hover:underline"
+              >
+                My Activity
+              </a>
+              .
+            </p>
 
+            {/* 2 buttons: Cancle and Unsubcribe */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsClearAllHis(false)}
+                className="px-4 py-2 mt-5 ml-10 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
+                onClick={() => {
+                  setIsClearAllHis(false);
+                  clearAllHistory();
+                }}
+              >
+                Clear watch history
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Notification appear if there is no video watched yet. */}
       {historyList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
