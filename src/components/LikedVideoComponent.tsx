@@ -235,7 +235,7 @@ export default function LikedVideoComponent() {
                                     className="flex gap-4 cursor-pointer group p-2 hover:bg-gray-600 rounded-xl transition items-start relative"
                                 >
                                     {/* Thumbnail */}
-                                    <div className="relative w-40 sm:w-64 aspect-video rounded-xl overflow-hidden bg-gray-800 shrink-0">
+                                    <div className="relative sm:w-64 aspect-video rounded-lg overflow-hidden bg-gray-800 shrink-0">
                                         <img
                                             src={video.snippet?.thumbnails?.medium?.url}
                                             alt={video.snippet?.title}

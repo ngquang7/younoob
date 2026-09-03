@@ -118,7 +118,9 @@ export default function WatchComponent() {
   useEffect(() => {
     //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
     if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
-    if (listId === 'LL') return;
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('list') || listId === 'LL' || listId === 'WL') return;
+
     const fetchUpNext = async () => {
       try {
         const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
@@ -130,6 +132,8 @@ export default function WatchComponent() {
     }
     fetchUpNext();
   }, [currenVideoTitle]);
+
+
 
   /*GO TO CHANNEL PAGE*/
   const channelId = video?.snippet?.channelId || "loading...";
@@ -168,11 +172,8 @@ export default function WatchComponent() {
 
   const handleSaveToggle = () => {
     if (!video || !video.id) return;
-
-
     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
     const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
-
     let updatedSavedVideos;
     if (isAlreadySaved) {
       updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
@@ -184,31 +185,79 @@ export default function WatchComponent() {
     localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
   };
 
-  const handleSaveToggleUpNext = (videoUpNext: any) => {
-    if (!videoUpNext || !videoUpNext.id) return;
+  
+  const getVideoId = (video: any) => {
+  if (!video) return '';
+  if (typeof video.id === 'object' && video.id !== null) {
+    return video.id.videoId || video.id;
+  }
+  return video.id;
+};
 
-    const currentId = typeof videoUpNext.id === 'object' ? videoUpNext.id.videoId : videoUpNext.id;
-    const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+//   const handleSaveToggleUpNext = (videoUpNext: any) => {
+//     if (!videoUpNext || !videoUpNext.id) return;  
+//     const cleanId = getVideoId(videoUpNext);
+//   if (!cleanId) {
+//     console.log("loi ki thuat");
+//     return;
+//   }
+// }
+//     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
 
-    const isAlreadySaved = existingSavedVideos.some((v: any) => {
-      const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
-      return vId === currentId;
-    });
+  //   const isAlreadySaved = existingSavedVideos.some((v: any) => {
+  //     const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+  //     return vId === cleanId;
+  //   });
 
-    let updatedSavedVideos;
-    if (isAlreadySaved) {
-      updatedSavedVideos = existingSavedVideos.filter((v: any) => {
-        const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
-        return vId !== currentId;
-      });
-      setIsSavedUpNext(false);
-    } else {
-      updatedSavedVideos = [videoUpNext, ...existingSavedVideos];
-      setIsSavedUpNext(true);
+  //   let updatedSavedVideos;
+  //   if (isAlreadySaved) {
+  //     updatedSavedVideos = existingSavedVideos.filter((v: any) => {
+  //       const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+  //       return vId !== cleanId;
+  //     });
+  //     setIsSavedUpNext(false);
+  //   } else {
+  //     updatedSavedVideos = [videoUpNext, ...existingSavedVideos];
+  //     setIsSavedUpNext(true);
+  //   }
+
+  //   localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+  //   setWatchLaterVideoList(updatedSavedVideos);
+  // };
+
+const handleSaveToggleUpNext = (videoUpNext: any) => {
+  if (!videoUpNext) return;
+  
+  const cleanId = getVideoId(videoUpNext);
+  if (!cleanId) return;
+
+  // Chuẩn hóa cấu trúc object lưu trữ để trang Watch Later / Liked đọc đúng dữ liệu
+  const normalizedVideo = {
+    id: cleanId,
+    snippet: {
+      title: videoUpNext?.snippet?.title || 'No Title',
+      channelTitle: videoUpNext?.snippet?.channelTitle || 'Unknown Channel',
+      thumbnails: videoUpNext?.snippet?.thumbnails || {},
+      //Title channel
     }
-
-    localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
   };
+
+  const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+  const isAlreadySaved = existingSavedVideos.some((v: any) => getVideoId(v) === cleanId);
+
+  let updatedSavedVideos;
+  if (isAlreadySaved) {
+    updatedSavedVideos = existingSavedVideos.filter((v: any) => getVideoId(v) !== cleanId);
+    setIsSavedUpNext(false);
+  } else {
+    updatedSavedVideos = [normalizedVideo, ...existingSavedVideos];
+    setIsSavedUpNext(true);
+  }
+
+  localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+  setWatchLaterVideoList(updatedSavedVideos);
+};
+
 
   const handleLikeToggle = () => {
     if (!video || !video.id) return;
@@ -294,12 +343,12 @@ export default function WatchComponent() {
       const savedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
 
 
-      const isSaved = savedVideos.some((v: any) => {
+      const isSavedd = savedVideos.some((v: any) => {
         const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
         return vId === currentId;
       });
 
-      setIsSavedUpNext(isSaved);
+      setIsSavedUpNext(isSavedd);
     }
   };
 
@@ -425,74 +474,82 @@ export default function WatchComponent() {
   }, [video]);
 
   const linkifyDescription = (text: string) => {
-  if (!text) return null;
+    if (!text) return null;
 
-  // Regex indentify link YouTube (youtube.com and youtu.be)
-  const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;  
-  // Regex of other link
-  const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
-  //Hash tage
-  const hashtagRegex = /#(?!\d)[\w]+/g;
-  //seperate string by space to check each element
-  const words = text.split(/(\s+)/);
+    // Regex indentify link YouTube (youtube.com and youtu.be)
+    const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;
+    // Regex of other link
+    const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
+    //Hash tage
+    const hashtagRegex = /#(?!\d)[\w]+/g;
+    //seperate string by space to check each element
+    const words = text.split(/(\s+)/);
 
-  return words.map((word, index) => {
-    // Check whether youtube link
-    if (word.match(youtubeRegex)) {
-      return (
-        <a
-          key={index}
-          href={word}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
-          onClick={(e) => e.stopPropagation()}
-          title={word}
-        >
-          <img 
-          src="/public/logo.png"
-          className="w[15px] h-[15px]"
-          />
-          <span className="text-gray-300">•</span>
-          <span className="truncate max-w-[180px]">YouTube Video</span>
-        </a>
-      );
-    } 
-    // if other link
-    else if (word.match(generalUrlRegex)) {
-      const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
-      return (
-        <a
-          key={index}
-          href={word}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#3ea6ff] hover:underline inline-block"
-          onClick={(e) => e.stopPropagation()}
-          title={word}
-        >
-          {displayUrl}
-        </a>
-      );
-    } else if (word.match(hashtagRegex)) {
-      const cleanWord = word.replace('#', '');
-      return (
-        <a
-          key={index}
-          href={`/search?q=${cleanWord}`} // Navigate to youtube hashtag
-          className="text-[#3ea6ff] hover:underline font-medium inline-block"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          {word}
-        </a>
-      );
-    }
-    return word;
-  });
-};
+    return words.map((word, index) => {
+      // Check whether youtube link
+      if (word.match(youtubeRegex)) {
+        return (
+          <a
+            key={index}
+            href={word}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
+            onClick={(e) => e.stopPropagation()}
+            title={word}
+          >
+            <img
+              src="/public/logo.png"
+              className="w[15px] h-[15px]"
+            />
+            <span className="text-gray-300">•</span>
+            <span className="truncate max-w-[180px]">YouTube Video</span>
+          </a>
+        );
+      }
+      // if other link
+      else if (word.match(generalUrlRegex)) {
+        const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
+        return (
+          <a
+            key={index}
+            href={word}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#3ea6ff] hover:underline inline-block"
+            onClick={(e) => e.stopPropagation()}
+            title={word}
+          >
+            {displayUrl}
+          </a>
+        );
+      } else if (word.match(hashtagRegex)) {
+        const cleanWord = word.replace('#', '');
+        return (
+          <a
+            key={index}
+            href={`/search?q=${cleanWord}`} // Navigate to youtube hashtag
+            className="text-[#3ea6ff] font-medium hover:inline-block"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {word}
+          </a>
+        );
+      }
+      return word;
+    });
+  };
 
+  const extractHashtags = (text: string) => {
+    if (!text) return [];
+    const hashtagRegex = /#(?!\d)\w+/g;
+    const matches = text.match(hashtagRegex) || [];
+    const tags = matches.slice(0, 3);
+    // \u00A0\u00A0\u00A0: space
+    return tags.join(' ');
+  };
 
   const getSubcriber = (subcriber: string) => {
     const totalSubcriber: number = Number(subcriber);
@@ -587,7 +644,7 @@ export default function WatchComponent() {
   }
 
   return (
-    <div className="w-full mx-auto px-4 py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+    <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
 
       {/* LEFT COLUMN (Video Player + Description + Comments) */}
       <div className="flex-1 min-w-0">
@@ -792,11 +849,13 @@ export default function WatchComponent() {
               <>
                 <span>{video?.statistics?.viewCount} views</span>
                 <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
+                <span className="text-[#3ea6ff]">{extractHashtags(video?.snippet?.description)}</span>
               </>
             ) : (
               <>
                 <span>{getView(video?.statistics?.viewCount)}</span>
                 <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+                <span className="text-gray-400">{extractHashtags(video?.snippet?.description)}</span>
               </>
             )}
           </div>
@@ -804,10 +863,10 @@ export default function WatchComponent() {
           {/* DESCRIPTION */}
           {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
           <div className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
-            {video?.snippet?.description ? 
-            (linkifyDescription(video.snippet.description))
-            : 
-            (<div className="italic">No description has been added to this video</div>)}
+            {video?.snippet?.description ?
+              (linkifyDescription(video.snippet.description))
+              :
+              (<div className="italic">No description has been added to this video</div>)}
           </div>
 
           <div
@@ -919,7 +978,7 @@ export default function WatchComponent() {
       </div>
 
       {/* RIGHT COLUMN (SIDEBAR FEED), UP NEXT */}
-      <div className="w-200 lg:w-[350px] shrink-0 flex flex-col gap-4">
+      <div className="lg:w-[380px] shrink-0 flex flex-col gap-3 -mr-3">
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
         {listId === 'LL' || listId === 'WL' ? (
           <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
@@ -972,10 +1031,10 @@ export default function WatchComponent() {
                     goWatch(video.id.videoId);
                   }
                 }}
-                className="flex gap-3 group cursor-pointer hover:bg-gray-900 relative"
+                className="flex gap-3 group w-full cursor-pointer hover:bg-gray-900 relative"
               >
                 {/* Mini Thumbnail */}
-                <div className="relative w-50 aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
+                <div className="relative w-[200px] aspect-video rounded-lg overflow-hidden shrink-0 bg-[#212121]">
                   <img
                     src={video?.snippet?.thumbnails.default?.url || "null"}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -988,15 +1047,15 @@ export default function WatchComponent() {
 
                 {/* Mini details */}
                 <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
-                  <h4 className="text-xs font-semibold leading-snug line-clamp-3 w-full text-[#f1f1f1] group-hover:text-white transition-colors">
+                  <h4 className="text-sm font-semibold leading-snug line-clamp-3 w-full text-[#f1f1f1] group-hover:text-white transition-colors">
                     {video?.snippet?.title || "Loading"}
                   </h4>
-                  <div className="flex flex-col gap-0.5 text-[10px] text-gray-400">
-                    <span className="truncate">{video?.snippet?.channelTitle || "Loading"}</span>
+                  <div className="flex flex-col gap-0.5 font-medium text-gray-400">
+                    <span className="truncate text-[12px]">{video?.snippet?.channelTitle || "Loading"}</span>
                     <div className="flex items-center truncate">
                       {/* <span>views</span> */}
                       {/* <span className="mx-1 text-[6px]">•</span> */}
-                      <span>{getTimeago(video?.snippet?.publishedAt)}</span>
+                      <span className="text-[12px]">{getTimeago(video?.snippet?.publishedAt)}</span>
                     </div>
                   </div>
                 </div>
@@ -1006,7 +1065,7 @@ export default function WatchComponent() {
                     const vidId = video.id?.videoId ?? null;
                     setActiveMenuId(activeMenuId === vidId ? null : vidId);
                   }}
-                  className="hidden group-hover:block absolute right-1 cursor-pointer top-20 w-[30px] h-[30px] bg-[#212121] hover:bg-[#383838] rounded-full text-white shadow-md transition"
+                  className="hidden text-l group-hover:block absolute right-1 cursor-pointer top-20 w-[30px] h-[30px] hover:bg-[#383838] rounded-full text-white shadow-md transition"
                 >
                   ⋮
                 </button>
@@ -1262,8 +1321,8 @@ export default function WatchComponent() {
                                 </div>
                               </div>
                             </>
-                          )}         
-                          </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </>
