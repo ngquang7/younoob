@@ -1,21 +1,25 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { video } from 'motion/react-m';
-import { searchYouTube, type YoutubeVideo } from '../api/youtubeSearch';
-import { getVideosDetails } from "../api/videoWatchInformation";
+import { searchYouTube} from '../api/youtubeSearch';
+import { getVideosDetails } from "../api/videoWatchingData";
 import { getChannelData } from '../api/channelData';
 import { getCommentData } from '../api/commentData';
-import type { YouTubeSearchItem, YouTubeVideo } from "../type";
-import { Plus, Check } from 'lucide-react';
-
-
+import type { YouTubeSearchItem} from "../type";
 
 export default function WatchComponent() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
+  const listId = searchParams.get('list');
   const listType = searchParams.get('list') === 'WL';
 
+  const [video, setVideo] = useState<any>(null); //Video
+  const [video1, setVideo1] = useState<any>(null); //Channel
+  const [playListVideo, setPlayListVideo] = useState<any[]>([]); //For playlist video
+  const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]); //For up next if it's not playlist
+  const [comments, setComments] = useState<any[]>([]); //Comment
+  const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]); //For up next
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -28,620 +32,564 @@ export default function WatchComponent() {
   const [isShareModal, setIsShareModal] = useState(false);
   const [isShareModalUpNext, setIsShareModalUpNext] = useState(false);
 
-  const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
-  const [video, setVideo] = useState<any>(null); //Video
-  const [comments, setComments] = useState<any[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [upNextVideos, setUpNextVideos] = useState<YouTubeSearchItem[]>([]);
   const [commentText, setCommentText] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
-  //Share button
-  const handleShareClick = () => {
-    const shareUrl = `https://youtube.com/watch?v=${videoId}`;
-    try {
-      navigator.clipboard.writeText(shareUrl);
-      setisNotice(true);
-      setTimeout(() => {
-        setisNotice(false);
-      }, 2300);
-    } catch (error) {
-      console.warn("Copy failed ", error);
-    }
-  };
-  const goWatch = (videoidd: string) => {
-    navigate(`/watch?v=${videoidd}`);
-  }
-  // Get videoID
-  const [video1, setVideo1] = useState<any>(null); //Channel
-  const [loading, setLoading] = useState<boolean>(false);
-  /* RELATED VIDEO */
-  useEffect(() => {
-    if (!videoId) return;
-    const fetchVideo = async () => {
-      setLoading(true);
-      try {
-        const response = await getVideosDetails(videoId);
-        //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
-        if (response.items && response.items.length > 0) {
-          const videoItem = response.items[0];
-          setVideo(response.items[0]);
-
-          const idChannel = videoItem.snippet?.channelId;
-          const response1 = await getChannelData(idChannel);
-          if (response1.items && response1.items.length > 0) {
-            // setVideo1(response1.items[0]);
-            // console.log("Subscriber Count:", video1.statistics.subscriberCount);
-            //SHOULD DO THIS METHOD INSTEAD OF THE METHOD ABOVE
-            //THIS IS BECAUSE video1 is a React state
-            //Calling setVideo1(...) does not instantly update the video1 variable on the next line.
-            //Because video1 is still null (or its previous value), trying to read video1.statistics will crash your app with a TypeError.
-            const channelItem = response1.items[0]; //Store in a local variable
-            setVideo1(channelItem); //Update state
-            //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
-          }
-        }
-        const commentResponse = await getCommentData(videoId);
-        if (commentResponse.items) {
-          const commentItem = commentResponse.items[0];
-          setComments(commentResponse.items);
-        }
-      } catch (error) {
-        console.error("Failed to fetch video:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVideo();
-  }, [searchParams]);
-
-  const listId = searchParams.get('list');
-  const [playListVideo, setPlayListVideo] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (listId === 'LL') {
-      const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-      setPlayListVideo(savedLikedVideos);
-    } else if (listId === 'WL') {
-      const savedSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      setPlayListVideo(savedSavedVideos);
-    }
-    else {
-      return;
-    }
-  }, [])
-
-  /* UP NEXT */
   const currenVideoTitle = video?.snippet?.title || "loading...";
-  useEffect(() => {
-    //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
-    if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has('list') || listId === 'LL' || listId === 'WL') return;
-
-    const fetchUpNext = async () => {
-      try {
-        const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
-        const dataUpNext = await searchYouTube(cleanVideoTitle);
-        setUpNextVideos(dataUpNext.items);
-      } catch (error) {
-        console.log("Error: ", error);
-      };
-    }
-    fetchUpNext();
-  }, [currenVideoTitle]);
-
-
-
-  /*GO TO CHANNEL PAGE*/
   const channelId = video?.snippet?.channelId || "loading...";
-  const goChannel = () => navigate(`/channel/${channelId}`);
 
-  const handleSubscribeToggle = () => {
-    const nextState = !isSubscribed;
-    setIsSubscribed(nextState);
-    // get the old subcription list from localStorage
-    // convert string to array
-    const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-
-    // Add this channel into this localstorage, this is hashmap(key, value)
-    const currentChannel = {
-      id: video?.snippet?.channelId || 'unknown_id',
-      title: video?.snippet?.channelTitle || 'Channel Name',
-      thumbnail: video1?.snippet?.thumbnails?.medium?.url || '', // avatar channel
+  /*G0 TO CHANNEL, VIDEO & SHOW NOTICE */
+    const goChannel = () => navigate(`/channel/${channelId}`);
+    const goWatch = (videoidd: string) => {
+      navigate(`/watch?v=${videoidd}`);
+    }
+    const showNotice = (message: string) => {
+      setNoticeMessage(message);
+      setTimeout(() => {
+        setNoticeMessage(null);
+      }, 2300);
     };
+  //
 
-    if (nextState) {
-      // if click subcribe (Subscribe): Add channel to array if it is not in array
-      const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
-      if (!exists) {
-        //add object(hashmap) into an array
-        //we get the old subcription list and push this object to the end of array
-        const updatedSubs = [...savedSubs, currentChannel];
-        //localstorage only save string, so we have to convert array to string
-        localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-      }
-    } else {
-      // IF WE UNSUBCRIBE (Unsubscribe): remove it from array
-      const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
-      localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-    }
-  };
+  /* GET DATA OF VIDEO FROM API YOUTUBE V3 (getVideoDetails, getChannelData, get CommentData) */
+    useEffect(() => {
+      if (!videoId) return;
+      const fetchVideo = async () => {
+        setLoading(true);
+        try {
+          const response = await getVideosDetails(videoId);
+          //WE MUST HAVE THIS, IF NOT, WE HAVEN'T LOAD IN4 TO VIDEO YET.
+          if (response.items && response.items.length > 0) {
+            const videoItem = response.items[0];
+            setVideo(response.items[0]);
 
-  const handleSaveToggle = () => {
-    if (!video || !video.id) return;
-    const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
-    let updatedSavedVideos;
-    if (isAlreadySaved) {
-      updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
-      setIsSaved(false);
-    } else {
-      updatedSavedVideos = [video, ...existingSavedVideos];
-      setIsSaved(true);
-    }
-    localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
-  };
-
-  
-  const getVideoId = (video: any) => {
-  if (!video) return '';
-  if (typeof video.id === 'object' && video.id !== null) {
-    return video.id.videoId || video.id;
-  }
-  return video.id;
-};
-
-//   const handleSaveToggleUpNext = (videoUpNext: any) => {
-//     if (!videoUpNext || !videoUpNext.id) return;  
-//     const cleanId = getVideoId(videoUpNext);
-//   if (!cleanId) {
-//     console.log("loi ki thuat");
-//     return;
-//   }
-// }
-//     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-
-  //   const isAlreadySaved = existingSavedVideos.some((v: any) => {
-  //     const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
-  //     return vId === cleanId;
-  //   });
-
-  //   let updatedSavedVideos;
-  //   if (isAlreadySaved) {
-  //     updatedSavedVideos = existingSavedVideos.filter((v: any) => {
-  //       const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
-  //       return vId !== cleanId;
-  //     });
-  //     setIsSavedUpNext(false);
-  //   } else {
-  //     updatedSavedVideos = [videoUpNext, ...existingSavedVideos];
-  //     setIsSavedUpNext(true);
-  //   }
-
-  //   localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
-  //   setWatchLaterVideoList(updatedSavedVideos);
-  // };
-
-const handleSaveToggleUpNext = (videoUpNext: any) => {
-  if (!videoUpNext) return;
-  
-  const cleanId = getVideoId(videoUpNext);
-  if (!cleanId) return;
-
-  // Chuẩn hóa cấu trúc object lưu trữ để trang Watch Later / Liked đọc đúng dữ liệu
-  const normalizedVideo = {
-    id: cleanId,
-    snippet: {
-      title: videoUpNext?.snippet?.title || 'No Title',
-      channelTitle: videoUpNext?.snippet?.channelTitle || 'Unknown Channel',
-      thumbnails: videoUpNext?.snippet?.thumbnails || {},
-      //Title channel
-    }
-  };
-
-  const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-  const isAlreadySaved = existingSavedVideos.some((v: any) => getVideoId(v) === cleanId);
-
-  let updatedSavedVideos;
-  if (isAlreadySaved) {
-    updatedSavedVideos = existingSavedVideos.filter((v: any) => getVideoId(v) !== cleanId);
-    setIsSavedUpNext(false);
-  } else {
-    updatedSavedVideos = [normalizedVideo, ...existingSavedVideos];
-    setIsSavedUpNext(true);
-  }
-
-  localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
-  setWatchLaterVideoList(updatedSavedVideos);
-};
-
-
-  const handleLikeToggle = () => {
-    if (!video || !video.id) return;
-
-    const existingLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-    const isAlreadyLiked = existingLikedVideos.some((v: any) => v.id === video.id);
-
-    let updatedLikedVideos;
-    if (isAlreadyLiked) {
-      // Nếu đã like rồi -> Bấm lần nữa là UNLIKE (gỡ ra)
-      updatedLikedVideos = existingLikedVideos.filter((v: any) => v.id !== video.id);
-      setIsLiked(false); // Cập nhật lại state giao diện thành chưa like
-    } else {
-      // Nếu chưa like -> Thêm vào danh sách
-      updatedLikedVideos = [video, ...existingLikedVideos];
-      setIsLiked(true); // Cập nhật lại state giao diện thành đã like
-    }
-    // Lưu lại vào localStorage
-    localStorage.setItem('like_video', JSON.stringify(updatedLikedVideos));
-  };
-
-
-
-  const handlePostComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-    // Create a fake comment (the structure must be the same API)
-    const newComment = {
-      id: Date.now().toString(), // create a temporary ID 
-      snippet: {
-        topLevelComment: {
-          snippet: {
-            authorDisplayName: "Quang (You)",
-            authorProfileImageUrl: "/public/Q.png", // Avatar
-            textDisplay: commentText,
-            publishedAt: new Date().toISOString(),
-            likeCount: 0
+            const idChannel = videoItem.snippet?.channelId;
+            const response1 = await getChannelData(idChannel);
+            if (response1.items && response1.items.length > 0) {
+              // setVideo1(response1.items[0]);
+              // console.log("Subscriber Count:", video1.statistics.subscriberCount);
+              //SHOULD DO THIS METHOD INSTEAD OF THE METHOD ABOVE
+              //THIS IS BECAUSE video1 is a React state
+              //Calling setVideo1(...) does not instantly update the video1 variable on the next line.
+              //Because video1 is still null (or its previous value), trying to read video1.statistics will crash your app with a TypeError.
+              const channelItem = response1.items[0]; //Store in a local variable
+              setVideo1(channelItem); //Update state
+              //console.log("Subscriber Count:", channelItem.statistics?.subscriberCount); //Read from channelItem, NOT the state variable
+            }
           }
+          const commentResponse = await getCommentData(videoId);
+          if (commentResponse.items) {
+            const commentItem = commentResponse.items[0];
+            setComments(commentResponse.items);
+          }
+        } catch (error) {
+          console.error("Failed to fetch video:", error);
+        } finally {
+          setLoading(false);
         }
+      };
+      fetchVideo();
+    }, [searchParams]);
+
+    useEffect(() => {
+      if (listId === 'LL') {
+        const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+        setPlayListVideo(savedLikedVideos);
+      } else if (listId === 'WL') {
+        const savedSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        setPlayListVideo(savedSavedVideos);
       }
-    };
-    //Update state (add to the first array)
-    setComments([newComment, ...comments]);
-    //total comments + 1 
-    if (video && video.statistics) {
-      const currentCount = Number(video.statistics.commentCount || 0);
-      setVideo({
-        ...video,
-        statistics: {
-          ...video.statistics,
-          commentCount: String(currentCount + 1)
+      else {
+        return;
+      }
+    }, [])
+
+    /* UP NEXT */
+    useEffect(() => {
+      //If we dont have this line, it will render the old upnext, because the title haven't load yet, so it will return the old one
+      if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.has('list') || listId === 'LL' || listId === 'WL') return;
+
+      const fetchUpNext = async () => {
+        try {
+          const cleanVideoTitle = currenVideoTitle.split('|')[0].split('-')[0].trim();
+          const dataUpNext = await searchYouTube(cleanVideoTitle);
+          setUpNextVideos(dataUpNext.items);
+        } catch (error) {
+          console.log("Error: ", error);
+        };
+      }
+      fetchUpNext();
+    }, [currenVideoTitle]);
+  //
+
+  /*(CURRENT VIDEO): HANDLE DES, SUB, SAVE, LIKE, COMMENT POST
+    (UP NEXT): OPEN SAVE MODAL, SAVE, ADD TO LIST */ 
+    const handleDescription = (text: string) => {
+      if (!text) return null;
+      // Regex indentify link YouTube (youtube.com and youtu.be)
+      const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;
+      // Regex of other link
+      const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
+      //Hash tage
+      const hashtagRegex = /#(?!\d)[\p{L}\p{N}_]+/gu;
+      //seperate string by space to check each element
+      const words = text.split(/(\s+)/);
+      return words.map((word, index) => {
+        // Check whether youtube link
+        if (word.match(youtubeRegex)) {
+          return (
+            <a
+              key={index}
+              href={word}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
+              onClick={(e) => e.stopPropagation()}
+              title={word}
+            >
+              <img
+                src="/public/logo.png"
+                className="w[15px] h-[15px]"
+              />
+              <span className="text-gray-300">•</span>
+              <span className="truncate max-w-[180px]">YouTube Video</span>
+            </a>
+          );
         }
+        // if other link
+        else if (word.match(generalUrlRegex)) {
+          const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
+          return (
+            <a
+              key={index}
+              href={word}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#3ea6ff] hover:underline inline-block"
+              onClick={(e) => e.stopPropagation()}
+              title={word}
+            >
+              {displayUrl}
+            </a>
+          );
+        } else if (word.match(hashtagRegex)) {
+          const cleanWord = word.replace('#', '');
+          return (
+            <a
+              key={index}
+              href={`/search?q=${cleanWord}`} // Navigate to youtube hashtag
+              className="text-[#3ea6ff] font-medium hover:inline-block"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {word}
+            </a>
+          );
+        }
+        return word;
       });
-    }
-    //Reset input và close button
-    setCommentText("");
-    setIsAddComment(false);
-  };
+    };
 
-  const showNotice = (message: string) => {
-    setNoticeMessage(message);
-    setTimeout(() => {
-      setNoticeMessage(null);
-    }, 2300);
-  };
-
-  const handleCopyURL = (id: string) => {
-    console.log(`id video: ${id}`);
-    const shareUrl = `https://youtube.com/watch?v=${id}`;
-    try {
-      navigator.clipboard.writeText(shareUrl);
-      showNotice("Copy successfully");
-    } catch (error) {
-      console.warn("Copy failed ", error);
-    }
-  };
-
-  const handleOpenSaveModal = (videoUpNext: any) => {
-    if (videoUpNext && videoUpNext.id) {
-
-      const currentId = typeof videoUpNext.id === 'object' ? videoUpNext.id.videoId : videoUpNext.id;
-
-      const savedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-
-
-      const isSavedd = savedVideos.some((v: any) => {
-        const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
-        return vId === currentId;
-      });
-
-      setIsSavedUpNext(isSavedd);
-    }
-  };
-
-  const shareToFacebook = (videoId: string) => {
-    if (!video || !video.id) return;
-    let youtubeUrl;
-    if (videoId) {
-      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    } else {
-      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    }
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
-    window.open(facebookShareUrl, '_blank');
-  };
-
-  const shareToX = (videoId: string, videoTitle: string) => {
-    if (!video || !video.id) return;
-    let youtubeUrl;
-    let text;
-    if (videoId) {
-      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
-    } else {
-      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-      text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
-    }
-    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
-    const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`;
-    window.open(xShareUrl, '_blank');
-  }
-
-  const shareToLinkedin = (videoId: string) => {
-    if (!video || !video.id) return;
-    let youtubeUrl;
-    if (videoId) {
-      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    } else {
-      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    }
-    const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
-    window.open(linkedinShareUrl, '_blank');
-  }
-
-  const shareToReddit = (videoId: string, videoTitle: string) => {
-    if (!video || !video.id) return;
-    let youtubeUrl;
-    let text;
-    if (videoId) {
-      youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
-    } else {
-      youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-      // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
-      text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
-    }
-    const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
-    window.open(redditShareUrl, '_blank');
-  }
-
-  const addVideoToList = (video: any) => {
-    if (!video.id || !video) return;
-    const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
-    if (!isAlreadyInList) {
-      const updateList = [video, ...existingListVideos];
-      localStorage.setItem('saved_video', JSON.stringify(updateList));
-    }
-    showNotice("Saved to Watch Later");
-  };
-
-  useEffect(() => {
-    const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    setWatchLaterVideoList(savedWatchLaterVideo);
-  }, []);
-
-
-  /* History video */
-  useEffect(() => {
-    if (video && video.id) {
-      // Get the list of history, if it's null, intialize it with empty list
-      //JSON.parse convert watch_history from string to array, if it's null, then intialize empty list 
-      const existingHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
-
-      // Filter out videos that have already been watched (to avoid repeating the same video)
-      const filteredHistory = existingHistory.filter((v: any) => v.id !== video.id);
-
-      // Push new video to the top of the list
-      const updatedHistory = [video, ...filteredHistory];
-
-      // Store in localStorage, convert array to string
-      localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
-    }
-  }, [video]);
-
-  useEffect(() => {
-    if (video && video.id) {
-      const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
-      setIsSaved(isSaved);
-    }
-  }, [video]);
-
-  /* Like, check is it liked or not */
-  useEffect(() => {
-    if (video && video.id) {
-      const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-      const isLiked = saveLikedVideos.some((v: any) => v.id === video.id);
-      setIsLiked(isLiked);
-    }
-  }, [video]);
-
-  /* Subcribe, check is it subcribed or not */
-  useEffect(() => {
-    if (video && video.snippet?.channelId) {
+    const handleSubscribeToggle = () => {
+      const nextState = !isSubscribed;
+      setIsSubscribed(nextState);
+      // get the old subcription list from localStorage
+      // convert string to array
       const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
 
-      // Kiểm tra xem ID của kênh hiện tại có nằm trong danh sách đã đăng ký không
-      const isSubbed = savedSubs.some((sub: any) => sub.id === video.snippet.channelId);
+      // Add this channel into this localstorage, this is hashmap(key, value)
+      const currentChannel = {
+        id: video?.snippet?.channelId || 'unknown_id',
+        title: video?.snippet?.channelTitle || 'Channel Name',
+        thumbnail: video1?.snippet?.thumbnails?.medium?.url || '', // avatar channel
+      };
 
-      // Cập nhật lại state của nút Subscribe cho khớp
-      setIsSubscribed(isSubbed);
-    }
-  }, [video]);
-
-  const linkifyDescription = (text: string) => {
-    if (!text) return null;
-
-    // Regex indentify link YouTube (youtube.com and youtu.be)
-    const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;
-    // Regex of other link
-    const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
-    //Hash tage
-    const hashtagRegex = /#(?!\d)[\w]+/g;
-    //seperate string by space to check each element
-    const words = text.split(/(\s+)/);
-
-    return words.map((word, index) => {
-      // Check whether youtube link
-      if (word.match(youtubeRegex)) {
-        return (
-          <a
-            key={index}
-            href={word}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
-            onClick={(e) => e.stopPropagation()}
-            title={word}
-          >
-            <img
-              src="/public/logo.png"
-              className="w[15px] h-[15px]"
-            />
-            <span className="text-gray-300">•</span>
-            <span className="truncate max-w-[180px]">YouTube Video</span>
-          </a>
-        );
+      if (nextState) {
+        // if click subcribe (Subscribe): Add channel to array if it is not in array
+        const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
+        if (!exists) {
+          //add object(hashmap) into an array
+          //we get the old subcription list and push this object to the end of array
+          const updatedSubs = [...savedSubs, currentChannel];
+          //localstorage only save string, so we have to convert array to string
+          localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
+        }
+      } else {
+        // IF WE UNSUBCRIBE (Unsubscribe): remove it from array
+        const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
+        localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
       }
-      // if other link
-      else if (word.match(generalUrlRegex)) {
-        const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
-        return (
-          <a
-            key={index}
-            href={word}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#3ea6ff] hover:underline inline-block"
-            onClick={(e) => e.stopPropagation()}
-            title={word}
-          >
-            {displayUrl}
-          </a>
-        );
-      } else if (word.match(hashtagRegex)) {
-        const cleanWord = word.replace('#', '');
-        return (
-          <a
-            key={index}
-            href={`/search?q=${cleanWord}`} // Navigate to youtube hashtag
-            className="text-[#3ea6ff] font-medium hover:inline-block"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {word}
-          </a>
-        );
+    };
+
+    const handleSaveToggle = () => {
+      if (!video || !video.id) return;
+      const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
+      let updatedSavedVideos;
+      if (isAlreadySaved) {
+        updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
+        setIsSaved(false);
+      } else {
+        updatedSavedVideos = [video, ...existingSavedVideos];
+        setIsSaved(true);
       }
-      return word;
-    });
-  };
+      localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+    };
 
-  const extractHashtags = (text: string) => {
-    if (!text) return [];
-    const hashtagRegex = /#(?!\d)\w+/g;
-    const matches = text.match(hashtagRegex) || [];
-    const tags = matches.slice(0, 3);
-    // \u00A0\u00A0\u00A0: space
-    return tags.join(' ');
-  };
+    const handleLikeToggle = () => {
+      if (!video || !video.id) return;
+      const existingLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+      const isAlreadyLiked = existingLikedVideos.some((v: any) => v.id === video.id);
 
-  const getSubcriber = (subcriber: string) => {
-    const totalSubcriber: number = Number(subcriber);
-    if (totalSubcriber < 1000) {
-      return `${totalSubcriber}`;
-    }
-    if (totalSubcriber < 1000000) {
-      const subcribers: number = totalSubcriber / 1000;
-      return `${subcribers}K`;
-    }
-    if (totalSubcriber < 1000000000) {
-      const subcribers: number = totalSubcriber / 1000000;
-      return `${subcribers}M`;
-    }
-  }
+      let updatedLikedVideos;
+      if (isAlreadyLiked) {
+        // Nếu đã like rồi -> Bấm lần nữa là UNLIKE (gỡ ra)
+        updatedLikedVideos = existingLikedVideos.filter((v: any) => v.id !== video.id);
+        setIsLiked(false); // Cập nhật lại state giao diện thành chưa like
+      } else {
+        // Nếu chưa like -> Thêm vào danh sách
+        updatedLikedVideos = [video, ...existingLikedVideos];
+        setIsLiked(true); // Cập nhật lại state giao diện thành đã like
+      }
+      // Lưu lại vào localStorage
+      localStorage.setItem('like_video', JSON.stringify(updatedLikedVideos));
+    };
 
+    const handlePostComment = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!commentText.trim()) return;
+      // Create a fake comment (the structure must be the same API)
+      const newComment = {
+        id: Date.now().toString(), // create a temporary ID 
+        snippet: {
+          topLevelComment: {
+            snippet: {
+              authorDisplayName: "Quang (You)",
+              authorProfileImageUrl: "/public/Q.png", // Avatar
+              textDisplay: commentText,
+              publishedAt: new Date().toISOString(),
+              likeCount: 0
+            }
+          }
+        }
+      };
+      //Update state (add to the first array)
+      setComments([newComment, ...comments]);
+      //total comments + 1 
+      if (video && video.statistics) {
+        const currentCount = Number(video.statistics.commentCount || 0);
+        setVideo({
+          ...video,
+          statistics: {
+            ...video.statistics,
+            commentCount: String(currentCount + 1)
+          }
+        });
+      }
+      //Reset input và close button
+      setCommentText("");
+      setIsAddComment(false);
+    };
 
-  const getTimeago = (date: string) => {
-    const videoDate = new Date(date);
-    const currentTime = new Date();
-    const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
+    const handleCopyURL = (id: string) => {
+      console.log(`id video: ${id}`);
+      const shareUrl = `https://youtube.com/watch?v=${id}`;
+      try {
+        navigator.clipboard.writeText(shareUrl);
+        showNotice("Copy successfully");
+      } catch (error) {
+        console.warn("Copy failed ", error);
+      }
+    };
+  //
+  /* FOR UP NEXT */
+    const removeVideoFromList = (id: string) => {
+      const storageKey = listType ? 'saved_video' : 'like_video';
 
-    if (timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-    if (timeAgo < 3600) { // MINUTE
-      const minutes = Math.floor(timeAgo / 60);
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 86400) { // HOUR
-      const hours = Math.floor(timeAgo / 3600);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 604800) { // DAY
-      const days = Math.floor(timeAgo / 86400);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 2592000) { // WEEK
-      const weeks = Math.floor(timeAgo / 604800);
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 31536000) { // MONTH
-      const months = Math.floor(timeAgo / 2592000);
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    }
-    //YEAR
-    const years = Math.floor(timeAgo / 31536000);
-    return `${years} year${years > 1 ? 's' : ''} ago`;
-  }
+      const updated = playListVideo.filter(v => v.id !== id);
+      setPlayListVideo(updated);
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      showNotice(`Removed from ${listType ? 'Watch Later' : 'Liked Videos'}`);
+    };
 
-  const getView = (view: string) => {
-    const totalView: number = Number(view);
-    if (totalView < 1000) {
-      return `${view} views`
-    }
-    if (totalView < 1000000) { // < 1M view 
-      const views: number = Math.floor(totalView / 1000);
-      return `${views}K views`;
-    }
-    if (totalView < 1000000000) {
-      const views: number = Math.floor(totalView / 1000000);
-      return `${views}M views`;
-    }
-    if (totalView < 1000000000000) {
-      const views: number = Math.floor(totalView / 1000000000);
-      return `${views}B views`;
-    }
-  }
+    const handleSaveToggleUpNext = (videoUpNext: any) => {
+      if (!videoUpNext) return;
 
-  const getTimeDescription = (date: string) => {
-    const videoDate = new Date(date);
-    const dayandmonth: string = videoDate.toDateString().slice(4, 10);
-    const year: string = videoDate.toDateString().slice(11, 16);
-    return `${dayandmonth}, ${year}`;
-  }
+      const cleanId = getVideoId(videoUpNext);
+      if (!cleanId) return;
 
-  const getLike = (like: string) => {
-    const totalLike: number = Number(like);
-    if (totalLike < 1000) {
-      return `${like}`
+      // Chuẩn hóa cấu trúc object lưu trữ để trang Watch Later / Liked đọc đúng dữ liệu
+      const normalizedVideo = {
+        id: cleanId,
+        snippet: {
+          title: videoUpNext?.snippet?.title || 'No Title',
+          channelTitle: videoUpNext?.snippet?.channelTitle || 'Unknown Channel',
+          thumbnails: videoUpNext?.snippet?.thumbnails || {},
+          //Title channel
+        }
+      };
+      const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      const isAlreadySaved = existingSavedVideos.some((v: any) => getVideoId(v) === cleanId);
+      let updatedSavedVideos;
+      if (isAlreadySaved) {
+        updatedSavedVideos = existingSavedVideos.filter((v: any) => getVideoId(v) !== cleanId);
+        setIsSavedUpNext(false);
+      } else {
+        updatedSavedVideos = [normalizedVideo, ...existingSavedVideos];
+        setIsSavedUpNext(true);
+      }
+      localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
+      setWatchLaterVideoList(updatedSavedVideos);
+    };
+
+    const handleOpenSaveModal = (videoUpNext: any) => {
+      if (videoUpNext && videoUpNext.id) {
+        const currentId = typeof videoUpNext.id === 'object' ? videoUpNext.id.videoId : videoUpNext.id;
+        const savedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        const isSavedd = savedVideos.some((v: any) => {
+          const vId = typeof v.id === 'object' ? v.id.videoId : v.id;
+          return vId === currentId;
+        });
+        setIsSavedUpNext(isSavedd);
+      }
+    };
+
+    const addVideoToList = (video: any) => {
+      if (!video.id || !video) return;
+      const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
+      if (!isAlreadyInList) {
+        const updateList = [video, ...existingListVideos];
+        localStorage.setItem('saved_video', JSON.stringify(updateList));
+      }
+      showNotice("Saved to Watch Later");
+    };
+  //
+  
+  /* SHARE BUTTON */
+    const shareToFacebook = (videoId: string) => {
+      if (!video || !video.id) return;
+      let youtubeUrl;
+      if (videoId) {
+        youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      } else {
+        youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+      }
+      const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
+      window.open(facebookShareUrl, '_blank');
+    };
+
+    const shareToX = (videoId: string, videoTitle: string) => {
+      if (!video || !video.id) return;
+      let youtubeUrl;
+      let text;
+      if (videoId) {
+        youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
+      } else {
+        youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+        text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+      }
+      // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+      const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`;
+      window.open(xShareUrl, '_blank');
     }
-    if (totalLike < 1000000) { // < 1M view 
-      const likes: number = Math.floor(totalLike / 1000);
-      return `${likes}K`;
+
+    const shareToLinkedin = (videoId: string) => {
+      if (!video || !video.id) return;
+      let youtubeUrl;
+      if (videoId) {
+        youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      } else {
+        youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+      }
+      const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
+      window.open(linkedinShareUrl, '_blank');
     }
-    if (totalLike < 1000000000) {
-      const likes: number = Math.floor(totalLike / 1000000);
-      return `${likes}M`;
+
+    const shareToReddit = (videoId: string, videoTitle: string) => {
+      if (!video || !video.id) return;
+      let youtubeUrl;
+      let text;
+      if (videoId) {
+        youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : '');
+      } else {
+        youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
+        // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
+        text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
+      }
+      const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
+      window.open(redditShareUrl, '_blank');
     }
-    if (totalLike < 1000000000000) {
-      const likes: number = Math.floor(totalLike / 1000000000);
-      return `${likes}B`;
+  //
+
+  /*SET STATE FOR CURRENT VIDEO AND UP NEXT */
+    useEffect(() => {
+      const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
+      setWatchLaterVideoList(savedWatchLaterVideo);
+    }, []);
+
+    /* History video */
+    useEffect(() => {
+      if (video && video.id) {
+        // Get the list of history, if it's null, intialize it with empty list
+        //JSON.parse convert watch_history from string to array, if it's null, then intialize empty list 
+        const existingHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
+
+        // Filter out videos that have already been watched (to avoid repeating the same video)
+        const filteredHistory = existingHistory.filter((v: any) => v.id !== video.id);
+
+        // Push new video to the top of the list
+        const updatedHistory = [video, ...filteredHistory];
+
+        // Store in localStorage, convert array to string
+        localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
+      }
+    }, [video]);
+
+    useEffect(() => {
+      if (video && video.id) {
+        const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
+        setIsSaved(isSaved);
+      }
+    }, [video]);
+
+    /* Like, check is it liked or not */
+    useEffect(() => {
+      if (video && video.id) {
+        const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+        const isLiked = saveLikedVideos.some((v: any) => v.id === video.id);
+        setIsLiked(isLiked);
+      }
+    }, [video]);
+
+    /* Subcribe, check is it subcribed or not */
+    useEffect(() => {
+      if (video && video.snippet?.channelId) {
+        const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
+        const isSubbed = savedSubs.some((sub: any) => sub.id === video.snippet.channelId);
+        setIsSubscribed(isSubbed);
+      }
+    }, [video]);
+  //
+
+  /* MAKE DATA FORM BETTER: GET */
+    const getVideoId = (video: any) => {
+      if (!video) return '';
+      if (typeof video.id === 'object' && video.id !== null) {
+        return video.id.videoId || video.id;
+      }
+      return video.id;
+    };
+
+    const getHashtags = (text: string) => {
+      if (!text) return [];
+      const hashtagRegex = /#(?!\d)\w+/g;
+      const matches = text.match(hashtagRegex) || [];
+      const tags = matches.slice(0, 3);
+      // \u00A0\u00A0\u00A0: space
+      return tags.join(' ');
+    };
+
+    const getSubcriber = (subcriber: string) => {
+      const totalSubcriber: number = Number(subcriber);
+      if (totalSubcriber < 1000) {
+        return `${totalSubcriber}`;
+      }
+      if (totalSubcriber < 1000000) {
+        const subcribers: number = totalSubcriber / 1000;
+        return `${subcribers}K`;
+      }
+      if (totalSubcriber < 1000000000) {
+        const subcribers: number = totalSubcriber / 1000000;
+        return `${subcribers}M`;
+      }
     }
-  }
+
+    const getTimeago = (date: string) => {
+      const videoDate = new Date(date);
+      const currentTime = new Date();
+      const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
+
+      if (timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
+      if (timeAgo < 3600) { // MINUTE
+        const minutes = Math.floor(timeAgo / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      }
+      if (timeAgo < 86400) { // HOUR
+        const hours = Math.floor(timeAgo / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      }
+      if (timeAgo < 604800) { // DAY
+        const days = Math.floor(timeAgo / 86400);
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+      }
+      if (timeAgo < 2592000) { // WEEK
+        const weeks = Math.floor(timeAgo / 604800);
+        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+      }
+      if (timeAgo < 31536000) { // MONTH
+        const months = Math.floor(timeAgo / 2592000);
+        return `${months} month${months > 1 ? 's' : ''} ago`;
+      }
+      //YEAR
+      const years = Math.floor(timeAgo / 31536000);
+      return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
+
+    const getView = (view: string) => {
+      const totalView: number = Number(view);
+      if (totalView < 1000) {
+        return `${view} views`
+      }
+      if (totalView < 1000000) { // < 1M view 
+        const views: number = Math.floor(totalView / 1000);
+        return `${views}K views`;
+      }
+      if (totalView < 1000000000) {
+        const views: number = Math.floor(totalView / 1000000);
+        return `${views}M views`;
+      }
+      if (totalView < 1000000000000) {
+        const views: number = Math.floor(totalView / 1000000000);
+        return `${views}B views`;
+      }
+    }
+
+    const getTimeDescription = (date: string) => {
+      const videoDate = new Date(date);
+      const dayandmonth: string = videoDate.toDateString().slice(4, 10);
+      const year: string = videoDate.toDateString().slice(11, 16);
+      return `${dayandmonth}, ${year}`;
+    }
+
+    const getLike = (like: string) => {
+      const totalLike: number = Number(like);
+      if (totalLike < 1000) {
+        return `${like}`
+      }
+      if (totalLike < 1000000) { // < 1M view 
+        const likes: number = Math.floor(totalLike / 1000);
+        return `${likes}K`;
+      }
+      if (totalLike < 1000000000) {
+        const likes: number = Math.floor(totalLike / 1000000);
+        return `${likes}M`;
+      }
+      if (totalLike < 1000000000000) {
+        const likes: number = Math.floor(totalLike / 1000000000);
+        return `${likes}B`;
+      }
+    }
+  //
 
   return (
     <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
@@ -830,7 +778,7 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
               onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
             >
-              Open on Youtube
+              Youtube
             </button>
           </div>
 
@@ -849,13 +797,13 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
               <>
                 <span>{video?.statistics?.viewCount} views</span>
                 <span>{getTimeDescription(video?.snippet?.publishedAt)}</span>
-                <span className="text-[#3ea6ff]">{extractHashtags(video?.snippet?.description)}</span>
+                <span className="text-[#3ea6ff]">{getHashtags(video?.snippet?.description)}</span>
               </>
             ) : (
               <>
                 <span>{getView(video?.statistics?.viewCount)}</span>
                 <span>{getTimeago(video?.snippet?.publishedAt)}</span>
-                <span className="text-gray-400">{extractHashtags(video?.snippet?.description)}</span>
+                <span className="text-gray-400">{getHashtags(video?.snippet?.description)}</span>
               </>
             )}
           </div>
@@ -864,7 +812,7 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
           {/* line-clamp2 and whitespace-pre-wrap, process data received from YOUTUBE API */}
           <div className={`font-sans text-gray-300 break-words ${!isExpandedDecription ? 'line-clamp-1' : 'whitespace-pre-wrap'}`}>
             {video?.snippet?.description ?
-              (linkifyDescription(video.snippet.description))
+              (handleDescription(video.snippet.description))
               :
               (<div className="italic">No description has been added to this video</div>)}
           </div>
@@ -979,12 +927,16 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
 
       {/* RIGHT COLUMN (SIDEBAR FEED), UP NEXT */}
       <div className="lg:w-[380px] shrink-0 flex flex-col gap-3 -mr-3">
-        <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
+        {listId === 'LL' || listId === 'WL' ?
+          ""
+          :
+          <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">Up Next</h3>
+        }
         {listId === 'LL' || listId === 'WL' ? (
-          <div className="flex flex-col gap-3 rounded-xl border border-gray-700">
+          <div className="flex flex-col gap-3 rounded-xl border border-gray-700 mr-3">
             {/* Header of Playlist */}
             <div className="bg-[#212121] p-3 rounded-xl border border-[#303030]">
-              <h3 className="font-sans font-bold text-sm text-white">{listType ? 'Watch Later' : 'Liked videos'}</h3>
+              <h3 className="font-sans font-bold text-xl text-white">{listType ? 'Watch Later' : 'Liked videos'}</h3>
               <p className="text-xs text-gray-400 mt-0.5">Private • Playlist • {playListVideo.length} videos</p>
             </div>
 
@@ -993,14 +945,14 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
               <div
                 key={item.id}
                 onClick={() => navigate(`/watch?v=${item.id}&list=${listId}&index=${index + 1}`)}
-                className={`flex gap-3 group cursor-pointer p-1.5 transition ${item.id === videoId ? 'bg-[#3f3f3f]' : 'hover:bg-[#272727]'
+                className={`flex gap-3 group cursor-pointer p-1.5 -mb-2 transition ${item.id === videoId ? 'bg-gray-700' : 'hover:bg-[#1c1c1c]'
                   }`}
               >
-                <span className="text-xs text-gray-400 flex items-center justify-center w-4 shrink-0 font-medium">
+                <span className="text-xs text-gray-400 flex items-center justify-center shrink-0 font-medium">
                   {index + 1}
                 </span>
 
-                <div className="relative w-25 aspect-video rounded-md overflow-hidden shrink-0 bg-[#212121]">
+                <div className="relative w-[90px] h-[55px] flex items-center aspect-video rounded-md overflow-hidden shrink-0 bg-[#212121]">
                   <img
                     src={item?.snippet?.thumbnails?.medium?.url || item?.snippet?.thumbnails?.default?.url}
                     className="w-full h-full object-cover"
@@ -1009,12 +961,182 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
 
                 <div className="flex-1 min-w-0 flex flex-col gap-1 py-0.5">
                   <h4 className="text-xs font-semibold leading-snug line-clamp-3 text-[#f1f1f1] group-hover:text-white">
-                    {item?.snippet?.title}
+                    {item?.snippet?.title?.length > 45
+                      ? item.snippet.title.slice(0, 45) + '...'
+                      : item?.snippet?.title}
                   </h4>
-                  <span className="text-[11px] text-gray-400 truncate">
+                  <span className="text-[12px] text-gray-400 truncate">
                     {item?.snippet?.channelTitle}
                   </span>
+
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const vidId = item.id;
+                    setActiveMenuId(activeMenuId === vidId ? null : vidId);
+                  }}
+                  className="hidden text-xl group-hover:block cursor-pointer top-20 w-[30px] h-[30px] hover:text-white"
+                >
+                  ⋮
+                </button>
+                {activeMenuId === item.id && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40 cursor-default"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMenuId(null);
+                      }}
+                    />
+
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="overflow-hidden absolute right-10 mt-[55px] w-[250px] bg-[#282828]  overflow-hidden text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
+                    >
+                      <div className="pb-2 border-b border-gray-500">
+                        {!listType && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                addVideoToList(item);
+                              }}
+                              className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
+                              <img
+                                alt="Save to Watch Later"
+                                src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
+                              />
+                              Save to Watch later
+                            </button>
+
+                          </>)}
+
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsShareModalUpNext(true);
+                          }}
+                          className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
+                          <img
+                            alt="Share"
+                            src="/public/share.png" className="h-5 w-5 mr-3"
+                          />
+                          Share
+                        </button>
+                        {isShareModalUpNext && (
+                          <div
+                            onClick={() => setIsShareModalUpNext(false)}
+                            className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
+                          >
+                            {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                              {/* Nút Đóng (Dấu X góc trên bên phải) */}
+                              <button
+                                onClick={() => setIsShareModalUpNext(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
+                              >
+                                ✕
+                              </button>
+                              <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
+                                Share
+                              </h2>
+                              <div className="flex flex-row gap-3">
+                                <button
+                                  className="flex flex-col cursor-pointer"
+                                  onClick={() => {
+                                    const videoId = video.id.videoId || "";
+                                    shareToFacebook(videoId);
+                                  }}
+                                >
+                                  <img
+                                    alt="Share"
+                                    src="/public/facebook.png"
+                                    className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
+                                  />
+                                  Facebook
+                                </button>
+                                <button
+                                  className="flex flex-col cursor-pointer"
+                                  onClick={() => {
+                                    shareToX(item.id, item.snippet.title);
+                                  }}
+                                >
+                                  <img
+                                    src="/public/X.png"
+                                    className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                  />
+                                  X
+                                </button>
+
+                                <button
+                                  className="flex flex-col cursor-pointer -ml-2"
+                                  onClick={() => {
+                                    shareToLinkedin(item.id);
+                                  }}
+                                >
+                                  <img
+                                    src="/public/linkedin.png"
+                                    className="rounded-full object-cover h-17 w-18 cursor-pointer"
+                                  />
+                                  Linked
+                                </button>
+
+                                <button
+                                  className="flex flex-col cursor-pointer"
+                                  onClick={() => {
+                                    shareToReddit(item.id, item.snippet.title);
+                                  }}
+                                >
+                                  <img
+                                    src="/public/reddit.png"
+                                    className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
+                                  />
+                                  Reddit
+                                </button>
+                              </div>
+                              <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
+                                {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={`https://youtube.com/watch?v=${item.id}`}
+                                  onClick={(e) => e.currentTarget.select()}
+                                  className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
+                                />
+
+                                <button
+                                  onClick={() => {
+                                    handleCopyURL(item.id);
+                                  }}
+                                  className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
+                                >
+                                  Copy
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeVideoFromList(item.id);
+                        }}
+                        className="mt-1 w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
+                      >
+                        <img
+                          alt="Add to queue"
+                          src="/public/bin.png" className="h-5 w-5 mr-3 pointer-events-none"
+                        />
+                        Remove from {listType ? 'Watch later' : 'Liked videos'}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
             <div className="text-s text-gray-400 mt-0.5 flex items-center justify-center">
@@ -1092,7 +1214,7 @@ const handleSaveToggleUpNext = (videoUpNext: any) => {
                         Add to queue
                       </button>
                       <button
-                        onClick={(e) => {
+                        onClick={() => {
                           setActiveMenuId(null);
                           addVideoToList(video);
                         }}
