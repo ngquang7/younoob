@@ -82,7 +82,20 @@ export default function ChannelComponent() {
     };
 
     const [modalUnsubribe, setModalUnsubcribe] = useState(false);
-
+    const getSubcriber = (subcriber: string) => {
+      const totalSubcriber: number = Number(subcriber);
+      if (totalSubcriber < 1000) {
+        return `${totalSubcriber}`;
+      }
+      if (totalSubcriber < 1000000) {
+        const subcribers: number = totalSubcriber / 1000;
+        return `${subcribers}K`;
+      }
+      if (totalSubcriber < 1000000000) {
+        const subcribers: number = totalSubcriber / 1000000;
+        return `${subcribers}M`;
+      }
+    }
     const getTimeago = (date: string) => {
         const videoDate = new Date(date);
         const currentTime = new Date();
@@ -117,11 +130,16 @@ export default function ChannelComponent() {
     return (
         <div className="ml-25 flex mr-25 flex-col">
             <div className="border-b border-gray-600 pb-3">
+                {channel?.[0]?.brandingSettings?.image?.bannerExternalUrl ? (
                 <img
                     src={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl || "Loading..."}
                     className="w-full h-45 object-cover rounded-2xl"
                 />
+                ) : (
+                    <></>
+                )}
                 <div className="flex gap-4 mt-10 items-start">
+                    
                     <img
                         src={channel?.[0]?.snippet?.thumbnails?.medium?.url}
                         alt="Channel Avatar"
@@ -135,7 +153,7 @@ export default function ChannelComponent() {
                             {channel?.[0]?.snippet?.title}
                         </h1>
                         <p className="text-gray-400 text-sm mt-3">
-                            <span className="font-bold text-white">{channel?.[0]?.snippet?.customUrl}</span> • {channel?.[0]?.statistics?.subscriberCount} subcribers • {channel?.[0]?.statistics?.videoCount} videos
+                            <span className="font-bold text-white">{channel?.[0]?.snippet?.customUrl}</span> • {getSubcriber(channel?.[0]?.statistics?.subscriberCount)} subcribers • {channel?.[0]?.statistics?.videoCount} videos
                         </p>
                         {/* whitespace-pre-wrap" */}
                         <div
@@ -154,8 +172,8 @@ export default function ChannelComponent() {
                                 }
                             }}
                             className={`-ml-2 py-2 text-sm font-semibold w-30 mt-3 rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
-                                    ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
-                                    : 'bg-white hover:bg-gray-200 text-black'
+                                ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
+                                : 'bg-white hover:bg-gray-200 text-black'
                                 }`}
                         >
                             {isSubscribed ?

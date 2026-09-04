@@ -190,8 +190,9 @@ export default function YouComponent () {
                             </button>
                         </div>
                     </div>
-                    {/* Video History */}
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
+                    {/* Video in column */}
+                    {/* lg:grid-cols-4 in small screen is not problem, but when it comes to big screen, it will have some error format */}
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5 ">
                     <div 
                         onClick={() => {
                             if(likedList.length > 0) {
@@ -213,7 +214,7 @@ export default function YouComponent () {
 
                     <img 
                         src={likedList[0]?.snippet?.thumbnails?.medium?.url} 
-                        alt={likedList  [0]?.snippet?.title} 
+                        alt={likedList[0]?.snippet?.title} 
                         className="w-full h-full object-cover rounded-[10px] flex relative cursor-pointer"
                     />
                         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
