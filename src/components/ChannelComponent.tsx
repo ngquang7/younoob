@@ -240,13 +240,13 @@ export default function ChannelComponent() {
                                 </button>
 
                                 {/* Tiêu đề kênh trong bảng */}
-                                <h2 className="text-xl font-bold mb-6">
+                                <h2 className="text-2xl font-bold mb-6">
                                     {channel?.[0]?.snippet?.title}
                                 </h2>
 
                                 {/* Description */}
                                 <div className="mb-6">
-                                    <h3 className="font-bold text-base mb-2">Description</h3>
+                                    <h3 className="font-bold text-base mb-2 text-xl">Description</h3>
                                     {/* whitespace-pre-wrap giúp giữ nguyên các khoảng xuống dòng của mô tả gốc */}
                                     <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
                                         {channel?.[0]?.brandingSettings?.channel?.description || channel?.[0]?.snippet?.description}
@@ -255,6 +255,7 @@ export default function ChannelComponent() {
 
                                 {/* Các thông tin phụ bên dưới (Sub, Video count, Custom URL...) */}
                                 <div className="border-t border-gray-700 pt-4 space-y-3 text-sm text-gray-300">
+                                    <h3 className="font-bold text-base  mb-2 text-xl text-white">More info</h3>
                                     <div className="flex items-center gap-3">
                                         <span>🔗</span>
                                         <span>{channel?.[0]?.snippet?.customUrl}</span>
