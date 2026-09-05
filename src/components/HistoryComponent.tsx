@@ -12,6 +12,15 @@ export default function HistoryComponent() {
   const [isSaved, setIsSaved] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
+  const [searchText, setSearchText] = useState('');
+
+const filteredHistory = historyList.filter((video) => {
+    const title = video.snippet?.title?.toLowerCase() || '';
+    const channelTitle = video.snippet?.channelTitle?.toLowerCase() || '';
+    const query = searchText.toLowerCase().trim();
+    return title.includes(query) || channelTitle.includes(query);
+  });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);  /* TEST console.log(`${searchText}`); */
 
   const showNotice = (message: string) => {
     setNoticeMessage(message);
@@ -30,6 +39,9 @@ export default function HistoryComponent() {
     const savedHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
     setHistoryList(savedHistory);
   }, []);
+  const handleSubmit = (e: React.SubmitEvent) => {
+    e.preventDefault(); // Stop page refresh
+  };
 
   const handleOpenSaveModal = (video: any) => {
     if (video && video.id) {
@@ -38,6 +50,7 @@ export default function HistoryComponent() {
       setIsSaved(isSaved);
     }
   };
+
   const handleSaveToggle = (video: any) => {
     if (!video || !video.id) return;
     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
@@ -96,7 +109,6 @@ export default function HistoryComponent() {
     }
   };
 
-
   const addVideoToList = (video: any) => {
     if (!video.id || !video) return;
     const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
@@ -137,13 +149,46 @@ export default function HistoryComponent() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold font-sans mt-3 ml-3">Watch History</h1>
         {historyList.length > 0 && (
+          <>
+            <form 
+              onSubmit={handleSubmit}
+              className="flex-1 max-2xl mx-4 hidden md:flex items-center mt-3 ml-[60px] mr-[50px]"
+            >
+              <div className="relative flex flex-1 w-[10px] items-center border-b border-[#303030] group px-4">
+              <button
+                className="w-10 h-8 -ml-5 hover:bg-neutral-700 rounded-full transition-colors"
+                // onClick={() => filteredHistory(searchText)}
+                type="submit"
+              >
+                <img
+                  src="/public/find.png" 
+                  className="h-4 w-4 ml-2"
+
+                />
+              </button>
+                
+                <input
+                  onChange={handleChange}
+                  value={searchText}
+                  type="text"
+                  placeholder="Search watch history"
+                  className="w-full bg-transparent text-[#f1f1f1] placeholder-gray-500 text-sm focus:outline-none"
+                />
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white scale-x-0 transition-transform duration-150 ease-out origin-center group-focus-within:scale-x-100"></div> 
+
+             </div>
+
+              {/* Submit (Finding) button */}
+            </form>
+
           <button
             onClick={() => setIsClearAllHis(true)}
-            // onClick={clearAllHistory}
-            className="px-4 py-2 text-xs font-semibold bg-[#212121] hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
+            className="px-4 py-2 text-xs font-semibold bg-[#212121] mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
           >
             Clear all watch history
           </button>
+
+          </>
         )}
       </div>
       {isClearAllHis && (
@@ -196,7 +241,7 @@ export default function HistoryComponent() {
         </div>
       )}
       {/* Notification appear if there is no video watched yet. */}
-      {historyList.length === 0 ? (
+      {history.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
           <p className="text-lg font-medium">You have no watch history yet.</p>
           <p className="text-sm">Videos you watch will show up here so you can easily find them again.</p>
@@ -204,7 +249,7 @@ export default function HistoryComponent() {
       ) : (
         /* Video in column */
         <div className="flex flex-col gap-3">
-          {historyList.map((video) => (
+          {filteredHistory.map((video) => (
             <div
               key={video.id}
               onClick={() => navigate(`/watch?v=${video.id}`)} // Click it, it will navigate to watch page

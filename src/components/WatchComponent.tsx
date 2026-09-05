@@ -604,7 +604,7 @@ export default function WatchComponent() {
             className="w-full h-full border-none"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-          ></iframe>
+          />
         </div>
 
         {/* Video Title */}

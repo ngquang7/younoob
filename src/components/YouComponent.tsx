@@ -195,8 +195,8 @@ export default function YouComponent () {
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5 ">
                     <div 
                         onClick={() => {
-                            if(likedList.length > 0) {
-                            navigate(`/watch?v=${likedVideoList[0]?.id}&list=LL&start_radio=1`)
+                            if (likedList.length > 0) {
+                            navigate(`/watch?v=${likedList[0]?.id}&list=LL`);
                             } else {
                                 goLikeVideo();
                             }

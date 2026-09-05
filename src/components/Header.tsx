@@ -58,6 +58,11 @@ export default function Header({ onToggleSidebar, onCustomClick, goHome }: Heade
           type="submit"
           className="bg-[#222222] border-y border-r border-[#303030] hover:bg-[#303030] h-9 px-6 py-2.5 rounded-r-full flex items-center justify-center cursor-pointer transition text-[#f1f1f1] active:bg-[#404040]"
         >
+                <img
+                  src="/public/find.png" 
+                  className="h-[20px] w-[20px]"
+
+                />
         </button>
       </form>
 
