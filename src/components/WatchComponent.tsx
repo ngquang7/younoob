@@ -646,16 +646,18 @@ export default function WatchComponent() {
                 ${isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
                   }`}
               >
+                {isLiked ? <></> : <><img src="/public/notlike.png" className="w-4 h-4"/></>}
                 {getLike(video?.statistics?.likeCount)} likes
               </button>
               {/* dislike button */}
               {/* Pay attention to hover */}
               <button
                 onClick={() => setDisIsLiked(!isdisLiked)}
-                className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] transition text-xs font-semibold cursor-pointer
+                className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] flex items-center gap-1.5 transition text-xs font-semibold cursor-pointer
               ${isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
                   }`}
               >
+                {isdisLiked ? <></> : <><img src="/public/notdislike.png" className="w-4 h-4"/></>}
                 dislike
               </button>
 
@@ -670,7 +672,14 @@ export default function WatchComponent() {
                   : 'bg-[#212121] hover:bg-[#303030]'}
                 `}
             >
-              {isSaved ? 'Saved' : 'Watch Later'}
+
+              {isSaved ? 'Saved' : 
+              <>              
+                <img 
+                  src="/public/savetoplaylist.png" className="h-4 w-4"
+                /> 
+                Watch Later
+              </>}
             </button>
 
             {/* SHARE */}
@@ -894,7 +903,12 @@ export default function WatchComponent() {
                 />
                 <div className="flex flex-col mb-8">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">{comment.authorDisplayName}</span>
+                    <span 
+                      className="font-semibold text-sm"
+                      onClick={() => {navigate(`/channel/${comment.authorChannelId.value}`);} }
+                    >
+                      {comment.authorDisplayName}
+                    </span>
                     <span className="text-xs text-gray-500">{getTimeago(comment.publishedAt)}</span>
                   </div>
                   <p

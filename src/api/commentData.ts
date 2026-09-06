@@ -20,6 +20,9 @@ export interface CommentResource {
         authorDisplayName: string;
         authorProfileImageUrl: string;
         authorChannelUrl?: string;
+        authorChannelId?: {
+            value: string;
+        };
         likeCount: number;
         publishedAt: string;
         updatedAt: string;

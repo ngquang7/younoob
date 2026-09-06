@@ -14,6 +14,7 @@ export default function ChannelComponent() {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [channel, setChannel] = useState<any>(null); //Channel
     const [channelVideo, setChannelVideo] = useState<YouTubeSearchItem[]>([]);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
 
     const goWatch = (videoidd: string) => navigate(`/watch?v=${videoidd}`);
@@ -143,7 +144,8 @@ export default function ChannelComponent() {
                     <img
                         src={channel?.[0]?.snippet?.thumbnails?.medium?.url}
                         alt="Channel Avatar"
-                        className="w-40 h-40 rounded-full object-cover border border-[#303030]"
+                        onClick={() => setPreviewImage(channel?.[0]?.snippet?.thumbnails?.medium?.url)}
+                        className="w-40 h-40 cursor-pointer rounded-full object-cover border border-[#303030]"
                     />
 
                     <div
@@ -160,7 +162,7 @@ export default function ChannelComponent() {
                             className="flex items-center gap-3 text-l text-gray-200 mb-1 cursor-pointer w-fit"
                             onClick={() => setIsModalOpen(true)}>
                             <button className="text-gray-400 text-sm mt-3 items-start cursor-pointer">
-                                {channel?.[0]?.brandingSettings?.channel?.description.slice(0, 10)} <span className="font-semibold text-l text-white">...more</span>
+                                {channel?.[0]?.brandingSettings?.channel?.description ? channel?.[0]?.brandingSettings?.channel?.description.slice(0, 10) : ""} <span className="font-semibold text-l text-white">...more</span>
                             </button>
                         </div>
                         <button
@@ -221,8 +223,20 @@ export default function ChannelComponent() {
                                     </div>
                                 </div>
                             </div>
-                        )
-                        }
+                        )}
+                    {previewImage && (
+                  <div
+                    className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    onClick={() => setPreviewImage(null)}
+                  >
+                    {/* Want preview bigger ? Modify w-64 h-64 */}
+                    <img
+                      src={previewImage}
+                      alt="Preview Large"
+                      className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
+                    />
+                  </div>
+                )}
                     </div>
                     {isModalOpen && (
                         <div
@@ -246,7 +260,7 @@ export default function ChannelComponent() {
 
                                 {/* Description */}
                                 <div className="mb-6">
-                                    <h3 className="font-bold text-base mb-2 text-xl">Description</h3>
+                                    <h3 className="font-bold text-base mb-2 text-xl">{channel?.[0]?.brandingSettings?.channel?.description > 0 ? 'Description' : ""}</h3>
                                     {/* whitespace-pre-wrap giúp giữ nguyên các khoảng xuống dòng của mô tả gốc */}
                                     <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
                                         {channel?.[0]?.brandingSettings?.channel?.description || channel?.[0]?.snippet?.description}
@@ -257,9 +271,21 @@ export default function ChannelComponent() {
                                 <div className="border-t border-gray-700 pt-4 space-y-3 text-sm text-gray-300">
                                     <h3 className="font-bold text-base  mb-2 text-xl text-white">More info</h3>
                                     <div className="flex items-center gap-3">
-                                        <span>🔗</span>
-                                        <span>{channel?.[0]?.snippet?.customUrl}</span>
-                                    </div>
+                                        <span>
+                                            <img
+                                                src="/public/youtubelogoDes.png" 
+                                                className="h-6 w-7"
+                                            />
+                                        </span>
+                                            <a
+                                            href={`https://www.youtube.com/${channel?.[0]?.snippet?.customUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="-mt-1"
+                                            >
+                                            www.youtube.com/{channel?.[0]?.snippet?.customUrl}
+                                            </a>       
+                                     </div>
                                     <div className="flex items-center gap-3">
                                         <span>👥</span>
                                         <span>{channel?.[0]?.statistics?.subscriberCount} subscribers</span>
