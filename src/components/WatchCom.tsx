@@ -174,67 +174,16 @@ export default function WatchCom() {
             return word;
         });
     };
-useWatchHistory(video);
-const {
-    isLiked,
-    isSaved,
-    isSubscribed,
-    handleLikeToggle,
-    handleSaveToggle,
-    handleSubscribeToggle,
-} = useVideoActions(video, video1 || video) as any;
-    // const handleSubscribeToggle = () => {
-    //     const nextState = !isSubscribed;
-    //     setIsSubscribed(nextState);
-    //     const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-    //     const currentChannel = {
-    //         id: video?.snippet?.channelId || 'unknown_id',
-    //         title: video?.snippet?.channelTitle || 'Channel Name',
-    //         thumbnail: video1?.snippet?.thumbnails?.medium?.url || '',
-    //     };
-
-    //     if (nextState) {
-    //         const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
-    //         if (!exists) {
-    //             const updatedSubs = [...savedSubs, currentChannel];
-    //             localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-    //         }
-    //     } else {
-    //         const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
-    //         localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-    //     }
-    // };
-
-    // const handleSaveToggle = () => {
-    //     if (!video || !video.id) return;
-    //     const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    //     const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
-    //     let updatedSavedVideos;
-    //     if (isAlreadySaved) {
-    //         updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
-    //         setIsSaved(false);
-    //     } else {
-    //         updatedSavedVideos = [video, ...existingSavedVideos];
-    //         setIsSaved(true);
-    //     }
-    //     localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
-    // };
-
-    // const handleLikeToggle = () => {
-    //     if (!video || !video.id) return;
-    //     const existingLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-    //     const isAlreadyLiked = existingLikedVideos.some((v: any) => v.id === video.id);
-
-    //     let updatedLikedVideos;
-    //     if (isAlreadyLiked) {
-    //         updatedLikedVideos = existingLikedVideos.filter((v: any) => v.id !== video.id);
-    //         setIsLiked(false);
-    //     } else {
-    //         updatedLikedVideos = [video, ...existingLikedVideos];
-    //         setIsLiked(true);
-    //     }
-    //     localStorage.setItem('like_video', JSON.stringify(updatedLikedVideos));
-    // };
+    
+    useWatchHistory(video);
+    const {
+        isLiked,
+        isSaved,
+        isSubscribed,
+        handleLikeToggle,
+        handleSaveToggle,
+        handleSubscribeToggle,
+    } = useVideoActions(video, video1 || video) as any;
 
     const handlePostComment = (e: React.FormEvent) => {
         e.preventDefault();
@@ -311,46 +260,6 @@ const {
         }
         showNotice("Saved to Watch Later");
     };
-
-
-
-    // useEffect(() => {
-    //     const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    //     setWatchLaterVideoList(savedWatchLaterVideo);
-    // }, []);
-
-    // useEffect(() => {
-    //     if (video && video.id) {
-    //         const existingHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
-    //         const filteredHistory = existingHistory.filter((v: any) => v.id !== video.id);
-    //         const updatedHistory = [video, ...filteredHistory];
-    //         localStorage.setItem('watch_history', JSON.stringify(updatedHistory));
-    //     }
-    // }, [video]);
-
-    // useEffect(() => {
-    //     if (video && video.id) {
-    //         const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    //         const isSavedVal = saveSavedVideos.some((v: any) => v.id === video.id);
-    //         setIsSaved(isSavedVal);
-    //     }
-    // }, [video]);
-
-    // useEffect(() => {
-    //     if (video && video.id) {
-    //         const saveLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
-    //         const isLikedVal = saveLikedVideos.some((v: any) => v.id === video.id);
-    //         setIsLiked(isLikedVal);
-    //     }
-    // }, [video]);
-
-    // useEffect(() => {
-    //     if (video && video.snippet?.channelId) {
-    //         const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-    //         const isSubbed = savedSubs.some((sub: any) => sub.id === video.snippet.channelId);
-    //         setIsSubscribed(isSubbed);
-    //     }
-    // }, [video]);
 
     const getVideoId = (v: any) => {
         if (!v) return '';
