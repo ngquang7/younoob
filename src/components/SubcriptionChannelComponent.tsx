@@ -12,8 +12,7 @@ export default function SubcriptionChannel() {
     const [loading, setLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(true);
     const [selectedChannel, setSelectedChannel] = useState<any | null>(null);
-
-
+    
     useEffect(() => {
         const fetchSubscriptionDetails = async () => {
             try {
