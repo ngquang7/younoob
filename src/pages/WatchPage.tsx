@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LeftBar from '../components/LeftBar'
 import WatchComponent from '../components/WatchComponent';
-
+import WatchCom from '../components/WatchCom';
 export default function WatchPage() {
     const navigate = useNavigate();
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -33,7 +33,7 @@ export default function WatchPage() {
             />
             
             <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-18'} p-4`}>
-                <WatchComponent />
+                <WatchCom />
             </main>
         </>
     );

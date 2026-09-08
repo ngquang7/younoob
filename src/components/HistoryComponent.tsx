@@ -99,6 +99,7 @@ const filteredHistory = historyList.filter((video) => {
     const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
     window.open(redditShareUrl, '_blank');
   }
+  
   const handleCopyURL = (video: any) => {
     const shareUrl = `https://youtube.com/watch?v=${video.id}`;
     try {
