@@ -10,8 +10,14 @@ import ShareModal from './ShareModal';
 import DescriptionBox from './DescriptionBox';
 import CommentSection from './CommentSection';
 import UpNext from './UpNext';
+import VideoInfoSection from './VideoInfoSection';
 
-export default function WatchComponent() {
+import { formatSubcriberCount } from '../utils/formatSubcriberCount';
+import { formatTimeAgo } from '../utils/formatTimeAgo';
+import { formatView } from '../utils/formatView';
+import { formatDateTime } from '../utils/formatDateTime';
+import { formatLike } from '../utils/formatLike';
+export default function WatchCom() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const videoId = searchParams.get('v');
@@ -305,31 +311,7 @@ export default function WatchComponent() {
     showNotice("Saved to Watch Later");
   };
 
-  const shareToFacebook = (targetVideoId: string) => {
-    const youtubeUrl = targetVideoId ? `https://www.youtube.com/watch?v=${targetVideoId}` : `https://www.youtube.com/watch?v=${video?.id}`;
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
-    window.open(facebookShareUrl, '_blank');
-  };
 
-  const shareToX = (targetVideoId: string, videoTitle: string) => {
-    const youtubeUrl = targetVideoId ? `https://www.youtube.com/watch?v=${targetVideoId}` : `https://www.youtube.com/watch?v=${video?.id}`;
-    const text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : (video?.snippet?.title ? video.snippet.title.replace(/\s*\(playlist\)/gi, '').trim() : ''));
-    const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`;
-    window.open(xShareUrl, '_blank');
-  };
-
-  const shareToLinkedin = (targetVideoId: string) => {
-    const youtubeUrl = targetVideoId ? `https://www.youtube.com/watch?v=${targetVideoId}` : `https://www.youtube.com/watch?v=${video?.id}`;
-    const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
-    window.open(linkedinShareUrl, '_blank');
-  };
-
-  const shareToReddit = (targetVideoId: string, videoTitle: string) => {
-    const youtubeUrl = targetVideoId ? `https://www.youtube.com/watch?v=${targetVideoId}` : `https://www.youtube.com/watch?v=${video?.id}`;
-    const text = encodeURIComponent(videoTitle ? videoTitle.replace(/\s*\(playlist\)/gi, '').trim() : (video?.snippet?.title ? video.snippet.title.replace(/\s*\(playlist\)/gi, '').trim() : ''));
-    const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
-    window.open(redditShareUrl, '_blank');
-  };
 
   useEffect(() => {
     const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
@@ -384,73 +366,7 @@ export default function WatchComponent() {
     const tags = matches.slice(0, 3);
     return tags.join(' ');
   };
-
-  const getSubcriber = (subcriber: string) => {
-    const totalSubcriber: number = Number(subcriber);
-    if (isNaN(totalSubcriber)) return '0';
-    if (totalSubcriber < 1000) return `${totalSubcriber}`;
-    if (totalSubcriber < 1000000) return `${Math.floor(totalSubcriber / 1000)}K`;
-    if (totalSubcriber < 1000000000) return `${Math.floor(totalSubcriber / 1000000)}M`;
-    return `${Math.floor(totalSubcriber / 1000000000)}B`;
-  };
-
-  const getTimeago = (date: string) => {
-    if (!date) return '';
-    const videoDate = new Date(date);
-    const currentTime = new Date();
-    const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
-
-    if (timeAgo < 60) return `${timeAgo} seconds ago`;
-    if (timeAgo < 3600) {
-      const minutes = Math.floor(timeAgo / 60);
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 86400) {
-      const hours = Math.floor(timeAgo / 3600);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 604800) {
-      const days = Math.floor(timeAgo / 86400);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 2592000) {
-      const weeks = Math.floor(timeAgo / 604800);
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    }
-    if (timeAgo < 31536000) {
-      const months = Math.floor(timeAgo / 2592000);
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    }
-    const years = Math.floor(timeAgo / 31536000);
-    return `${years} year${years > 1 ? 's' : ''} ago`;
-  };
-
-  const getView = (view: string) => {
-    const totalView: number = Number(view);
-    if (isNaN(totalView)) return '0 views';
-    if (totalView < 1000) return `${view} views`;
-    if (totalView < 1000000) return `${Math.floor(totalView / 1000)}K views`;
-    if (totalView < 1000000000) return `${Math.floor(totalView / 1000000)}M views`;
-    return `${Math.floor(totalView / 1000000000)}B views`;
-  };
-
-  const getTimeDescription = (date: string) => {
-    if (!date) return '';
-    const videoDate = new Date(date);
-    const dayandmonth: string = videoDate.toDateString().slice(4, 10);
-    const year: string = videoDate.toDateString().slice(11, 16);
-    return `${dayandmonth}, ${year}`;
-  };
-
-  const getLike = (like: string) => {
-    const totalLike: number = Number(like);
-    if (isNaN(totalLike)) return '0';
-    if (totalLike < 1000) return `${like}`;
-    if (totalLike < 1000000) return `${Math.floor(totalLike / 1000)}K`;
-    if (totalLike < 1000000000) return `${Math.floor(totalLike / 1000000)}M`;
-    return `${Math.floor(totalLike / 1000000000)}B`;
-  };
-
+  
   return (
     <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
       {/* LEFT COLUMN */}
@@ -468,103 +384,30 @@ export default function WatchComponent() {
           {video?.snippet?.title || "..Loading.."}
         </h1>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-3 pb-4 border-b border-[#2d2d2d]">
-          <div className="flex items-center gap-3">
-            <img
-              src={video1?.snippet?.thumbnails?.medium?.url || "..Loading.."}
-              className="w-10 h-10 rounded-full object-cover border border-[#303030]"
-            />
-            <div className="flex flex-col">
-              <span
-                onClick={goChannel}
-                className="font-sans font-semibold text-sm hover:text-white cursor-pointer"
-              >
-                {video?.snippet?.channelTitle || "Loading..."}
-              </span>
-              <span className="text-xs text-gray-400">
-                {getSubcriber(video1?.statistics?.subscriberCount)} subscribers
-              </span>
-            </div>
-
-            <button
-              onClick={handleSubscribeToggle}
-              className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${
-                isSubscribed
-                  ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
-                  : 'bg-white hover:bg-gray-200 text-black'
-              }`}
-            >
-              {isSubscribed ? 'Subscribed' : 'Subscribe'}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto py-0">
-            <div className="flex items-center bg-[#212121] rounded-full border border-[#303030]/50 shrink-0">
-              <button
-                onClick={handleLikeToggle}
-                className={`flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer ${
-                  isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-                }`}
-              >
-                {isLiked ? null : <img src="/public/notlike.png" className="w-4 h-4" />}
-                {getLike(video?.statistics?.likeCount)} likes
-              </button>
-              <button
-                onClick={() => setDisIsLiked(!isdisLiked)}
-                className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] flex items-center gap-1.5 transition text-xs font-semibold cursor-pointer ${
-                  isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-                }`}
-              >
-                {isdisLiked ? null : <img src="/public/notdislike.png" className="w-4 h-4" />}
-                dislike
-              </button>
-            </div>
-
-            <button
-              onClick={handleSaveToggle}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#303030]/50 transition text-xs font-semibold shrink-0 cursor-pointer ${
-                isSaved
-                  ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80'
-                  : 'bg-[#212121] hover:bg-[#303030]'
-              }`}
-            >
-              {isSaved ? (
-                'Saved'
-              ) : (
-                <>
-                  <img src="/public/savetoplaylist.png" className="h-4 w-4" />
-                  Watch Later
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsShareModal(true);
-              }}
-              className="flex items-center px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
-            >
-              <img alt="Share" src="/public/share.png" className="h-4 w-4 mr-2" />
-              Share
-            </button>
-
-            <button
-              onClick={() => window.open(`https://youtube.com/watch?v=${videoId}`, '_blank')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
-            >
-              Youtube
-            </button>
-          </div>
-        </div>
+        <VideoInfoSection
+          video={video}
+          video1={video1}
+          videoId={videoId}
+          goChannel={goChannel}
+          getLike={formatLike}
+          isSubscribed={isSubscribed}
+          handleSubscribeToggle={handleSubscribeToggle}
+          isLiked={isLiked}
+          handleLikeToggle={handleLikeToggle}
+          isdisLiked={isdisLiked}
+          setIsDisLiked={setDisIsLiked}
+          isSaved={isSaved}
+          handleSaveToggle={handleSaveToggle}
+          onOpenShare={() => setIsShareModal(true)}
+        />
 
         <DescriptionBox
           video={video}
           isExpanded={isExpandedDecription}
           setIsExpanded={setisExpandedDecription}
-          getView={getView}
-          getTimeago={getTimeago}
-          getTimeDescription={getTimeDescription}
+          getView={formatView}
+          getTimeago={formatTimeAgo}
+          getTimeDescription={formatDateTime}
           getHashtags={getHashtags}
           handleDescription={handleDescription}
         />
@@ -577,7 +420,7 @@ export default function WatchComponent() {
           setIsAddComment={setIsAddComment}
           handlePostComment={handlePostComment}
           commentCount={video?.statistics?.commentCount}
-          getTimeago={getTimeago}
+          getTimeago={formatTimeAgo}
         />
       </div>
 
@@ -591,14 +434,9 @@ export default function WatchComponent() {
         activeMenuId={activeMenuId}
         setActiveMenuId={setActiveMenuId}
         goWatch={goWatch}
-        getTimeago={getTimeago}
+        getTimeago={formatTimeAgo}
         addVideoToList={addVideoToList}
         removeVideoFromList={removeVideoFromList}
-        handleCopyURL={handleCopyURL}
-        shareToFacebook={shareToFacebook}
-        shareToX={shareToX}
-        shareToLinkedin={shareToLinkedin}
-        shareToReddit={shareToReddit}
         watchLaterVideoList={watchLaterVideoList}
         handleSaveToggleUpNext={handleSaveToggleUpNext}
         currentVideo={video}

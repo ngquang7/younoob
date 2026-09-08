@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShareModal from './ShareModal';
-
+import { 
+  shareToFacebook, 
+  shareToX, 
+  shareToLinkedin, 
+  shareToReddit,
+  handleCopyURL
+} from '../utils/shareUtils';
 interface SidebarProps {
   listId: string | null;
   listType: boolean;
@@ -14,11 +20,6 @@ interface SidebarProps {
   getTimeago: (date: string) => string;
   addVideoToList: (video: any) => void;
   removeVideoFromList: (id: string) => void;
-  handleCopyURL: (id: string) => void;
-  shareToFacebook: (id: string) => void;
-  shareToX: (id: string, title: string) => void;
-  shareToLinkedin: (id: string) => void;
-  shareToReddit: (id: string, title: string) => void;
   watchLaterVideoList: any[];
   handleSaveToggleUpNext: (video: any) => void;
   currentVideo: any;
