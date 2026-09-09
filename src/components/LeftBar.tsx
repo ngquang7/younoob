@@ -25,8 +25,6 @@ export default function LeftBar({ expanded, goHome, goHistory }: SidebarProps) {
 
   if (!expanded) {
     return (
-      // <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1] [&::-webkit-scrollbar]:w-0 hover:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30 hover:[&::-webkit-scrollbar-thumb]:rounded-full">
-      // {/* <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1] [&::-webkit-scrollbar]:hidden hover:[&::-webkit-scrollbar]:block hover:[&::-webkit-scrollbar]:w-2 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 hover:[&::-webkit-scrollbar-thumb]:rounded-full"> */}
       <aside className="fixed top-14 left-0 bottom-0 w-18 bg-neutral-1000 hidden sm:flex flex-col items-center py-2 gap-4 z-40 select-none border-r border-[#212121]/50 ">
         {/* Home */}
         <button
