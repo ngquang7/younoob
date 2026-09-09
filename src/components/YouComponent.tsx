@@ -7,6 +7,7 @@ import VideoCard from "../components/VideoCard";
 import SectionHeader from './SectionHeader';
 import EmptyState from './EmptyState';
 import PlaylistCard from './PlaylistCard';
+
 export default function YouComponent() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -77,15 +78,23 @@ export default function YouComponent() {
             </div>
 
             {/* Playlists */}
-            <PlaylistCard
-                title="Liked Videos"
-                items={likedList}
-                playlistKey="LL"
-                navigate={navigate}
-                onViewFull={goLikeVideo}
-                PlaylistBackgroundLayers={PlaylistBackgroundLayers}
-            />
-
+            <div className="w-full px-6 mt-1 flex flex-col items-center justify-between border-gray-600">
+                <SectionHeader
+                    title="Playlists"
+                    navigate={navigate}
+                    playlistType='playlists'
+                />
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5 w-full">
+                    <PlaylistCard
+                        title="Liked Videos"
+                        items={likedList}
+                        playlistKey="LL"
+                        navigate={navigate}
+                        onViewFull={goLikeVideo}
+                        PlaylistBackgroundLayers={PlaylistBackgroundLayers}
+                    />
+                </div>
+            </div>
             {/* Watch Later */}
             <div className="w-full px-6 mt-1 flex flex-col items-center justify-between border-gray-600">
                 <SectionHeader
@@ -120,7 +129,6 @@ export default function YouComponent() {
                 <SectionHeader
                     title="Liked Video"
                     navigate={navigate}
-                    playlistType='LL'
                 />
                 <div className="text-sm font-semibold w-full text-left -mt-6 mb-5 text-gray-500">{likedList.length} video</div>
                 {/* Liked Video */}

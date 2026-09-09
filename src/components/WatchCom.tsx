@@ -35,9 +35,6 @@ export default function WatchCom() {
     const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    // const [isSubscribed, setIsSubscribed] = useState(false);
-    // const [isLiked, setIsLiked] = useState(false);
-    // const [isSaved, setIsSaved] = useState(false);
     const [isdisLiked, setDisIsLiked] = useState(false);
     const [isExpandedDecription, setisExpandedDecription] = useState(false);
     const [isAddComment, setIsAddComment] = useState(false);
@@ -174,7 +171,7 @@ export default function WatchCom() {
             return word;
         });
     };
-    
+
     useWatchHistory(video);
     const {
         isLiked,
@@ -279,6 +276,7 @@ export default function WatchCom() {
 
     return (
         <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+            
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">
                 <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
@@ -335,23 +333,24 @@ export default function WatchCom() {
             </div>
 
             {/* RIGHT COLUMN (SIDEBAR) */}
-            <UpNext
-                listId={listId}
-                listType={listType}
-                playListVideo={playListVideo}
-                upNextVideos={upNextVideos}
-                videoId={videoId}
-                activeMenuId={activeMenuId}
-                setActiveMenuId={setActiveMenuId}
-                goWatch={goWatch}
-                getTimeago={formatTimeAgo}
-                addVideoToList={addVideoToList}
-                removeVideoFromList={removeVideoFromList}
-                watchLaterVideoList={watchLaterVideoList}
-                handleSaveToggleUpNext={handleSaveToggleUpNext}
-                currentVideo={video}
-            />
-
+            <div className="lg:w-[380px] shrink-0 flex flex-col gap-3 -mr-3">
+                <UpNext
+                    listId={listId}
+                    listType={listType}
+                    playListVideo={playListVideo}
+                    upNextVideos={upNextVideos}
+                    videoId={videoId}
+                    activeMenuId={activeMenuId}
+                    setActiveMenuId={setActiveMenuId}
+                    goWatch={goWatch}
+                    getTimeago={formatTimeAgo}
+                    addVideoToList={addVideoToList}
+                    removeVideoFromList={removeVideoFromList}
+                    watchLaterVideoList={watchLaterVideoList}
+                    handleSaveToggleUpNext={handleSaveToggleUpNext}
+                    currentVideo={video}
+                />
+            </div>
             <ShareModal
                 isOpen={isShareModal}
                 onClose={() => setIsShareModal(false)}

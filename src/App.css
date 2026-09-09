@@ -10,3 +10,22 @@ body {
   overflow-x: hidden;
 }
 
+/* Ẩn thanh cuộn mặc định, chỉ hiện thanh mỏng khi hover */
+.yt-scrollbar {
+  scrollbar-width: none; /* Cho Firefox */
+}
+.yt-scrollbar::-webkit-scrollbar {
+  width: 0px; /* Ẩn mặc định trên Chrome/Edge/Safari */
+  background: transparent;
+}
+.yt-scrollbar:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+.yt-scrollbar:hover::-webkit-scrollbar {
+  width: 6px; /* Hiện thanh cuộn khi rê chuột vào */
+}
+.yt-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}

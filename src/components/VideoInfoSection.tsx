@@ -72,20 +72,16 @@ export default function VideoInfoSection({
         <div className="flex items-center bg-[#212121] rounded-full border border-[#303030]/50 shrink-0">
           <button
             onClick={handleLikeToggle}
-            className={`flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer ${
-              isLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-            }`}
-          >
-            {isLiked ? null : <img src="/public/notlike.png" className="w-4 h-4" alt="Like" />}
-            {getLike(video?.statistics?.likeCount)} likes
+            className="flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer text-[#f1f1f1]">
+            {isLiked ? <img src="/public/liked.png" className="w-5 h-5" alt="Liked" /> : <img src="/public/notlike.png" className="w-5 h-5" alt="Like" />}
+            {video?.statistics?.likeCount !== undefined ? getLike(video?.statistics?.likeCount)  : 'Like'} 
           </button>
           <button
             onClick={() => setIsDisLiked(!isdisLiked)}
-            className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] flex items-center gap-1.5 transition text-xs font-semibold cursor-pointer ${
-              isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]'
-            }`}
+            className={`px-4 py-2 hover:bg-[#303030] rounded-r-full text-[#f1f1f1] flex items-center gap-1.5 transition text-xs font-semibold cursor-pointer text-[#f1f1f1]`}
           >
-            {isdisLiked ? null : <img src="/public/notdislike.png" className="w-4 h-4" alt="Dislike" />}
+            {/* ${isdisLiked ? 'text-[#ff0000]' : 'text-[#f1f1f1]' */}
+            {isdisLiked ? <img src="/public/disliked.png" className="w-5 h-5" alt="Disliked" /> : <img src="/public/notdislike.png" className="w-5 h-5" alt="Dislike" />}
             dislike
           </button>
         </div>

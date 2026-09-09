@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShareModal from './ShareModal';
-import { 
-  shareToFacebook, 
-  shareToX, 
-  shareToLinkedin, 
-  shareToReddit,
-  handleCopyURL
-} from '../utils/shareUtils';
+import UpNextMenu from './UpNextMenu';
+import PlaylistMenu from './PlayListMenu';
 interface SidebarProps {
   listId: string | null;
   listType: boolean;
@@ -49,7 +44,7 @@ export default function UpNext({
   const isPlaylistMode = listId === 'LL' || listId === 'WL';
 
   return (
-    <div className="lg:w-[380px] shrink-0 flex flex-col gap-3 -mr-3">
+    <>
       {!isPlaylistMode && (
         <h3 className="font-sans font-semibold text-sm text-gray-400 mb-1 px-1">
           Up Next
@@ -73,9 +68,8 @@ export default function UpNext({
               onClick={() =>
                 navigate(`/watch?v=${item.id}&list=${listId}&index=${index + 1}`)
               }
-              className={`flex gap-3 group cursor-pointer p-1.5 -mb-2 transition ${
-                item.id === videoId ? 'bg-gray-700' : 'hover:bg-[#1c1c1c]'
-              }`}
+              className={`flex gap-3 group cursor-pointer p-1.5 -mb-2 transition ${item.id === videoId ? 'bg-gray-700' : 'hover:bg-[#1c1c1c]'
+                }`}
             >
               <span className="text-xs text-gray-400 flex items-center justify-center shrink-0 font-medium">
                 {index + 1}
@@ -113,75 +107,16 @@ export default function UpNext({
                 ⋮
               </button>
 
-              {activeMenuId === item.id && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40 cursor-default"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveMenuId(null);
-                    }}
-                  />
-
-                  <div
-                    onClick={(e) => e.stopPropagation()}
-                    className="overflow-hidden absolute right-10 mt-[55px] w-[250px] bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
-                  >
-                    <div className="pb-2 border-b border-gray-500">
-                      {!listType && (
-                        <button
-                          onClick={() => {
-                            setActiveMenuId(null);
-                            addVideoToList(item);
-                          }}
-                          className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl"
-                        >
-                          <img
-                            alt="Save to Watch Later"
-                            src="/public/savetowatchlater.png"
-                            className="h-6 w-6 mr-3"
-                          />
-                          Save to Watch later
-                        </button>
-                      )}
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShareVideoTarget({
-                            id: item.id,
-                            title: item.snippet?.title || '',
-                          });
-                          setIsShareModalUpNext(true);
-                        }}
-                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <img
-                          alt="Share"
-                          src="/public/share.png"
-                          className="h-5 w-5 mr-3"
-                        />
-                        Share
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeVideoFromList(item.id);
-                      }}
-                      className="mt-1 w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
-                    >
-                      <img
-                        alt="Remove"
-                        src="/public/bin.png"
-                        className="h-5 w-5 mr-3 pointer-events-none"
-                      />
-                      Remove from {listType ? 'Watch later' : 'Liked videos'}
-                    </button>
-                  </div>
-                </>
-              )}
+              <PlaylistMenu
+                item={item}
+                listType={listType}
+                activeMenuId={activeMenuId}
+                setActiveMenuId={setActiveMenuId}
+                addVideoToList={addVideoToList}
+                removeVideoFromList={removeVideoFromList}
+                setShareVideoTarget={setShareVideoTarget}
+                setIsShareModalUpNext={setIsShareModalUpNext}
+              />
             </div>
           ))}
 
@@ -237,81 +172,17 @@ export default function UpNext({
                 >
                   ⋮
                 </button>
-
-                {activeMenuId === vId && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40 cursor-default"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveMenuId(null);
-                      }}
-                    />
-
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="overflow-hidden absolute right-0 mt-[110px] w-[200px] bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
-                    >
-                      <button className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
-                        <img
-                          alt="Add to queue"
-                          src="/public/addtoqueue.png"
-                          className="h-6 w-6 mr-3"
-                        />
-                        Add to queue
-                      </button>
-                      <button
-                        onClick={() => {
-                          setActiveMenuId(null);
-                          addVideoToList(video);
-                        }}
-                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <img
-                          alt="Save to watch later"
-                          src="/public/savetowatchlater.png"
-                          className="h-6 w-6 mr-3"
-                        />
-                        Save to watch later
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMenuId(null);
-                          setSelectedVideo(video);
-                        }}
-                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <img
-                          alt="Save to playlist"
-                          src="/public/savetoplaylist.png"
-                          className="h-6 w-5 mr-3"
-                        />
-                        Save to playlist
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShareVideoTarget({
-                            id: vId,
-                            title: video.snippet?.title || '',
-                          });
-                          setIsShareModalUpNext(true);
-                        }}
-                        className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <img
-                          alt="Share"
-                          src="/public/share.png"
-                          className="h-5 w-5 mr-3"
-                        />
-                        Share
-                      </button>
-                    </div>
-                  </>
-                )}
-
+                <UpNextMenu
+                  video={video}
+                  vId={vId}
+                  activeMenuId={activeMenuId}
+                  setActiveMenuId={setActiveMenuId}
+                  addVideoToList={addVideoToList}
+                  setSelectedVideo={setSelectedVideo}
+                  setShareVideoTarget={setShareVideoTarget}
+                  setIsShareModalUpNext={setIsShareModalUpNext}
+                />
+                
                 {selectedVideo === video && (
                   <>
                     <div
@@ -394,6 +265,6 @@ export default function UpNext({
         videoId={shareVideoTarget?.id || currentVideo?.id || ''}
         videoTitle={shareVideoTarget?.title || currentVideo?.snippet?.title || ''}
       />
-    </div>
+    </>
   );
 }
