@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 interface SidebarProps {
   expanded: boolean;
-  goHome: () => void;
   goHistory: () => void;
 
 }
-export default function LeftBar({ expanded, goHome, goHistory }: SidebarProps) {
+export default function LeftBar({ expanded, goHistory }: SidebarProps) {
   const navigate = useNavigate();
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
+  const goHome = () => navigate(`/`);
   const goChannel = (chanelId: string) => navigate(`/channel/${chanelId}`);
   const goSubcriptionChannel = () => navigate(`/feed/channels`);
   const goLikeVideo = () => navigate(`/playlist?list=LL`);

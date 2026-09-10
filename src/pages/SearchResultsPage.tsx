@@ -17,7 +17,6 @@ const SearchResultsPage = () => {
   const [videos, setVideos] = useState<YouTubeSearchItem[]>([]);
   const controller = new AbortController();   // Cleanup Function 
 
-  const goHome = () => navigate(`/`);
   const goHistory = () => navigate(`/feed/history`);
   const goWatch = (videoidd: string) => navigate(`/watch?v=${videoidd}`);
   const goChannel = (channelId: string) => navigate(`/channel/${channelId}`);
@@ -89,14 +88,12 @@ const SearchResultsPage = () => {
   return (
     <>
       <Header 
-          goHome={goHome}
           onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
           onCustomClick={handleSearchAgain}
       />
 
       <LeftBar
           goHistory={goHistory}
-          goHome={goHome}
           expanded={sidebarExpanded}
       />
 
