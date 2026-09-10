@@ -7,9 +7,6 @@ import WatchCom from '../components/WatchCom';
 export default function WatchPage() {
     const navigate = useNavigate();
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
-
-    const goHome = () => navigate(`/`);
-    const goHistory = () => navigate(`/feed/history`);
     const goSearchResults = (search: String) => navigate(`/search?q=${search}`); // Navigate to a new route with query parameters
 
     useEffect(() => {
@@ -21,14 +18,11 @@ export default function WatchPage() {
     return (
         <>
             <Header
-                goHome={goHome}
                 onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
                 onCustomClick={goSearchResults}
             />
 
             <LeftBar
-                goHistory={goHistory}
-                goHome={goHome}
                 expanded={sidebarExpanded}
             />
             

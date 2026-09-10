@@ -8,9 +8,6 @@ const YouPage = () => {
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
-  const goHome = () => navigate(`/`)
-  const goHistory = () => navigate(`/feed/history`);
-  
   const goSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
     navigate(`/search?q=${search}`);
@@ -24,14 +21,11 @@ const YouPage = () => {
   return (
     <>
       <Header
-        goHome={goHome}
         onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
         onCustomClick={goSearchResults}
       />
 
       <LeftBar
-        goHome={goHome}
-        goHistory={goHistory}
         expanded={sidebarExpanded}
       />
       
