@@ -1,8 +1,8 @@
 import {useState, useEffect} from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import Header from '../components/navigation/Header.tsx';
 import VideoGrid from '../components/VideoGrid';
-import LeftBar from '../components/LeftBar'
+import LeftBar from '../components/navigation/LeftBar.tsx'
 import {searchYouTube, type YouTubeSearchItem} from "../api/youtubeSearch.ts";
 import axios from "axios";
 import {videoDetailApi} from  "../api/videoData.ts"

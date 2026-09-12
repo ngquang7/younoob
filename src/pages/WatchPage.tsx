@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import LeftBar from '../components/LeftBar'
+import Header from '../components/navigation/Header';
+import LeftBar from '../components/navigation/LeftBar'
 import WatchComponent from '../components/WatchComponent';
 import WatchCom from '../components/WatchCom';
 export default function WatchPage() {

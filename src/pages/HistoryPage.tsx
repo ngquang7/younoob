@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import Header from '../components/navigation/Header';
 import VideoGrid from '../components/VideoGrid';
-import LeftBar from '../components/LeftBar'
+import LeftBar from '../components/navigation/LeftBar'
 import HistoryComponent from '../components/HistoryComponent';
 
 const HistoryPage = () => {

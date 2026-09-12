@@ -182,38 +182,7 @@ export default function WatchCom() {
         handleSubscribeToggle,
     } = useVideoActions(video, video1 || video) as any;
 
-    const handlePostComment = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!commentText.trim()) return;
-        const newComment = {
-            id: Date.now().toString(),
-            snippet: {
-                topLevelComment: {
-                    snippet: {
-                        authorDisplayName: "Quang (You)",
-                        authorProfileImageUrl: "/public/Q.png",
-                        textDisplay: commentText,
-                        publishedAt: new Date().toISOString(),
-                        likeCount: 0
-                    }
-                }
-            }
-        };
-        setComments([newComment, ...comments]);
-        if (video && video.statistics) {
-            const currentCount = Number(video.statistics.commentCount || 0);
-            setVideo({
-                ...video,
-                statistics: {
-                    ...video.statistics,
-                    commentCount: String(currentCount + 1)
-                }
-            });
-        }
-        setCommentText("");
-        setIsAddComment(false);
-    };
-
+    
     const removeVideoFromList = (id: string) => {
         const storageKey = listType ? 'saved_video' : 'like_video';
         const updated = playListVideo.filter(v => v.id !== id);
@@ -322,13 +291,14 @@ export default function WatchCom() {
 
                 <CommentSection
                     comments={comments}
+                    setComments={setComments}
                     commentText={commentText}
                     setCommentText={setCommentText}
                     isAddComment={isAddComment}
                     setIsAddComment={setIsAddComment}
-                    handlePostComment={handlePostComment}
                     commentCount={video?.statistics?.commentCount}
-                    getTimeago={formatTimeAgo}
+                    video={video}
+                    setVideo={setVideo}
                 />
             </div>
 
@@ -351,6 +321,7 @@ export default function WatchCom() {
                     currentVideo={video}
                 />
             </div>
+            
             <ShareModal
                 isOpen={isShareModal}
                 onClose={() => setIsShareModal(false)}

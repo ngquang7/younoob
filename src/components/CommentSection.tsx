@@ -1,30 +1,67 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatTimeAgo } from '../utils/formatTimeAgo';
 
 interface CommentSectionProps {
   comments: any[];
+  setComments: React.Dispatch<React.SetStateAction<any[]>>;
   commentText: string;
   setCommentText: (text: string) => void;
   isAddComment: boolean;
   setIsAddComment: (val: boolean) => void;
-  handlePostComment: (e: React.FormEvent) => void;
   commentCount: string;
-  getTimeago: (date: string) => string;
+  video: any;
+  setVideo: React.Dispatch<React.SetStateAction<any>>;
+
 }
 
 export default function CommentSection({
   comments,
+  setComments,
   commentText,
   setCommentText,
   isAddComment,
   setIsAddComment,
-  handlePostComment,
   commentCount,
-  getTimeago,
+  video,
+  setVideo
+  
 }: CommentSectionProps) {
   const navigate = useNavigate();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+
+  const handlePostComment = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!commentText.trim()) return;
+        const newComment = {
+            id: Date.now().toString(),
+            snippet: {
+                topLevelComment: {
+                    snippet: {
+                        authorDisplayName: "Quang (You)",
+                        authorProfileImageUrl: "/public/Q.png",
+                        textDisplay: commentText,
+                        publishedAt: new Date().toISOString(),
+                        likeCount: 0
+                    }
+                }
+            }
+        };
+        setComments([newComment, ...comments]);
+        if (video && video.statistics) {
+            const currentCount = Number(video.statistics.commentCount || 0);
+            setVideo({
+                ...video,
+                statistics: {
+                    ...video.statistics,
+                    commentCount: String(currentCount + 1)
+                }
+            });
+        }
+        setCommentText("");
+        setIsAddComment(false);
+    };
   return (
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-6">
@@ -93,15 +130,27 @@ export default function CommentSection({
                   {comment.authorDisplayName}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {getTimeago(comment.publishedAt)}
+                  {formatTimeAgo(comment.publishedAt)}
                 </span>
               </div>
               <p
                 dangerouslySetInnerHTML={{ __html: comment.textDisplay }}
                 className="text-sm mt-1 text-gray-200"
               />
-              <div className="flex items-center gap-4 mt-2">
-                <span className="text-xs text-gray-400">👍 {comment.likeCount}</span>
+              <div className="flex items-center mt-2">
+
+                <span className="text-xs text-gray-400 flex flex-row">
+                  <button
+                    className="w-7 h-7 flex items-center justify-center cursor-pointer rounded-full hover:bg-neutral-700 transition-colors text-left">
+                  <img 
+                    src="/public/notlike.png"
+                    className="h-4 w-4"
+                  />
+                  </button>
+                  <span className="mt-1.5">{comment.likeCount == 0 ? '' : `${comment.likeCount}`}</span>
+                </span>
+
+
               </div>
             </div>
             {previewImage && (

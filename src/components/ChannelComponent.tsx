@@ -260,7 +260,7 @@ export default function ChannelComponent() {
 
                                 {/* Description */}
                                 <div className="mb-6">
-                                    <h3 className="font-bold text-base mb-2 text-xl">{channel?.[0]?.brandingSettings?.channel?.description > 0 ? 'Description' : ""}</h3>
+                                    <h3 className="font-bold text-base mb-2 text-xl">{channel?.[0]?.brandingSettings?.channel?.description.length > 0 ? 'Description' : ""}</h3>
                                     {/* whitespace-pre-wrap giúp giữ nguyên các khoảng xuống dòng của mô tả gốc */}
                                     <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
                                         {channel?.[0]?.brandingSettings?.channel?.description || channel?.[0]?.snippet?.description}

@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import LeftBar from '../components/LeftBar';
+import Header from '../components/navigation/Header';
+import LeftBar from '../components/navigation/LeftBar';
 import PlayListComponent from '../components/PlayListComponent';
 
 const PlaylistPage = () => {
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  
-  const goHome = () => navigate(`/`)
-  const goHistory = () => navigate(`/feed/history`);
+
   
   const goSearchResults = (search: String) => {
     // Navigate to a new route with query parameters
@@ -24,14 +22,12 @@ const PlaylistPage = () => {
   return (
     <>
       <Header
-        goHome={goHome}
         onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)}
         onCustomClick={goSearchResults}
       />
 
       <LeftBar
-        goHome={goHome}
-        goHistory={goHistory}
+
         expanded={sidebarExpanded}
       />
       
