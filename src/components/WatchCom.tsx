@@ -6,11 +6,11 @@ import { getChannelData } from '../api/channelData';
 import { getCommentData } from '../api/commentData';
 import type { YouTubeSearchItem } from "../type";
 
-import ShareModal from './ShareModal';
-import DescriptionBox from './DescriptionBox';
-import CommentSection from './CommentSection';
+import ShareModal from './common/ShareModal';
+import DescriptionBox from './video/DescriptionBox';
+import CommentSection from './comment/CommentSection';
 import UpNext from './UpNext';
-import VideoInfoSection from './VideoInfoSection';
+import VideoInfoSection from './video/VideoInfoSection';
 
 import { useWatchHistory } from '../hooks/useWatchHistory';
 import { useVideoActions } from '../hooks/useVideoAction';

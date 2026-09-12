@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatTimeAgo } from '../utils/formatTimeAgo';
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
 interface CommentSectionProps {
   comments: any[];
@@ -12,7 +12,6 @@ interface CommentSectionProps {
   commentCount: string;
   video: any;
   setVideo: React.Dispatch<React.SetStateAction<any>>;
-
 }
 
 export default function CommentSection({
@@ -25,43 +24,52 @@ export default function CommentSection({
   commentCount,
   video,
   setVideo
-  
+
 }: CommentSectionProps) {
   const navigate = useNavigate();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [likedCommentIds, setLikedCommentIds] = useState<string[]>([]);
 
+  const toggleLike = (commentId: string) => {
+    console.log("helko")
+    setLikedCommentIds((prev) =>
+      prev.includes(commentId)
+        ? prev.filter((id) => id !== commentId)
+        : [...prev, commentId]
+    );
+  };
 
   const handlePostComment = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!commentText.trim()) return;
-        const newComment = {
-            id: Date.now().toString(),
-            snippet: {
-                topLevelComment: {
-                    snippet: {
-                        authorDisplayName: "Quang (You)",
-                        authorProfileImageUrl: "/public/Q.png",
-                        textDisplay: commentText,
-                        publishedAt: new Date().toISOString(),
-                        likeCount: 0
-                    }
-                }
-            }
-        };
-        setComments([newComment, ...comments]);
-        if (video && video.statistics) {
-            const currentCount = Number(video.statistics.commentCount || 0);
-            setVideo({
-                ...video,
-                statistics: {
-                    ...video.statistics,
-                    commentCount: String(currentCount + 1)
-                }
-            });
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const newComment = {
+      id: Date.now().toString(),
+      snippet: {
+        topLevelComment: {
+          snippet: {
+            authorDisplayName: "Quang (You)",
+            authorProfileImageUrl: "/public/Q.png",
+            textDisplay: commentText,
+            publishedAt: new Date().toISOString(),
+            likeCount: 0
+          }
         }
-        setCommentText("");
-        setIsAddComment(false);
+      }
     };
+    setComments([newComment, ...comments]);
+    if (video && video.statistics) {
+      const currentCount = Number(video.statistics.commentCount || 0);
+      setVideo({
+        ...video,
+        statistics: {
+          ...video.statistics,
+          commentCount: String(currentCount + 1)
+        }
+      });
+    }
+    setCommentText("");
+    setIsAddComment(false);
+  };
   return (
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-6">
@@ -110,7 +118,10 @@ export default function CommentSection({
       </form>
 
       {comments.map((item) => {
+        const isLikedComment = likedCommentIds.includes(item.id);
         const comment = item.snippet.topLevelComment.snippet;
+        const baseLikes = comment.likeCount || 0;
+        const displayLikes = isLikedComment ? baseLikes + 1 : baseLikes;
         return (
           <div key={item.id} className="flex gap-4">
             <img
@@ -141,13 +152,24 @@ export default function CommentSection({
 
                 <span className="text-xs text-gray-400 flex flex-row">
                   <button
+                    onClick={() => toggleLike(item.id)}
                     className="w-7 h-7 flex items-center justify-center cursor-pointer rounded-full hover:bg-neutral-700 transition-colors text-left">
-                  <img 
-                    src="/public/notlike.png"
-                    className="h-4 w-4"
-                  />
+                    <img
+                      src={isLikedComment ? "/public/liked.png" : "/public/notlike.png"}
+                      className="h-4 w-4"
+                    />
                   </button>
-                  <span className="mt-1.5">{comment.likeCount == 0 ? '' : `${comment.likeCount}`}</span>
+                  <span className="mt-1.5">{displayLikes == 0 ? '' : displayLikes}</span>
+
+                  <button
+                    className="w-7 h-7 flex items-center justify-center cursor-pointer rounded-full hover:bg-neutral-700 transition-colors text-left">
+                    <img
+                      src="/public/notdislike.png"
+                      className="h-4 w-4"
+                    />
+                  </button>
+                  <span className="mt-1.5"></span>
+
                 </span>
 
 

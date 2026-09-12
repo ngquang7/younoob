@@ -6,7 +6,7 @@ import {
   shareToLinkedin, 
   shareToReddit, 
   handleCopyURL 
-} from '../utils/shareUtils'; // Điều chỉnh đường dẫn tương ứng với thư mục của bạn
+} from '../../utils/shareUtils';
 
 interface ShareModalProps {
   isOpen: boolean;

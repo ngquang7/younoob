@@ -1,4 +1,4 @@
-import { formatSubcriberCount } from '../utils/formatSubcriberCount';
+import { formatSubcriberCount } from '../../utils/formatSubcriberCount';
 
 interface VideoInfoSectionProps {
   video: any;

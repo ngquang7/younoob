@@ -3,10 +3,10 @@ import { useState, useEffect, useRef } from 'react';
 import { formatView } from '../utils/formatView';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import UserProfile from "../components/UserProfile";
-import VideoCard from "../components/VideoCard";
+import VideoCard from "./card/VideoCard";
 import SectionHeader from './SectionHeader';
-import EmptyState from './EmptyState';
-import PlaylistCard from './PlaylistCard';
+import EmptyState from './common/EmptyState';
+import PlaylistCard from './card/PlaylistCard';
 
 export default function YouComponent() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

@@ -1,3 +1,5 @@
+// For YouPage when there is no video in History, Playlists, Watch Later, Liked video
+
 export default function EmptyState({ message = "Your videos will show up right here" }: { message?: string }) {
     return (
         <div className="col-span-full text-sm font-semibold text-gray-400 flex flex-col items-center justify-center text-center w-full py-10">

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ShareModal from './ShareModal';
-import UpNextMenu from './UpNextMenu';
-import PlaylistMenu from './PlayListMenu';
+import ShareModal from './common/ShareModal';
+import UpNextMenu from './video/UpNextMenu';
+import PlaylistMenu from './video/PlaylistMenu';
 interface SidebarProps {
   listId: string | null;
   listType: boolean;

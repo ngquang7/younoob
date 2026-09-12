@@ -57,9 +57,9 @@ export default function SubcriptionChannel() {
     };
 
     return (
-        <div className="mx-auto px-10 py-2 text-white min-h-screen">
+        <div className="mx-auto px-50 py-2 text-white min-h-screen">
             <div className="flex flex-col gap-3">
-                <h1 className="text-3xl font-bold font-sans mt-3 ml-3 mb-3">All Subcriptions</h1>
+                <h1 className="text-4xl font-bold font-sans mt-3 ml-3 mb-3">All Subcriptions</h1>
                 {/* CHANNELs THAT ARE SUBCRIBED */}
                 {subscriptions.length === 0 ? (
                     <p className="px-3 text-xs text-gray-500 italic">No subscriptions yet</p>

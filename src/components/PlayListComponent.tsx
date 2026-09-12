@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PlaylistCard from './PlaylistCard';
+import PlaylistCard from './card/PlaylistCard';
 export default function PlayListComponent() {
     const [likedVideoList, setlikedVideoList] = useState<any[]>([]);
     const [savedVideoList, setSavedVideoList] = useState<any[]>([]);
