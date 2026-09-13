@@ -1,24 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatView } from '../utils/formatView';
-import ShareModal from './common/ShareModal';
-import MenuContainer from './common/MenuContainer';
 import { storageService } from '../hooks/storageService';
 
-import SaveToPlaylistModal from './common/SaveToPlaylistModal';
-import SaveToWatchLater from './common/SaveToWatchLater';
 
-import AddToQueueButton from './menu-button/AddToQueueButton';
-import PlaylistButton from './menu-button/PlaylistButton';
-import RemoveButton from './menu-button/RemoveButton';
-import ShareButton from './menu-button/ShareButton';
-import SaveToWatchLaterButton from './menu-button/SaveToWatchLaterButton';
+import HistoryList from './history/HistoryList';
+import ClearHistoryModal from './common/ClearHistoryModal';
+
 
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isClearAllHis, setIsClearAllHis] = useState(false);
   const navigate = useNavigate();
-  const [activeMenuId, setActiveMenuId] = useState(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [isShareModal, setIsShareModal] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -110,118 +103,26 @@ export default function HistoryComponent() {
         <div className="flex flex-row">
 
           <div className="mx-auto mr-[430px] py-2 text-white min-h-screen">
-
-            {/* Notification appear if there is no video watched yet. */}
-            {history.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
-                <p className="text-lg font-medium">You have no watch history yet.</p>
-                <p className="text-sm">Videos you watch will show up here so you can easily find them again.</p>
-              </div>
-            ) : (
-              /* Video in column */
-              <div className="flex flex-col gap-3">
-                {filteredHistory.map((video) => (
-                  <div
-                    key={video.id}
-                    onClick={() => navigate(`/watch?v=${video.id}`)} // Click it, it will navigate to watch page
-                    className="flex gap-4 cursor-pointer group p-2 hover:bg-[#212121] rounded-xl transition items-start relative"
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative w-40 sm:w-64 aspect-video rounded-xl overflow-hidden bg-gray-800 shrink-0">
-                      <img
-                        src={video.snippet?.thumbnails?.medium?.url}
-                        alt={video.snippet?.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    {/* In4 of video */}
-                    <div className="flex-1 flex flex-col pr-8">
-                      <h3 className="font-semibold text-sm sm:text-base line-clamp-2 text-white">
-                        {video.snippet?.title}
-                      </h3>
-                      <span className="text-xs text-gray-400 mt-1">
-                        {video.snippet?.channelTitle} • {video.statistics?.viewCount ? `${formatView(video.statistics.viewCount)} views` : ''}
-                      </span>
-                    </div>
-
-                    {/* X button*/}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveMenuId(activeMenuId === video.id ? null : video.id);
-                      }}
-                      className="text-xl w-10 h-10 font-bold font-sans cursor-pointer hover:bg-neutral-700 rounded-full transition-colors"
-
-                    >
-                      ⋮
-                    </button>
-                    {activeMenuId === video.id && (
-                      <>
-                        <MenuContainer onClose={() => setActiveMenuId(null)}>
-                          <AddToQueueButton />
-                          
-                          <SaveToWatchLaterButton
-                            video={video}
-                            onClose={() => setActiveMenuId(null)}
-                            showNotice={showNotice}
-                            setWatchLaterVideoList={setWatchLaterVideoList}
-                            setIsSaved={setIsSaved}
-                          />
-
-                          <PlaylistButton
-                            video={video}
-                            onClose={() => setActiveMenuId(null)}
-                            setSelectedVideo={setSelectedVideo}
-                            handleOpenSaveModal={handleOpenSaveModal}
-                          />
-
-                          <ShareButton
-                            onOpenShareModal={() => {
-                              setSelectedShareVideo(video);
-                              setIsShareModal(true);
-                            }}
-                          />
-                          <ShareModal
-                            isOpen={isShareModal}
-                            onClose={() => setIsShareModal(false)}
-                            videoId={video?.id || ''}
-                            videoTitle={video?.snippet?.title || ''}
-                            showNotice={showNotice}
-                          />
-
-                          <RemoveButton
-                            videoId={video.id}
-                            label="Remove from history"
-                            onClose={() => setActiveMenuId(null)}
-                            remove={removeFromHistory}
-                          />
-                        </MenuContainer>
-                      </>
-                    )}
-
-                    {/* SELECTED VIDEO TO OPERATE. FOR EX: DELETE, ADD, SHARE */}
-                    {selectedVideo?.id === video.id && (
-                      <>
-                        <SaveToPlaylistModal
-                          onClose={() => setSelectedVideo(null)}
-                        >
-                          <SaveToWatchLater
-                            watchLaterVideoList={watchLaterVideoList}
-                            isSaved={isSaved}
-                            onToggleSave={() => handleSaveToggle(selectedVideo)}
-                          />
-                        </SaveToPlaylistModal>
-
-                      </>
-                    )}  {/*Selected Video*/}
-
-                  </div>
-
-                ))}
-
-              </div>
-            )}
+            <HistoryList
+              historyListLength={historyList.length}
+              filteredHistory={filteredHistory}
+              activeMenuId={activeMenuId}
+              setActiveMenuId={setActiveMenuId}
+              selectedVideo={selectedVideo}
+              setSelectedVideo={setSelectedVideo}
+              watchLaterVideoList={watchLaterVideoList}
+              isSaved={isSaved}
+              handleSaveToggle={handleSaveToggle}
+              handleOpenSaveModal={handleOpenSaveModal}
+              showNotice={showNotice}
+              setWatchLaterVideoList={setWatchLaterVideoList}
+              setIsSaved={setIsSaved}
+              removeFromHistory={removeFromHistory}
+              isShareModal={isShareModal}
+              setIsShareModal={setIsShareModal}
+              selectedShareVideo={selectedShareVideo}
+              setSelectedShareVideo={setSelectedShareVideo}
+            />
           </div>
 
           {/* RIGHT COLUMN */}
@@ -269,55 +170,15 @@ export default function HistoryComponent() {
                 </>
               )}
 
-              {isClearAllHis && (
-                <div
-                  onClick={() => setIsClearAllHis(false)}
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-                >
-                  {/* Size of padding */}
-                  <div onClick={(e) => e.stopPropagation()}
-                    className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
-                  >
-                    {/* Title: Unsubribe from {channel name} */}
-                    <div className="text-white text-xl w-full mb-5 text-left">
-                      Clear watch history?
-                    </div>
-                    <p className="text-gray-400 text-sm text-left flex w-full mb-5">
-                      Your YouTube watch history will be cleared from all YouTube apps on all devices.</p>
-                    <p className="text-gray-400 text-sm text-left leading-relaxed">
-                      Your video recommendations will be reset, but may still be influenced by activity on other Google products. To learn more, visit{' '}
-                      <a
-                        href="https://myactivity.google.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#3ea6ff] hover:underline"
-                      >
-                        My Activity
-                      </a>
-                      .
-                    </p>
+              <ClearHistoryModal
+                isOpen={isClearAllHis}
+                onClose={() => setIsClearAllHis(false)}
+                onConfirm={() => {
+                  setIsClearAllHis(false);
+                  clearAllHistory();
+                }}
+              />
 
-                    {/* 2 buttons: Cancle and Unsubcribe */}
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setIsClearAllHis(false)}
-                        className="px-4 py-2 mt-5 ml-10 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
-                        onClick={() => {
-                          setIsClearAllHis(false);
-                          clearAllHistory();
-                        }}
-                      >
-                        Clear watch history
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </aside>
         </div>
@@ -328,8 +189,6 @@ export default function HistoryComponent() {
           <span>{noticeMessage}</span>
         </div>
       )}
-
-
     </>
   );
 }
