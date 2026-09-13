@@ -8,8 +8,8 @@ import type { YouTubeSearchItem } from "../type";
 
 import ShareModal from './common/ShareModal';
 import DescriptionBox from './video/DescriptionBox';
-import CommentSection from './comment/CommentSection';
-import UpNext from './UpNext';
+import CommentSection from './video/CommentSection';
+import UpNext from './video/UpNext';
 import VideoInfoSection from './video/VideoInfoSection';
 
 import { useWatchHistory } from '../hooks/useWatchHistory';

@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 interface HeaderProps {
   onToggleSidebar: () => void;
   onCustomClick: (message: string) => void;
-  goHome: () => void;
 }
-export default function Header({ onToggleSidebar, onCustomClick, goHome }: HeaderProps) {
+export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) {
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
+  const goHome = () => navigate(`/`);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);  /* TEST console.log(`${searchText}`); */
   const handleLoginClick = () => navigate('/login');
@@ -34,7 +34,11 @@ export default function Header({ onToggleSidebar, onCustomClick, goHome }: Heade
           id="nav-logo"
           className="flex items-center gap-1.5 cursor-pointer active:scale-98 transition group"
         >
-          <span onClick={goHome} title="Youtube Home" className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1">
+          <span 
+            onClick={goHome} 
+            title="Youtube Home" 
+            className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1"
+          >
             <img src="/public/logo-white.png" className="w-30 h-8" />
           </span>
         </div>

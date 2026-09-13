@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
+import { formatView } from '../utils/formatView';
+import ShareModal from './common/ShareModal';
+import MenuContainer from './common/MenuContainer';
+import { storageService } from '../hooks/storageService';
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isClearAllHis, setIsClearAllHis] = useState(false);
@@ -33,12 +35,14 @@ export default function HistoryComponent() {
     const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
     setWatchLaterVideoList(savedWatchLaterVideo);
   }, []);
+
   // Load history when go to this page
+
   useEffect(() => {
-    //Get string string
-    const savedHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
-    setHistoryList(savedHistory);
+    const data = storageService.getHistory() || [];
+    setHistoryList(data);
   }, []);
+
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault(); // Stop page refresh
   };
@@ -68,47 +72,6 @@ export default function HistoryComponent() {
     }
     localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
   };
-  const shareToFacebook = (video: any) => {
-    if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
-    window.open(facebookShareUrl, '_blank');
-  };
-
-  const shareToX = (video: any) => {
-    if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
-    const text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
-    const xShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(youtubeUrl)}&text=${text}`;
-    window.open(xShareUrl, '_blank');
-  }
-
-  const shareToLinkedin = (video: any) => {
-    if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(youtubeUrl)}`;
-    window.open(linkedinShareUrl, '_blank');
-  }
-
-  const shareToReddit = (video: any) => {
-    if (!video || !video.id) return;
-    const youtubeUrl = `https://www.youtube.com/watch?v=${video.id}`;
-    // "replace(/\s*\(playlist\)/gi, '').trim()" delete (playlist) 
-    const text = encodeURIComponent(video.snippet?.title ? `${video.snippet?.title.replace(/\s*\(playlist\)/gi, '').trim()}` : '');
-    const redditShareUrl = `https://reddit.com/submit?url=${encodeURIComponent(youtubeUrl)}&title=${text}`;
-    window.open(redditShareUrl, '_blank');
-  }
-
-  const handleCopyURL = (video: any) => {
-    const shareUrl = `https://youtube.com/watch?v=${video.id}`;
-    try {
-      navigator.clipboard.writeText(shareUrl);
-      showNotice("Copy successfully")
-    } catch (error) {
-      console.warn("Copy failed ", error);
-    }
-  };
 
   const addVideoToList = (video: any) => {
     if (!video.id || !video) return;
@@ -135,17 +98,8 @@ export default function HistoryComponent() {
     localStorage.removeItem('watch_history');
   };
 
-  const getView = (view: string) => {
-    const totalView: number = Number(view);
-    if (totalView < 1000) return `${view}`;
-    if (totalView < 1000000) return `${Math.floor(totalView / 1000)}K`; //  K views
-    if (totalView < 1000000000) return `${Math.floor(totalView / 1000000)}M`; // M views
-    if (totalView < 1000000000000) return `${Math.floor(totalView / 1000000000)}B`; // B views
-  }
-
   return (
     <>
-
       <div className="mx-auto px-15 py-2 text-white min-h-screen">
         {/* Header and clear button */}
         <div className="flex justify-between items-center mb-6">
@@ -156,55 +110,6 @@ export default function HistoryComponent() {
 
           <div className="mx-auto mr-[430px] py-2 text-white min-h-screen">
 
-            {isClearAllHis && (
-              <div
-                onClick={() => setIsClearAllHis(false)}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-              >
-                {/* Size of padding */}
-                <div onClick={(e) => e.stopPropagation()}
-                  className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
-                >
-                  {/* Title: Unsubribe from {channel name} */}
-                  <div className="text-white text-xl w-full mb-5 text-left">
-                    Clear watch history?
-                  </div>
-                  <p className="text-gray-400 text-sm text-left flex w-full mb-5">
-                    Your YouTube watch history will be cleared from all YouTube apps on all devices.</p>
-                  <p className="text-gray-400 text-sm text-left leading-relaxed">
-                    Your video recommendations will be reset, but may still be influenced by activity on other Google products. To learn more, visit{' '}
-                    <a
-                      href="https://myactivity.google.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#3ea6ff] hover:underline"
-                    >
-                      My Activity
-                    </a>
-                    .
-                  </p>
-
-                  {/* 2 buttons: Cancle and Unsubcribe */}
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setIsClearAllHis(false)}
-                      className="px-4 py-2 mt-5 ml-10 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
-                      onClick={() => {
-                        setIsClearAllHis(false);
-                        clearAllHistory();
-                      }}
-                    >
-                      Clear watch history
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
             {/* Notification appear if there is no video watched yet. */}
             {history.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-2">
@@ -235,7 +140,7 @@ export default function HistoryComponent() {
                         {video.snippet?.title}
                       </h3>
                       <span className="text-xs text-gray-400 mt-1">
-                        {video.snippet?.channelTitle} • {video.statistics?.viewCount ? `${getView(video.statistics.viewCount)} views` : ''}
+                        {video.snippet?.channelTitle} • {video.statistics?.viewCount ? `${formatView(video.statistics.viewCount)} views` : ''}
                       </span>
                     </div>
 
@@ -252,18 +157,7 @@ export default function HistoryComponent() {
                     </button>
                     {activeMenuId === video.id && (
                       <>
-                        <div
-                          className="fixed inset-0 z-40 cursor-default"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMenuId(null);
-                          }}
-                        />
-
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          className="overflow-hidden absolute right-0 mt-12 w-64 bg-[#282828] overflow-hidden text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
-                        >
+                        <MenuContainer onClose={() => setActiveMenuId(null)}>
                           <button
                             className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
                             <img
@@ -313,92 +207,13 @@ export default function HistoryComponent() {
                             />
                             Share
                           </button>
-                          {isShareModal && (
-                            <div
-                              onClick={() => setIsShareModal(false)}
-                              className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
-                            >
-                              {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="bg-[#212121] text-white w-[400px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
-                                {/* Nút Đóng (Dấu X góc trên bên phải) */}
-                                <button
-                                  onClick={() => setIsShareModal(false)}
-                                  className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl w-10 h-10 rounded-full cursor-pointer"
-                                >
-                                  ✕
-                                </button>
-                                <h2 className="text-xl font-bold mb-6 flex items-center justify-center">
-                                  Share
-                                </h2>
-                                <div className="flex flex-row gap-3">
-                                  <button
-                                    className="flex flex-col cursor-pointer"
-                                    onClick={() => shareToFacebook(video)}
-                                  >
-                                    <img
-                                      alt="Share"
-                                      src="/public/facebook.png"
-                                      className="rounded-full object-cover h-15 w-15 mb-2 cursor-pointer"
-                                    />
-                                    Facebook
-                                  </button>
-                                  <button
-                                    className="flex flex-col cursor-pointer"
-                                    onClick={() => { shareToX(video) }}
-                                  >
-                                    <img
-                                      src="/public/X.png"
-                                      className="rounded-full object-cover h-17 w-18 cursor-pointer"
-                                    />
-                                    X
-                                  </button>
-
-                                  <button
-                                    className="flex flex-col cursor-pointer -ml-2"
-                                    onClick={() => { shareToLinkedin(video) }}
-                                  >
-                                    <img
-                                      src="/public/linkedin.png"
-                                      className="rounded-full object-cover h-17 w-18 cursor-pointer"
-                                    />
-                                    Linked
-                                  </button>
-
-                                  <button
-                                    className="flex flex-col cursor-pointer"
-                                    onClick={() => { shareToReddit(video) }}
-                                  >
-                                    <img
-                                      src="/public/reddit.png"
-                                      className="rounded-full object-cover mb-2 h-15 w-15 cursor-pointer"
-                                    />
-                                    Reddit
-                                  </button>
-                                </div>
-                                <div className="flex items-center bg-[#1f1f1f] border border-neutral-700 rounded-xl p-2 max-w-md mt-5">
-                                  {/* <div className="mt-10 bg-black h-15 rounded-[10px] overflow-x-auto whitespace-nowrap w-full text-white"> */}
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={`https://youtube.com/watch?v=${video.id}`}
-                                    onClick={(e) => e.currentTarget.select()}
-                                    className="w-full bg-transparent text-white text-sm px-3 outline-none cursor-text select-all truncate selection:bg-blue-600"
-                                  />
-
-                                  <button
-                                    onClick={() => {
-                                      handleCopyURL(video)
-                                    }}
-                                    className="bg-white hover:bg-neutral-200 text-black font-medium px-4 py-2 rounded-full text-sm transition-colors whitespace-nowrap ml-2 cursor-pointer"
-                                  >
-                                    Copy
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
+                          <ShareModal
+                            isOpen={isShareModal}
+                            onClose={() => setIsShareModal(false)}
+                            videoId={video?.id || ''}
+                            videoTitle={video?.snippet?.title || ''}
+                            showNotice={showNotice}
+                          />
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -412,7 +227,7 @@ export default function HistoryComponent() {
                             />
                             Remove from history
                           </button>
-                        </div>
+                        </MenuContainer>
 
                       </>
                     )}
@@ -518,6 +333,7 @@ export default function HistoryComponent() {
               </div>
             )}
           </div>
+
           {/* RIGHT COLUMN */}
           <aside className="fixed justify-end flex shrink-0 right-10 mt-[10px] bg-zinc-900 border-r border-zinc-800 rounded-[15px] overflow-hidden">
             <div className="flex flex-col items-start w-[400px] justify-center h-full text-gray-500 bg-gradient-to-b from-[#5c241c] via-[#241517] to-[#121212]">
@@ -563,6 +379,55 @@ export default function HistoryComponent() {
                 </>
               )}
 
+              {isClearAllHis && (
+                <div
+                  onClick={() => setIsClearAllHis(false)}
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                >
+                  {/* Size of padding */}
+                  <div onClick={(e) => e.stopPropagation()}
+                    className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
+                  >
+                    {/* Title: Unsubribe from {channel name} */}
+                    <div className="text-white text-xl w-full mb-5 text-left">
+                      Clear watch history?
+                    </div>
+                    <p className="text-gray-400 text-sm text-left flex w-full mb-5">
+                      Your YouTube watch history will be cleared from all YouTube apps on all devices.</p>
+                    <p className="text-gray-400 text-sm text-left leading-relaxed">
+                      Your video recommendations will be reset, but may still be influenced by activity on other Google products. To learn more, visit{' '}
+                      <a
+                        href="https://myactivity.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#3ea6ff] hover:underline"
+                      >
+                        My Activity
+                      </a>
+                      .
+                    </p>
+
+                    {/* 2 buttons: Cancle and Unsubcribe */}
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setIsClearAllHis(false)}
+                        className="px-4 py-2 mt-5 ml-10 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
+                        onClick={() => {
+                          setIsClearAllHis(false);
+                          clearAllHistory();
+                        }}
+                      >
+                        Clear watch history
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </aside>
         </div>

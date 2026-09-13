@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/navigation/LeftBar'
-import ChannelComponent from '../components/ChannelComponent';
+import ChannelComponent from '../components/channel/ChannelComponent';
 
 const ChannelPage = () => {
   const navigate = useNavigate();

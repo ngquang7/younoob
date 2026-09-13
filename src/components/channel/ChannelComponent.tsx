@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getChannelData } from '../api/channelData';
-import { searchYouTube, type YouTubeSearchItem } from "../api/youtubeSearch.ts";
+import { getChannelData } from '../../api/channelData';
+import { searchYouTube, type YouTubeSearchItem } from "../../api/youtubeSearch.ts";
 
 export default function ChannelComponent() {
 

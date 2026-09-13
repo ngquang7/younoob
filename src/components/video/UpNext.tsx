@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ShareModal from './common/ShareModal';
-import UpNextMenu from './video/UpNextMenu';
-import PlaylistMenu from './video/PlaylistMenu';
+import ShareModal from '../common/ShareModal';
+import MenuUpNext from '../menu/MenuUpNext';
+import MenuPlaylist from '../menu/MenuPlaylist';
+
 interface SidebarProps {
   listId: string | null;
   listType: boolean;
@@ -107,7 +108,7 @@ export default function UpNext({
                 ⋮
               </button>
 
-              <PlaylistMenu
+              <MenuPlaylist
                 item={item}
                 listType={listType}
                 activeMenuId={activeMenuId}
@@ -172,7 +173,7 @@ export default function UpNext({
                 >
                   ⋮
                 </button>
-                <UpNextMenu
+                <MenuUpNext
                   video={video}
                   vId={vId}
                   activeMenuId={activeMenuId}
@@ -182,7 +183,7 @@ export default function UpNext({
                   setShareVideoTarget={setShareVideoTarget}
                   setIsShareModalUpNext={setIsShareModalUpNext}
                 />
-                
+
                 {selectedVideo === video && (
                   <>
                     <div

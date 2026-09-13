@@ -1,3 +1,4 @@
+import MenuContainer from "../common/MenuContainer";
 interface PlaylistMenuProps {
     item: any;
     listType: boolean;
@@ -9,7 +10,7 @@ interface PlaylistMenuProps {
     setIsShareModalUpNext: (isOpen: boolean) => void;
 }
 
-export default function PlaylistMenu({
+export default function MenuPlaylist({
     item,
     listType,
     activeMenuId,
@@ -23,17 +24,9 @@ export default function PlaylistMenu({
 
     return (
         <>
-            <div
-                className="fixed inset-0 z-40 cursor-default"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveMenuId(null);
-                }}
-            />
-            <div
-                onClick={(e) => e.stopPropagation()}
-                className="overflow-hidden absolute right-10 mt-[55px] w-[250px] bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border-neutral-700"
-            >
+            <MenuContainer
+                className="mt-[55px]"
+                onClose={() => setActiveMenuId(null)}>
                 <div className="pb-2 border-b border-gray-500">
                     {!listType && (
                         <button
@@ -84,7 +77,7 @@ export default function PlaylistMenu({
                     />
                     Remove from {listType ? 'Watch later' : 'Liked videos'}
                 </button>
-            </div>
+            </MenuContainer>
         </>
     );
 }
