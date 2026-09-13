@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/navigation/LeftBar'
-import SubcriptionChannel from '../components/SubcriptionChannelComponent';
+import SubcriptionChannel from '../components/subcription/SubcriptionChannelComponent';
 
 const SubcriptionPage = () => {
   const navigate = useNavigate();

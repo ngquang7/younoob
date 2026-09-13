@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { storageService } from '../hooks/storageService';
+import { storageService } from '../../hooks/storageService';
 
 
-import HistoryList from './history/HistoryList';
-import ClearHistoryModal from './common/ClearHistoryModal';
+import HistoryList from './HistoryList';
+import ClearHistoryModal from '../common/ClearHistoryModal';
 
 
 export default function HistoryComponent() {
@@ -126,8 +126,8 @@ export default function HistoryComponent() {
           </div>
 
           {/* RIGHT COLUMN */}
-          <aside className="fixed justify-end flex shrink-0 right-10 mt-[10px] bg-zinc-900 border-r border-zinc-800 rounded-[15px] overflow-hidden">
-            <div className="flex flex-col items-start w-[400px] justify-center h-full text-gray-500 bg-gradient-to-b from-[#5c241c] via-[#241517] to-[#121212]">
+          <aside className="fixed justify-end flex shrink-0 right-10 mt-[10px] rounded-[15px] overflow-hidden">
+            <div className="flex flex-col items-start w-[400px] justify-center h-full text-gray-500 bg-[#0f0f0f]">
               {historyList.length > 0 && (
                 <>
                   <form

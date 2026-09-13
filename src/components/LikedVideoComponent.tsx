@@ -1,7 +1,8 @@
 import { li } from 'motion/react-m';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
+import { formatView } from '../utils/formatView';
+import { formatTimeAgo } from '../utils/formatTimeAgo';
 export default function LikedVideoComponent() {
     const [videoList, setVideoList] = useState<any[]>([]);
     const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
@@ -125,44 +126,6 @@ export default function LikedVideoComponent() {
     };
 
     const getTotalLikedVideo = videoList.length;
-    const getView = (view: string) => {
-        const totalView: number = Number(view);
-        if (totalView < 1000) return `${view}`;
-        if (totalView < 1000000) return `${Math.floor(totalView / 1000)}K`; //  K views
-        if (totalView < 1000000000) return `${Math.floor(totalView / 1000000)}M`; // M views
-        if (totalView < 1000000000000) return `${Math.floor(totalView / 1000000000)}B`; // B views
-    }
-
-    const getTimeago = (date: string) => {
-        const videoDate = new Date(date);
-        const currentTime = new Date();
-        const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
-        if (timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-        if (timeAgo < 3600) { // MINUTE
-            const minutes = Math.floor(timeAgo / 60);
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 86400) { // HOUR
-            const hours = Math.floor(timeAgo / 3600);
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 604800) { // DAY
-            const days = Math.floor(timeAgo / 86400);
-            return `${days} day${days > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 2592000) { // WEEK
-            const weeks = Math.floor(timeAgo / 604800);
-            return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 31536000) { // MONTH
-            const months = Math.floor(timeAgo / 2592000);
-            return `${months} month${months > 1 ? 's' : ''} ago`;
-        }
-        //YEAR
-        const years = Math.floor(timeAgo / 31536000);
-        return `${years} year${years > 1 ? 's' : ''} ago`;
-    }
-
     return (
         <>
             <div
@@ -252,7 +215,7 @@ export default function LikedVideoComponent() {
                                             {video.snippet?.channelTitle}
                                         </span>
                                         <span className="text-xs text-gray-400 mt-1">
-                                            {video.statistics?.viewCount ? `${getView(video.statistics.viewCount)} views` : ''} • {video.snippet?.publishedAt ? `${getTimeago(video.snippet.publishedAt)}` : ''}
+                                            {video.statistics?.viewCount ? `${formatView(video.statistics.viewCount)} views` : ''} • {video.snippet?.publishedAt ? `${formatTimeAgo(video.snippet.publishedAt)}` : ''}
                                         </span>
                                     </div>
 

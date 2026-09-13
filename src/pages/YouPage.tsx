@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import LeftBar from '../components/navigation/LeftBar'
-import YouComponent from '../components/YouComponent';
+import YouComponent from '../components/you/YouComponent';
 
 const YouPage = () => {
   const navigate = useNavigate();

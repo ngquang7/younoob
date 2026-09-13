@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import VideoGrid from '../components/VideoGrid';
 import LeftBar from '../components/navigation/LeftBar'
-import HistoryComponent from '../components/HistoryComponent';
+import HistoryComponent from '../components/history/HistoryComponent';
 
 const HistoryPage = () => {
   const navigate = useNavigate();

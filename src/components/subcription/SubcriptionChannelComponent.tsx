@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getChannelData } from '../api/channelData';
-import { formatSubcriberCount } from '../utils/formatSubcriberCount';
+import { getChannelData } from '../../api/channelData';
+import { formatSubcriberCount } from '../../utils/formatSubcriberCount';
 import SubscriptionItem from './SubcriptionItem';
-import UnsubscribeModal from './UnsubcribeModal';
+import UnsubscribeModal from '../common/UnsubcribeModal';
 export default function SubcriptionChannel() {
     const navigate = useNavigate();
     const [subscriptions, setSubscriptions] = useState<any[]>([]);

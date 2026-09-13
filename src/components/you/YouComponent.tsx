@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { formatView } from '../utils/formatView';
-import { formatTimeAgo } from '../utils/formatTimeAgo';
-import UserProfile from "../components/UserProfile";
-import VideoCard from "./card/VideoCard";
+import { formatView } from '../../utils/formatView';
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import UserProfile from "./UserProfile";
+import VideoCard from "../card/VideoCard";
 import SectionHeader from './SectionHeader';
-import EmptyState from './common/EmptyState';
-import PlaylistCard from './card/PlaylistCard';
+import EmptyState from '../common/EmptyState';
+import PlaylistCard from '../card/PlaylistCard';
 
 export default function YouComponent() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
