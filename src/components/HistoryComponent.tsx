@@ -4,6 +4,16 @@ import { formatView } from '../utils/formatView';
 import ShareModal from './common/ShareModal';
 import MenuContainer from './common/MenuContainer';
 import { storageService } from '../hooks/storageService';
+
+import SaveToPlaylistModal from './common/SaveToPlaylistModal';
+import SaveToWatchLater from './common/SaveToWatchLater';
+
+import AddToQueueButton from './menu-button/AddToQueueButton';
+import PlaylistButton from './menu-button/PlaylistButton';
+import RemoveButton from './menu-button/RemoveButton';
+import ShareButton from './menu-button/ShareButton';
+import SaveToWatchLaterButton from './menu-button/SaveToWatchLaterButton';
+
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isClearAllHis, setIsClearAllHis] = useState(false);
@@ -15,7 +25,7 @@ export default function HistoryComponent() {
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
   const [searchText, setSearchText] = useState('');
-
+  const [selectedShareVideo, setSelectedShareVideo] = useState<any>(null);
   const filteredHistory = historyList.filter((video) => {
     const title = video.snippet?.title?.toLowerCase() || '';
     const channelTitle = video.snippet?.channelTitle?.toLowerCase() || '';
@@ -37,7 +47,6 @@ export default function HistoryComponent() {
   }, []);
 
   // Load history when go to this page
-
   useEffect(() => {
     const data = storageService.getHistory() || [];
     setHistoryList(data);
@@ -57,45 +66,37 @@ export default function HistoryComponent() {
 
   const handleSaveToggle = (video: any) => {
     if (!video || !video.id) return;
-    const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    const isAlreadySaved = existingSavedVideos.some((v: any) => v.id === video.id);
-
-    let updatedSavedVideos;
-    if (isAlreadySaved) {
-      updatedSavedVideos = existingSavedVideos.filter((v: any) => v.id !== video.id);
-      setIsSaved(false);
-      showNotice(`Removed from Watch Later`);
-    } else {
-      updatedSavedVideos = [video, ...existingSavedVideos];
-      setIsSaved(true);
+    const isNowSaved = storageService.toggleSave(video);
+    setWatchLaterVideoList(storageService.getSaved());
+    setIsSaved(isNowSaved);
+    if (isNowSaved) {
       showNotice(`Saved to Watch Later`);
+    } else {
+      showNotice(`Removed from Watch Later`);
     }
-    localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
   };
 
   const addVideoToList = (video: any) => {
     if (!video.id || !video) return;
-    const existingListVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-    const isAlreadyInList = existingListVideos.some((v: any) => v.id === video.id);
-    if (!isAlreadyInList) {
-      const updateList = [video, ...existingListVideos];
-      localStorage.setItem('saved_video', JSON.stringify(updateList));
-    }
-    showNotice(`Saved to Watch Later`);
+    storageService.addToSaved(video);
+    const updated = storageService.getSaved();
+    setWatchLaterVideoList(updated);
+    setIsSaved(true);
+    showNotice("Saved to Watch Later");
   };
 
   // Delete 1 video from history
   const removeFromHistory = (id: string) => {
-    const updated = historyList.filter(v => v.id !== id);
-    setHistoryList(updated);
-    localStorage.setItem('watch_history', JSON.stringify(updated));
-    showNotice(`All views of this video removed from history`);
+    storageService.removeHistoryItem(id); // Gọi hàm xóa trong service của bạn
+    setHistoryList(prev => prev.filter(item => item.id !== id));
+    showNotice("All views of this video removed from history");
   };
 
   // Clear history
   const clearAllHistory = () => {
+    storageService.clearAllHistory();
     setHistoryList([]);
-    localStorage.removeItem('watch_history');
+    showNotice("Watch history cleared");
   };
 
   return (
@@ -158,55 +159,29 @@ export default function HistoryComponent() {
                     {activeMenuId === video.id && (
                       <>
                         <MenuContainer onClose={() => setActiveMenuId(null)}>
-                          <button
-                            className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
-                            <img
-                              alt="Add to queue"
-                              src="/public/addtoqueue.png" className="h-6 w-6 mr-3"
-                            />
-                            Add to queue
-                          </button>
+                          <AddToQueueButton />
+                          
+                          <SaveToWatchLaterButton
+                            video={video}
+                            onClose={() => setActiveMenuId(null)}
+                            showNotice={showNotice}
+                            setWatchLaterVideoList={setWatchLaterVideoList}
+                            setIsSaved={setIsSaved}
+                          />
 
-                          <button
-                            onClick={(e) => {
-                              setActiveMenuId(null);
-                              addVideoToList(video);
-                            }}
-                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
-                            <img
-                              alt="Save to watch later"
-                              src="/public/savetowatchlater.png" className="h-6 w-6 mr-3"
-                            />
-                            Save to watch later
-                          </button>
+                          <PlaylistButton
+                            video={video}
+                            onClose={() => setActiveMenuId(null)}
+                            setSelectedVideo={setSelectedVideo}
+                            handleOpenSaveModal={handleOpenSaveModal}
+                          />
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveMenuId(null);
-                              setSelectedVideo(video);
-                              handleOpenSaveModal(video);
-                            }}
-                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
-                            <img
-                              alt="Save to playlist"
-                              src="/public/savetoplaylist.png" className="h-6 w-5 mr-3"
-                            />
-                            Save to playlist
-                          </button>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                          <ShareButton
+                            onOpenShareModal={() => {
+                              setSelectedShareVideo(video);
                               setIsShareModal(true);
                             }}
-                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left">
-                            <img
-                              alt="Share"
-                              src="/public/share.png" className="h-5 w-5 mr-3"
-                            />
-                            Share
-                          </button>
+                          />
                           <ShareModal
                             isOpen={isShareModal}
                             onClose={() => setIsShareModal(false)}
@@ -214,118 +189,33 @@ export default function HistoryComponent() {
                             videoTitle={video?.snippet?.title || ''}
                             showNotice={showNotice}
                           />
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFromHistory(video.id);
-                            }}
-                            className="w-full px-4 py-2 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-b-xl"
-                          >
-                            <img
-                              alt="Add to queue"
-                              src="/public/bin.png" className="h-5 w-5 mr-3 pointer-events-none"
-                            />
-                            Remove from history
-                          </button>
-                        </MenuContainer>
 
+                          <RemoveButton
+                            videoId={video.id}
+                            label="Remove from history"
+                            onClose={() => setActiveMenuId(null)}
+                            remove={removeFromHistory}
+                          />
+                        </MenuContainer>
                       </>
                     )}
+
                     {/* SELECTED VIDEO TO OPERATE. FOR EX: DELETE, ADD, SHARE */}
                     {selectedVideo?.id === video.id && (
                       <>
-                        <div
-                          className="fixed inset-0 z-40 cursor-default"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedVideo(null); // Close modal when click outside modal
-                          }}
-                        />
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          className="overflow-hidden absolute right-0 mt-12 w-[400px] cursor-default bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm"
+                        <SaveToPlaylistModal
+                          onClose={() => setSelectedVideo(null)}
                         >
-                          <div className="px-4 py-2 text-[17px] font-bold mb-6">Save to...</div>
-                          {/* Add Video To List */}
-                          <div className="w-full px-5 py-2 flex items-center -mt-4 cursor-pointer hover:bg-neutral-700 transition-colors text-left">
-                            <div
-                              onClick={() => handleSaveToggle(video)}
-                              className="relative group">
-                              {/*  */}
-                              {watchLaterVideoList.length > 0 ? (
-                                <>
-                                  <div className="flex flex-row">
-                                    <div className="relative w-28 h-8 flex-shrink-0">
-                                      <div className="absolute -top-2 left-3 right-2 h-8 w-[55px] bg-[#737373] rounded-md"></div>
+                          <SaveToWatchLater
+                            watchLaterVideoList={watchLaterVideoList}
+                            isSaved={isSaved}
+                            onToggleSave={() => handleSaveToggle(selectedVideo)}
+                          />
+                        </SaveToPlaylistModal>
 
-                                      <img
-                                        src={watchLaterVideoList[0]?.snippet?.thumbnails?.medium?.url}
-                                        className="h-[35px] w-[65px] absolute ml-2 inset-0 rounded-md overflow-hidden border border-black/40 flex items-center justify-center"
-                                      />
-                                    </div>
-
-                                    <div className="flex flex-col -ml-6 -mt-1">
-                                      <span className="text-sm font-medium">Watch later</span>
-                                      <span className="text-xs text-neutral-400">Private</span>
-                                    </div>
-                                    <div className="ml-[170px] text-neutral-300">
-                                      {isSaved ?
-                                        <>
-                                          <img
-                                            src="/public/savedVideo.png" className="h-6 w-5"
-                                          />
-                                        </>
-                                        :
-                                        <>
-                                          <img
-                                            src="/public/savetoplaylist.png" className="h-6 w-5"
-                                          />
-                                        </>
-                                      }
-                                    </div>
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="flex flex-row">
-                                    <div className="relative w-28 h-8 flex-shrink-0">
-                                      <div className="absolute -top-2 left-3 right-2 h-8 w-[55px] bg-[#737373] rounded-md"></div>
-
-                                      <img
-                                        src="/loading1.png"
-                                        className="h-[35px] w-[65px] absolute ml-2 inset-0 rounded-md overflow-hidden border border-black/40 flex items-center justify-center"
-                                      />
-                                    </div>
-
-
-                                    <div className="flex flex-col -ml-6 -mt-1">
-                                      <span className="text-sm font-medium">Watch later</span>
-                                      <span className="text-xs text-neutral-400">Private</span>
-                                    </div>
-                                    <div className="ml-[170px] text-neutral-300">
-                                      {isSaved ?
-                                        <>
-                                          <img
-                                            src="/public/saved.png" className="h-6 w-5"
-                                          />
-                                        </>
-                                        :
-                                        <>
-                                          <img
-                                            src="/public/savetoplaylist.png" className="h-6 w-5"
-                                          />
-                                        </>
-                                      }
-
-                                    </div>
-                                  </div>
-                                </>
-                              )} {/* watchLaterVideoList, render the first element and check whether this video has been saved */}
-                            </div>
-                          </div>
-                        </div>
                       </>
                     )}  {/*Selected Video*/}
+
                   </div>
 
                 ))}

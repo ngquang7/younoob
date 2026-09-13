@@ -40,7 +40,7 @@ export default function ShareModal({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-default bg-black/60"
     >
       <div
         onClick={(e) => e.stopPropagation()}
