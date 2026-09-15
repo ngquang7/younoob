@@ -29,7 +29,7 @@ export default function PlayListComponent() {
 
             {/* Header*/}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-4xl font-bold font-sans mt-3 ml-3 mb-2">Playlists</h1>
+                <h1 className="text-4xl font-bold font-sans mb-2">Playlists</h1>
 
             </div>
 

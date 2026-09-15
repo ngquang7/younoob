@@ -112,44 +112,50 @@ export default function WatchCom() {
 
     const handleDescription = (text: string) => {
         if (!text) return null;
-        const youtubeRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)/g;
-        const generalUrlRegex = /(https?:\/\/[^\s]+)/g;
-        const hashtagRegex = /#(?!\d)[\p{L}\p{N}_]+/gu;
-        const words = text.split(/(\s+)/);
-        return words.map((word, index) => {
-            if (word.match(youtubeRegex)) {
+        const regex = /((?:https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)|(?:https?:\/\/[^\s]+)|(#(?!\d)[\p{L}\p{N}_]+))/gu;
+
+        const youtubeRegex = /^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+$/;
+        const generalUrlRegex = /^https?:\/\/[^\s]+$/;
+        const hashtagRegex = /^#(?!\d)[\p{L}\p{N}_]+$/u;
+
+        const parts = text.split(regex);
+
+        return parts.map((part, index) => {
+            if (!part) return null;
+
+            if (youtubeRegex.test(part)) {
                 return (
                     <a
                         key={index}
-                        href={word}
+                        href={part}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
                         onClick={(e) => e.stopPropagation()}
-                        title={word}
+                        title={part}
                     >
                         <img src="/public/logo.png" className="w-[15px] h-[15px]" />
                         <span className="text-gray-300">•</span>
                         <span className="truncate max-w-[180px]">YouTube Video</span>
                     </a>
                 );
-            } else if (word.match(generalUrlRegex)) {
-                const displayUrl = word.length > 30 ? word.substring(0, 30) + '...' : word;
+            } else if (generalUrlRegex.test(part)) {
+                const displayUrl = part.length > 30 ? part.substring(0, 30) + '...' : part;
                 return (
                     <a
                         key={index}
-                        href={word}
+                        href={part}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[#3ea6ff] hover:inline-block"
                         onClick={(e) => e.stopPropagation()}
-                        title={word}
+                        title={part}
                     >
                         {displayUrl}
                     </a>
                 );
-            } else if (word.match(hashtagRegex)) {
-                const cleanWord = word.replace('#', '');
+            } else if (hashtagRegex.test(part)) {
+                const cleanWord = part.replace('#', '');
                 return (
                     <span
                         key={index}
@@ -159,11 +165,11 @@ export default function WatchCom() {
                         }}
                         className="text-[#3ea6ff] font-medium hover:inline-block cursor-pointer"
                     >
-                        {word}
+                        {part}
                     </span>
                 );
             }
-            return word;
+            return part;
         });
     };
 
@@ -177,7 +183,7 @@ export default function WatchCom() {
         handleSubscribeToggle,
     } = useVideoActions(video, video1 || video) as any;
 
-    
+
     const removeVideoFromList = (id: string) => {
         const storageKey = listType ? 'saved_video' : 'like_video';
         const updated = playListVideo.filter(v => v.id !== id);
@@ -240,7 +246,7 @@ export default function WatchCom() {
 
     return (
         <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
-            
+
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">
                 <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
@@ -311,7 +317,7 @@ export default function WatchCom() {
                     currentVideo={video}
                 />
             </div>
-            
+
             <ShareModal
                 isOpen={isShareModal}
                 onClose={() => setIsShareModal(false)}

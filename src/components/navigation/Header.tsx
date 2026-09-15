@@ -39,7 +39,7 @@ export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) 
             title="Youtube Home" 
             className="text-[#f1f1f1] font-sans font-bold text-lg tracking-tighter flex items-center gap-1"
           >
-            <img src="/public/logo-white.png" className="w-30 h-8" />
+            <img src="/public/logo-white.png" className="w-24 h-6" />
           </span>
         </div>
       </div>

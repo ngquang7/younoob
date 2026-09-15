@@ -2,7 +2,7 @@ import React from 'react';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { formatDateTime } from '../../utils/formatDateTime';
 import { formatView } from '../../utils/formatView';
-
+import { formatNumberUsStyle } from '../../utils/formatNumberUsStyle';
 interface DescriptionBoxProps {
   video: any;
   isExpanded: boolean;
@@ -27,7 +27,7 @@ export default function DescriptionBox({
       <div className="flex items-center gap-3 font-semibold text-l text-gray-200 mb-1">
         {isExpanded ? (
           <>
-            <span>{video?.statistics?.viewCount} views</span>
+            <span>{formatNumberUsStyle(video?.statistics?.viewCount)} views</span>
             <span>{formatDateTime(video?.snippet?.publishedAt)}</span>
             <span className="text-[#3ea6ff]">
               {getHashtags(video?.snippet?.description)}
