@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { storageService } from '../../hooks/storageService';
 
 
-import HistoryList from './HistoryList';
+import HistoryList from '../history/HistoryList';
 import ClearHistoryModal from '../common/ClearHistoryModal';
 
 

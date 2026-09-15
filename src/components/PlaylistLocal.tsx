@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { formatView } from './../utils/formatView';
+import { formatView } from '../utils/formatView';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import MenuContainer from './common/MenuContainer';
 import SaveToPlaylistModal from './common/SaveToPlaylistModal';
@@ -34,7 +34,6 @@ interface PlaylistLocalProps {
     setSelectedShareVideo: (video: any) => void;
 
 }
-
 export default function PlaylistLocal({
     videoListLength,
     playlistTitle,
@@ -117,6 +116,7 @@ export default function PlaylistLocal({
                         {activeMenuId === video.id && (
                             <MenuContainer onClose={() => setActiveMenuId(null)}>
                                 <AddToQueueButton />
+                                {!playlistTitle && (
                                 <SaveToWatchLaterButton
                                     video={video}
                                     onClose={() => setActiveMenuId(null)}
@@ -124,6 +124,7 @@ export default function PlaylistLocal({
                                     setWatchLaterVideoList={setWatchLaterVideoList}
                                     setIsSaved={setIsSaved}
                                 />
+                                )}
                                 <PlaylistButton
                                     video={video}
                                     onClose={() => setActiveMenuId(null)}
@@ -145,7 +146,7 @@ export default function PlaylistLocal({
                                 />
                                 <RemoveButton
                                     videoId={video.id}
-                                    label="Remove from history"
+                                    label={`Remove from ${playlistTitle ? 'Watch Later' : 'Liked Videos'}`}
                                     onClose={() => setActiveMenuId(null)}
                                     remove={removeVideoFromList}
                                 />

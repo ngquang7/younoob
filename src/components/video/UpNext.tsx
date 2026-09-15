@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ShareModal from '../common/ShareModal';
 import MenuUpNext from '../menu/MenuUpNext';
 import MenuPlaylist from '../menu/MenuPlaylist';
-
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
 interface SidebarProps {
   listId: string | null;
   listType: boolean;
@@ -13,7 +13,6 @@ interface SidebarProps {
   activeMenuId: string | null;
   setActiveMenuId: (id: string | null) => void;
   goWatch: (id: string) => void;
-  getTimeago: (date: string) => string;
   addVideoToList: (video: any) => void;
   removeVideoFromList: (id: string) => void;
   watchLaterVideoList: any[];
@@ -30,7 +29,6 @@ export default function UpNext({
   activeMenuId,
   setActiveMenuId,
   goWatch,
-  getTimeago,
   addVideoToList,
   removeVideoFromList,
   watchLaterVideoList,
@@ -158,7 +156,7 @@ export default function UpNext({
                     </span>
                     <div className="flex items-center truncate">
                       <span className="text-[12px]">
-                        {getTimeago(video?.snippet?.publishedAt)}
+                        {formatTimeAgo(video?.snippet?.publishedAt)}
                       </span>
                     </div>
                   </div>

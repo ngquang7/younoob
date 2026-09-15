@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import LeftBar from '../components/navigation/LeftBar'
 import WatchComponent from '../components/WatchComponent';
-import WatchCom from '../components/WatchCom';
+import WatchCom from '../components/page/WatchCom';
 export default function WatchPage() {
     const navigate = useNavigate();
     const [sidebarExpanded, setSidebarExpanded] = useState(true);

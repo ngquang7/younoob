@@ -1,11 +1,10 @@
 import { formatSubcriberCount } from '../../utils/formatSubcriberCount';
-
+import { formatLike } from '../../utils/formatLike';
 interface VideoInfoSectionProps {
   video: any;
   video1: any;
   videoId: string | null;
   goChannel: () => void;
-  getLike: (like: string) => string;
   isSubscribed: boolean;
   handleSubscribeToggle: () => void;
   isLiked: boolean;
@@ -22,7 +21,6 @@ export default function VideoInfoSection({
   video1,
   videoId,
   goChannel,
-  getLike,
   isSubscribed,
   handleSubscribeToggle,
   isLiked,
@@ -74,7 +72,7 @@ export default function VideoInfoSection({
             onClick={handleLikeToggle}
             className="flex items-center gap-1.5 px-4 py-2 hover:bg-[#303030] rounded-l-full border-r border-[#303030] transition text-xs font-semibold cursor-pointer text-[#f1f1f1]">
             {isLiked ? <img src="/public/liked.png" className="w-5 h-5" alt="Liked" /> : <img src="/public/notlike.png" className="w-5 h-5" alt="Like" />}
-            {video?.statistics?.likeCount !== undefined ? getLike(video?.statistics?.likeCount)  : 'Like'} 
+            {video?.statistics?.likeCount !== undefined ? formatLike(video?.statistics?.likeCount)  : 'Like'} 
           </button>
           <button
             onClick={() => setIsDisLiked(!isdisLiked)}

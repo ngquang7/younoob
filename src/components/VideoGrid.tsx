@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type {YouTubeSearchItem, YouTubeVideo}  from "../type";
+import type {YouTubeSearchItem}  from "../type";
 import {useState, useRef} from 'react';
 import {formatTimeAgo}  from "../utils/formatTimeAgo";
 

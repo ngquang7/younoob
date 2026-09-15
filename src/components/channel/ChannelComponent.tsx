@@ -2,7 +2,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getChannelData } from '../../api/channelData';
 import { searchYouTube, type YouTubeSearchItem } from "../../api/youtubeSearch.ts";
-
+import ChannelBanner from './ChannelBanner.tsx';
+import ChannelSection from './ChannelSection.tsx';
+import { formatTimeAgo } from '../../utils/formatTimeAgo.ts';
 export default function ChannelComponent() {
 
     const navigate = useNavigate();
@@ -82,227 +84,16 @@ export default function ChannelComponent() {
         }
     };
 
-    const [modalUnsubribe, setModalUnsubcribe] = useState(false);
-    const getSubcriber = (subcriber: string) => {
-      const totalSubcriber: number = Number(subcriber);
-      if (totalSubcriber < 1000) {
-        return `${totalSubcriber}`;
-      }
-      if (totalSubcriber < 1000000) {
-        const subcribers: number = totalSubcriber / 1000;
-        return `${subcribers}K`;
-      }
-      if (totalSubcriber < 1000000000) {
-        const subcribers: number = totalSubcriber / 1000000;
-        return `${subcribers}M`;
-      }
-    }
-    const getTimeago = (date: string) => {
-        const videoDate = new Date(date);
-        const currentTime = new Date();
-        const timeAgo = Math.floor((currentTime.getTime() - videoDate.getTime()) / 1000);
-
-        if (timeAgo < 60) return `${timeAgo} seconds ago`; //SECOND
-        if (timeAgo < 3600) { // MINUTE
-            const minutes = Math.floor(timeAgo / 60);
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 86400) { // HOUR
-            const hours = Math.floor(timeAgo / 3600);
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 604800) { // DAY
-            const days = Math.floor(timeAgo / 86400);
-            return `${days} day${days > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 2592000) { // WEEK
-            const weeks = Math.floor(timeAgo / 604800);
-            return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-        }
-        if (timeAgo < 31536000) { // MONTH
-            const months = Math.floor(timeAgo / 2592000);
-            return `${months} month${months > 1 ? 's' : ''} ago`;
-        }
-        //YEAR
-        const years = Math.floor(timeAgo / 31536000);
-        return `${years} year${years > 1 ? 's' : ''} ago`;
-    }
-
     return (
         <div className="ml-25 flex mr-25 flex-col">
             <div className="border-b border-gray-600 pb-3">
-                {channel?.[0]?.brandingSettings?.image?.bannerExternalUrl ? (
-                <img
-                    src={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl || "Loading..."}
-                    className="w-full h-45 object-cover rounded-2xl"
+                <ChannelBanner bannerUrl={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl} />
+
+                <ChannelSection
+                    channel={channel}
+                    isSubscribed={isSubscribed}
+                    handleSubscribeToggle={handleSubscribeToggle}
                 />
-                ) : (
-                    <></>
-                )}
-                <div className="flex gap-4 mt-10 items-start">
-                    
-                    <img
-                        src={channel?.[0]?.snippet?.thumbnails?.medium?.url}
-                        alt="Channel Avatar"
-                        onClick={() => setPreviewImage(channel?.[0]?.snippet?.thumbnails?.medium?.url)}
-                        className="w-40 h-40 cursor-pointer rounded-full object-cover border border-[#303030]"
-                    />
-
-                    <div
-                        className="flex flex-col items-top"
-                    >
-                        <h1 className="text-4xl font-bold text-white">
-                            {channel?.[0]?.snippet?.title}
-                        </h1>
-                        <p className="text-gray-400 text-sm mt-3">
-                            <span className="font-bold text-white">{channel?.[0]?.snippet?.customUrl}</span> • {getSubcriber(channel?.[0]?.statistics?.subscriberCount)} subcribers • {channel?.[0]?.statistics?.videoCount} videos
-                        </p>
-                        {/* whitespace-pre-wrap" */}
-                        <div
-                            className="flex items-center gap-3 text-l text-gray-200 mb-1 cursor-pointer w-fit"
-                            onClick={() => setIsModalOpen(true)}>
-                            <button className="text-gray-400 text-sm mt-3 items-start cursor-pointer">
-                                {channel?.[0]?.brandingSettings?.channel?.description ? channel?.[0]?.brandingSettings?.channel?.description.slice(0, 10) : ""} <span className="font-semibold text-l text-white">...more</span>
-                            </button>
-                        </div>
-                        <button
-                            onClick={() => {
-                                if (isSubscribed === false) {
-                                    handleSubscribeToggle();
-                                } else {
-                                    setModalUnsubcribe(true);
-                                }
-                            }}
-                            className={`-ml-2 py-2 text-sm font-semibold w-30 mt-3 rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
-                                ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
-                                : 'bg-white hover:bg-gray-200 text-black'
-                                }`}
-                        >
-                            {isSubscribed ?
-                                <>
-                                    <img
-                                        src="/public/tick.png"
-                                        className="h-3 w-3 ml-3 flex flex-row"
-                                    />
-                                    <div className="-mt-4 ml-3">Subscribed</div>
-                                </>
-                                : 'Subcribe'}
-                        </button>
-                        {modalUnsubribe && (
-                            <div
-                                onClick={() => setModalUnsubcribe(false)}
-                                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px]"
-                            >
-                                {/* Size of padding */}
-                                <div
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="bg-[#212121] flex-col text-white max-w-[80vh] max-h-[80vh] flex items-center rounded-2xl p-6 shadow-2xl relative [scrollbar-width:none]"
-                                >
-                                    {/* Title: Unsubribe from {channel name} */}
-                                    <div className="text-gray-400 text-l">
-                                        Unsubscribe from <span className="text-white font-bold" >{channel?.[0]?.snippet?.title}</span> ?
-                                    </div>
-                                    {/* 2 buttons: Cancle and Unsubcribe */}
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => setModalUnsubcribe(false)}
-                                            className="px-4 py-2 mt-5 ml-15 flex hover:bg-[#303030] text-white text-sm font-semibold rounded-full transition cursor-pointer"
-                                        >
-                                            Cancle
-                                        </button>
-                                        <button
-                                            className="px-4 py-2 mt-5 flex items-end hover:bg-[#303030] text-blue-500 text-sm font-semibold rounded-full transition cursor-pointer"
-                                            onClick={() => {
-                                                handleSubscribeToggle();
-                                                setModalUnsubcribe(false);
-                                            }}
-
-                                        >
-                                            Unsubribe
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    {previewImage && (
-                  <div
-                    className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-                    onClick={() => setPreviewImage(null)}
-                  >
-                    {/* Want preview bigger ? Modify w-64 h-64 */}
-                    <img
-                      src={previewImage}
-                      alt="Preview Large"
-                      className="w-200 h-200 rounded-full object-cover shadow-lg border-4 border-gray-600"
-                    />
-                  </div>
-                )}
-                    </div>
-                    {isModalOpen && (
-                        <div
-                            onClick={() => setIsModalOpen(false)}
-                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                        >
-                            {/* Khung chứa nội dung bảng (Màu nền tối giống YouTube, có bo góc và cuộn khi dài) */}
-                            <div onClick={(e) => e.stopPropagation()} className="bg-[#212121] text-white w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative border border-gray-700 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
-                                {/* Nút Đóng (Dấu X góc trên bên phải) */}
-                                <button
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl p-2 rounded-full cursor-pointer hover:bg-gray-700 transition"
-                                >
-                                    ✕
-                                </button>
-
-                                {/* Tiêu đề kênh trong bảng */}
-                                <h2 className="text-2xl font-bold mb-6">
-                                    {channel?.[0]?.snippet?.title}
-                                </h2>
-
-                                {/* Description */}
-                                <div className="mb-6">
-                                    <h3 className="font-bold text-base mb-2 text-xl">{channel?.[0]?.brandingSettings?.channel?.description.length > 0 ? 'Description' : ""}</h3>
-                                    {/* whitespace-pre-wrap giúp giữ nguyên các khoảng xuống dòng của mô tả gốc */}
-                                    <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
-                                        {channel?.[0]?.brandingSettings?.channel?.description || channel?.[0]?.snippet?.description}
-                                    </p>
-                                </div>
-
-                                {/* Các thông tin phụ bên dưới (Sub, Video count, Custom URL...) */}
-                                <div className="border-t border-gray-700 pt-4 space-y-3 text-sm text-gray-300">
-                                    <h3 className="font-bold text-base  mb-2 text-xl text-white">More info</h3>
-                                    <div className="flex items-center gap-3">
-                                        <span>
-                                            <img
-                                                src="/public/youtubelogoDes.png" 
-                                                className="h-6 w-7"
-                                            />
-                                        </span>
-                                            <a
-                                            href={`https://www.youtube.com/${channel?.[0]?.snippet?.customUrl}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="-mt-1"
-                                            >
-                                            www.youtube.com/{channel?.[0]?.snippet?.customUrl}
-                                            </a>       
-                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <span>👥</span>
-                                        <span>{channel?.[0]?.statistics?.subscriberCount} subscribers</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span>🎬</span>
-                                        <span>{channel?.[0]?.statistics?.videoCount} videos</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span>📅</span>
-                                        <span>Joined {new Date(channel?.[0]?.snippet?.publishedAt).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
             </div>
             {/* Videos of channel */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
@@ -353,7 +144,7 @@ export default function ChannelComponent() {
                                     <div className="flex items-center text-xs font-sans text-gray-400">
                                         {/* <span className="text-gray-400">view</span> */}
                                         {/* <span className="mx-1.5 text-[8px]">•</span> */}
-                                        <span className="text-gray-400">{getTimeago(video.snippet.publishedAt)}</span>
+                                        <span className="text-gray-400">{formatTimeAgo(video.snippet.publishedAt)}</span>
                                     </div>
                                 </div>
                             </div>

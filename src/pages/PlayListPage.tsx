@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import LeftBar from '../components/navigation/LeftBar';
-import PlayListComponent from '../components/PlayListComponent';
+import PlayListComponent from '../components/page/PlayListComponent';
 
 const PlaylistPage = () => {
   const navigate = useNavigate();

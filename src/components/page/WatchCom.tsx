@@ -1,25 +1,20 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { searchYouTube } from '../api/youtubeSearch';
-import { getVideosDetails } from "../api/videoWatchingData";
-import { getChannelData } from '../api/channelData';
-import { getCommentData } from '../api/commentData';
-import type { YouTubeSearchItem } from "../type";
+import { searchYouTube } from '../../api/youtubeSearch';
+import { getVideosDetails } from "../../api/videoWatchingData";
+import { getChannelData } from '../../api/channelData';
+import { getCommentData } from '../../api/commentData';
+import type { YouTubeSearchItem } from "../../type";
 
-import ShareModal from './common/ShareModal';
-import DescriptionBox from './video/DescriptionBox';
-import CommentSection from './video/CommentSection';
-import UpNext from './video/UpNext';
-import VideoInfoSection from './video/VideoInfoSection';
+import ShareModal from '../common/ShareModal';
+import DescriptionBox from '../video/DescriptionBox';
+import CommentSection from '../video/CommentSection';
+import UpNext from '../video/UpNext';
+import VideoInfoSection from '../video/VideoInfoSection';
 
-import { useWatchHistory } from '../hooks/useWatchHistory';
-import { useVideoActions } from '../hooks/useVideoAction';
+import { useWatchHistory } from '../../hooks/useWatchHistory';
+import { useVideoActions } from '../../hooks/useVideoAction';
 
-import { formatSubcriberCount } from '../utils/formatSubcriberCount';
-import { formatTimeAgo } from '../utils/formatTimeAgo';
-import { formatView } from '../utils/formatView';
-import { formatDateTime } from '../utils/formatDateTime';
-import { formatLike } from '../utils/formatLike';
 export default function WatchCom() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -266,7 +261,6 @@ export default function WatchCom() {
                     video1={video1}
                     videoId={videoId}
                     goChannel={goChannel}
-                    getLike={formatLike}
                     isSubscribed={isSubscribed}
                     handleSubscribeToggle={handleSubscribeToggle}
                     isLiked={isLiked}
@@ -282,9 +276,6 @@ export default function WatchCom() {
                     video={video}
                     isExpanded={isExpandedDecription}
                     setIsExpanded={setisExpandedDecription}
-                    getView={formatView}
-                    getTimeago={formatTimeAgo}
-                    getTimeDescription={formatDateTime}
                     getHashtags={getHashtags}
                     handleDescription={handleDescription}
                 />
@@ -313,7 +304,6 @@ export default function WatchCom() {
                     activeMenuId={activeMenuId}
                     setActiveMenuId={setActiveMenuId}
                     goWatch={goWatch}
-                    getTimeago={formatTimeAgo}
                     addVideoToList={addVideoToList}
                     removeVideoFromList={removeVideoFromList}
                     watchLaterVideoList={watchLaterVideoList}

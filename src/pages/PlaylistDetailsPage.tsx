@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import LeftBar from '../components/navigation/LeftBar';
-import LikedVideoComponent from '../components/LikedVideoComponent';
+import LikedVideoComponent from '../components/page/LikedVideoComponent';
 
 const LikedVideoPage = () => {
   const navigate = useNavigate();
