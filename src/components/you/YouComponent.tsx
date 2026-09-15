@@ -57,18 +57,27 @@ export default function YouComponent() {
                     navigate={navigate}
                 />
                 {/* Video History */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
+                <div className={`grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4`}>
                     {historyList.length > 0 ? (
                         <>
-                            {historyList.slice(0, 4).map((video) => (
-                                <VideoCard
+
+                            {historyList.slice(0, 4).map((video, index) => (
+                                <div
                                     key={video.id}
-                                    video={video}
-                                    navigate={navigate}
-                                    goChannel={goChannel}
-                                    formatView={formatView}
-                                    formatTimeAgo={formatTimeAgo}
-                                />
+                                    className={`
+                                    ${index === 2 ? 'hidden md:block' : ''}
+                                    ${index === 3 ? 'hidden lg:block' : ''}
+                                `}
+                                >
+                                    <VideoCard
+                                        key={video.id}
+                                        video={video}
+                                        navigate={navigate}
+                                        goChannel={goChannel}
+                                        formatView={formatView}
+                                        formatTimeAgo={formatTimeAgo}
+                                    />
+                                </div>
                             ))}
                         </>
                     ) : (
@@ -95,6 +104,7 @@ export default function YouComponent() {
                     />
                 </div>
             </div>
+
             {/* Watch Later */}
             <div className="w-full px-6 mt-1 flex flex-col items-center justify-between border-gray-600">
                 <SectionHeader
@@ -104,18 +114,26 @@ export default function YouComponent() {
                 />
                 <div className="text-sm font-semibold w-full text-left -mt-6 mb-5 text-gray-500">{savedList.length} video</div>
                 {/* Watch Later Video */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div className={`grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4`}>
                     {savedList.length > 0 ? (
                         <>
-                            {savedList.slice(0, 4).map((video) => (
-                                <VideoCard
+                            {savedList.slice(0, 4).map((video, index) => (
+                                <div
                                     key={video.id}
-                                    video={video}
-                                    navigate={navigate}
-                                    goChannel={goChannel}
-                                    formatView={formatView}
-                                    formatTimeAgo={formatTimeAgo}
-                                />
+                                    className={`
+                                    ${index === 2 ? 'hidden md:block' : ''}
+                                    ${index === 3 ? 'hidden lg:block' : ''}
+                                `}
+                                >
+                                    <VideoCard
+                                        key={video.id}
+                                        video={video}
+                                        navigate={navigate}
+                                        goChannel={goChannel}
+                                        formatView={formatView}
+                                        formatTimeAgo={formatTimeAgo}
+                                    />
+                                </div>
                             ))}
                         </>
                     ) : (
@@ -129,21 +147,30 @@ export default function YouComponent() {
                 <SectionHeader
                     title="Liked Video"
                     navigate={navigate}
+                    playlistType='LL'
                 />
                 <div className="text-sm font-semibold w-full text-left -mt-6 mb-5 text-gray-500">{likedList.length} video</div>
                 {/* Liked Video */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 ">
+                <div className={`grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4`}>
                     {likedList.length > 0 ? (
                         <>
-                            {likedList.slice(0, 4).map((video) => (
-                                <VideoCard
+                            {likedList.slice(0, 4).map((video, index) => (
+                                <div
                                     key={video.id}
-                                    video={video}
-                                    navigate={navigate}
-                                    goChannel={goChannel}
-                                    formatView={formatView}
-                                    formatTimeAgo={formatTimeAgo}
-                                />
+                                    className={`
+                                    ${index === 2 ? 'hidden md:block' : ''}
+                                    ${index === 3 ? 'hidden lg:block' : ''}
+                                    `}
+                                >
+                                    <VideoCard
+                                        key={video.id}
+                                        video={video}
+                                        navigate={navigate}
+                                        goChannel={goChannel}
+                                        formatView={formatView}
+                                        formatTimeAgo={formatTimeAgo}
+                                    />
+                                </div>
                             ))}
                         </>
                     ) : (

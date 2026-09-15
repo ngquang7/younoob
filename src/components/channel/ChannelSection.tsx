@@ -29,6 +29,8 @@ export default function ChannelSection({
     const videoCount = channelData?.statistics?.videoCount;
     const viewCount = channelData?.statistics?.viewCount;
     const publishedAt = channelData?.snippet?.publishedAt;
+    const country = channelData?.snippet.country;
+    console.log(`${country}`);
 
     return (
         <div className="flex gap-4 mt-10 items-start relative">

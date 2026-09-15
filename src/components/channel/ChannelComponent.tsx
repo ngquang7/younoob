@@ -85,7 +85,7 @@ export default function ChannelComponent() {
     };
 
     return (
-        <div className="ml-25 flex mr-25 flex-col">
+        <div className="w-full flex flex-col">
             <div className="border-b border-gray-600 pb-3">
                 <ChannelBanner bannerUrl={channel?.[0]?.brandingSettings?.image?.bannerExternalUrl} />
 
