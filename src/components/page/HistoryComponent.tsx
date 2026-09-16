@@ -10,7 +10,6 @@ import ClearHistoryModal from '../common/ClearHistoryModal';
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isClearAllHis, setIsClearAllHis] = useState(false);
-  const navigate = useNavigate();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [isShareModal, setIsShareModal] = useState(false);
@@ -49,13 +48,14 @@ export default function HistoryComponent() {
     e.preventDefault(); // Stop page refresh
   };
 
-  const handleOpenSaveModal = (video: any) => {
+const handleOpenSaveModal = (video: any) => {
     if (video && video.id) {
-      const saveSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-      const isSaved = saveSavedVideos.some((v: any) => v.id === video.id);
-      setIsSaved(isSaved);
+        const savedVideos = storageService.getSaved(); 
+        const isSaved = savedVideos.some((v: any) => v.id === video.id);
+        setIsSaved(isSaved);
+        setSelectedVideo(video);
     }
-  };
+};
 
   const handleSaveToggle = (video: any) => {
     if (!video || !video.id) return;
@@ -69,18 +69,9 @@ export default function HistoryComponent() {
     }
   };
 
-  const addVideoToList = (video: any) => {
-    if (!video.id || !video) return;
-    storageService.addToSaved(video);
-    const updated = storageService.getSaved();
-    setWatchLaterVideoList(updated);
-    setIsSaved(true);
-    showNotice("Saved to Watch Later");
-  };
-
   // Delete 1 video from history
   const removeFromHistory = (id: string) => {
-    storageService.removeHistoryItem(id); // Gọi hàm xóa trong service của bạn
+    storageService.removeHistoryItem(id);
     setHistoryList(prev => prev.filter(item => item.id !== id));
     showNotice("All views of this video removed from history");
   };

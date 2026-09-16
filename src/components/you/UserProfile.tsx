@@ -3,7 +3,6 @@ interface UserProfileProps {
     userId: string;
     avatar?: string;
 }
-
 export default function UserProfile({ 
     username, 
     userId, 

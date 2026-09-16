@@ -1,12 +1,25 @@
-import React from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 interface MenuContainerProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string; // Thêm prop này để nhận khoảng cách tùy chỉnh
 }
 
-export default function MenuContainer({ onClose, children, className = "mt-12" }: MenuContainerProps) {
+export default function MenuContainer({ onClose, children, className = "mt-12 right-0" }: MenuContainerProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [isDropUp, setIsDropUp] = useState(false);
+
+  useEffect(() => {
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Nếu chân của menu vượt quá chiều cao màn hình (chạm đáy)
+      if (rect.bottom > windowHeight - 20) {
+        setIsDropUp(true); // Bật chế độ lật ngược lên trên
+      }
+    }
+  }, []);
   return (
     <>
       <div
@@ -17,8 +30,11 @@ export default function MenuContainer({ onClose, children, className = "mt-12" }
         }}
       />
       <div
+        ref={menuRef}
         onClick={(e) => e.stopPropagation()}
-        className={`absolute right-0 w-64 bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border border-neutral-700 overflow-hidden ${className}`}
+        className={`absolute w-64 bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border border-neutral-700 overflow-hidden 
+        ${isDropUp ? 'bottom-full mb-2' : ''}  
+        ${className}`}
       >
         {children}
       </div>

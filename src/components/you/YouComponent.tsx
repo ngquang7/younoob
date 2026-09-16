@@ -16,25 +16,38 @@ export default function YouComponent() {
     const [savedList, setSavedList] = useState<any[]>([]);
     const [isHovered, setIsHovered] = useState(false);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
-    const goChannel = (channelId: string) => navigate(`/channel/${channelId}`);
+
     const goLikeVideo = () => navigate(`/playlist?list=LL`);
-
-    useEffect(() => {
-        //Get string string
+    const showNotice = (message: string) => {
+        setNoticeMessage(message);
+        setTimeout(() => {
+            setNoticeMessage(null);
+        }, 2300);
+    };
+    const loadUserData = () => {
         const savedHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
-        setHistoryList(savedHistory);
-    }, []);
-
-    useEffect(() => {
         const savedLikedVideo = JSON.parse(localStorage.getItem('like_video') || '[]');
+        const savedSavedVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
+
+        setHistoryList(savedHistory);
         setLikedList(savedLikedVideo);
-    }, []);
+        setSavedList(savedSavedVideo);
+    };
 
     useEffect(() => {
-        const savedSavedVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
-        setSavedList(savedSavedVideo);
+        loadUserData();
+        window.addEventListener('focus', loadUserData);
+        window.addEventListener('storage_updated', loadUserData);
+
+        return () => {
+            window.removeEventListener('focus', loadUserData);
+            window.removeEventListener('storage_updated', loadUserData);
+        };
     }, []);
+
+
     const PlaylistBackgroundLayers = (
         <>
             <div className="absolute -top-4 h-full left-6 right-5 bg-[#3e3e3e] rounded-xl z-0"></div>
@@ -73,9 +86,8 @@ export default function YouComponent() {
                                         key={video.id}
                                         video={video}
                                         navigate={navigate}
-                                        goChannel={goChannel}
-                                        formatView={formatView}
-                                        formatTimeAgo={formatTimeAgo}
+                                        showNotice={showNotice}
+                                        type="history"
                                     />
                                 </div>
                             ))}
@@ -129,9 +141,8 @@ export default function YouComponent() {
                                         key={video.id}
                                         video={video}
                                         navigate={navigate}
-                                        goChannel={goChannel}
-                                        formatView={formatView}
-                                        formatTimeAgo={formatTimeAgo}
+                                        showNotice={showNotice}
+                                        type="watchlater"
                                     />
                                 </div>
                             ))}
@@ -166,9 +177,8 @@ export default function YouComponent() {
                                         key={video.id}
                                         video={video}
                                         navigate={navigate}
-                                        goChannel={goChannel}
-                                        formatView={formatView}
-                                        formatTimeAgo={formatTimeAgo}
+                                        showNotice={showNotice}
+                                        type="liked"
                                     />
                                 </div>
                             ))}

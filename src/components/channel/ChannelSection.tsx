@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { formatSubcriberCount } from "../../utils/formatSubcriberCount";
 import { formatDateTime } from "../../utils/formatDateTime";
-import {formatNumberUsStyle} from "../../utils/formatNumberUsStyle";
+import { formatNumberUsStyle } from "../../utils/formatNumberUsStyle";
+import { formatCountryName } from "../../utils/formatCountryName";
 interface ChannelSectionProps {
     channel: any;
     isSubscribed?: boolean;
@@ -30,7 +31,7 @@ export default function ChannelSection({
     const viewCount = channelData?.statistics?.viewCount;
     const publishedAt = channelData?.snippet?.publishedAt;
     const country = channelData?.snippet.country;
-    console.log(`${country}`);
+
 
     return (
         <div className="flex gap-4 mt-10 items-start relative">
@@ -58,11 +59,11 @@ export default function ChannelSection({
                     onClick={() => setIsModalOpen(true)}
                 >
                     <button className="text-gray-400 text-sm mt-3 items-start cursor-pointer">
-                        {description ? (<><span className="text-gray-400 text-sm mt-3">{descriptionSnippet}</span><span className="font-semibold text-l text-white">...more</span></>) : (<><span className="text-gray-400 text-sm mt-3">More about this channle </span><span className="font-semibold text-l text-white">...more</span></>)} 
+                        {description ? (<><span className="text-gray-400 text-sm mt-3">{descriptionSnippet}</span><span className="font-semibold text-l text-white">...more</span></>) : (<><span className="text-gray-400 text-sm mt-3">More about this channle </span><span className="font-semibold text-l text-white">...more</span></>)}
                     </button>
                 </div>
 
-                {/* Nút Subscribe */}
+                {/* Subscribe button */}
                 <button
                     onClick={() => {
                         if (!isSubscribed) {
@@ -79,7 +80,7 @@ export default function ChannelSection({
                     {isSubscribed ? (
                         <div className="flex items-center justify-center">
                             <img src="/public/tick.png" className="h-3 w-3 ml-1" alt="tick" />
-                            <span className="ml-1">Subscribed</span>
+                            <span className="ml-2">Subscribed</span>
                         </div>
                     ) : (
                         "Subscribe"
@@ -175,7 +176,12 @@ export default function ChannelSection({
                                     www.youtube.com/{customUrl}
                                 </a>
                             </div>
-
+                            {country ? (
+                            <div className="flex items-center gap-3">
+                                <img src="/public/countryDes.png" className="h-7 w-7" alt="logo" />
+                                <span>{formatCountryName(country)}</span>
+                            </div>
+                            ): (<></>)}
                             <div className="flex items-center gap-3">
                                 <img src="/public/iDes.png" className="h-7 w-7" alt="logo" />
                                 <span>Joined {publishedAt ? formatDateTime(publishedAt) : ""}</span>
@@ -187,17 +193,17 @@ export default function ChannelSection({
                             </div>
 
                             {videoCount > 0 ? (
-                            <div className="flex items-center gap-3">
-                                <img src="/public/videoDes.png" className="h-6 w-7" alt="logo" />
-                                <span>{videoCount} videos</span>
-                            </div>
+                                <div className="flex items-center gap-3">
+                                    <img src="/public/videoDes.png" className="h-6 w-7" alt="logo" />
+                                    <span>{videoCount} videos</span>
+                                </div>
                             ) : (<></>)}
 
                             {viewCount > 0 ? (
-                            <div className="flex items-center gap-3">
-                                <img src="/public/viewDes.png" className="h-6 w-7" alt="logo" />
-                                <span>{formatNumberUsStyle(viewCount)} views</span>
-                            </div>) : (<></>)}
+                                <div className="flex items-center gap-3">
+                                    <img src="/public/viewDes.png" className="h-6 w-7" alt="logo" />
+                                    <span>{formatNumberUsStyle(viewCount)} views</span>
+                                </div>) : (<></>)}
                         </div>
                     </div>
                 </div>
