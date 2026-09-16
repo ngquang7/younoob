@@ -1,4 +1,12 @@
 import MenuContainer from "../common/MenuContainer";
+import SaveToPlaylistModal from '../common/SaveToPlaylistModal';
+import SaveToWatchLater from '../common/SaveToWatchLater';
+import ShareModal from '../common/ShareModal';
+import AddToQueueButton from '../menu-button/AddToQueueButton';
+import PlaylistButton from '../menu-button/PlaylistButton';
+import RemoveButton from '../menu-button/RemoveButton';
+import ShareButton from '../menu-button/ShareButton';
+import SaveToWatchLaterButton from '../menu-button/SaveToWatchLaterButton';
 interface UpNextMenuProps {
     video: any;
     vId: string;
@@ -24,16 +32,9 @@ export default function MenuUpNext({
     return (
         <>
             <MenuContainer
-                className="mt-28"
+                className="mt-28 right-0"
                 onClose={() => setActiveMenuId(null)}>
-                <button className="w-full px-4 py-2 flex items-center -mt-2 cursor-pointer hover:bg-neutral-700 transition-colors text-left rounded-t-xl">
-                    <img
-                        alt="Add to queue"
-                        src="/public/addtoqueue.png"
-                        className="h-6 w-6 mr-3"
-                    />
-                    Add to queue
-                </button>
+                <AddToQueueButton />
                 <button
                     onClick={() => {
                         setActiveMenuId(null);
@@ -48,6 +49,7 @@ export default function MenuUpNext({
                     />
                     Save to watch later
                 </button>
+
 
                 <button
                     onClick={(e) => {

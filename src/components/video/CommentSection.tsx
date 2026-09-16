@@ -133,7 +133,7 @@ export default function CommentSection({
             <div className="flex flex-col mb-8">
               <div className="flex items-center gap-2">
                 <span
-                  className="font-semibold text-sm cursor-pointer hover:underline"
+                  className="font-semibold text-sm cursor-pointer"
                   onClick={() => {
                     navigate(`/channel/${comment.authorChannelId?.value || ''}`);
                   }}

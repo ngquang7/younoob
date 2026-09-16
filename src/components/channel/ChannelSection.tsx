@@ -34,7 +34,7 @@ export default function ChannelSection({
 
 
     return (
-        <div className="flex gap-4 mt-10 items-start relative">
+        <div className="flex gap-4 mt-10 items-start relative mb-10">
             {/* Avatar & Phóng to ảnh */}
             {avatarUrl && (
                 <img
@@ -78,8 +78,8 @@ export default function ChannelSection({
                         }`}
                 >
                     {isSubscribed ? (
-                        <div className="flex items-center justify-center">
-                            <img src="/public/tick.png" className="h-3 w-3 ml-1" alt="tick" />
+                        <div className="flex items-center justify-center mb-1">
+                            <img src="/public/tick.png" className="h-3 w-3" alt="tick" />
                             <span className="ml-2">Subscribed</span>
                         </div>
                     ) : (

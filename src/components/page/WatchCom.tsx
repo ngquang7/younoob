@@ -152,6 +152,7 @@ export default function WatchCom() {
                         title={part}
                     >
                         {displayUrl}
+                        
                     </a>
                 );
             } else if (hashtagRegex.test(part)) {
@@ -166,6 +167,7 @@ export default function WatchCom() {
                         className="text-[#3ea6ff] font-medium hover:inline-block cursor-pointer"
                     >
                         {part}
+                        
                     </span>
                 );
             }
@@ -280,6 +282,7 @@ export default function WatchCom() {
 
                 <DescriptionBox
                     video={video}
+                    video1={video1}
                     isExpanded={isExpandedDecription}
                     setIsExpanded={setisExpandedDecription}
                     getHashtags={getHashtags}

@@ -36,8 +36,9 @@ export default function VideoInfoSection({
       {/* CHANNEL INFO & SUBSCRIBE */}
       <div className="flex items-center gap-3">
         <img
+          onClick={goChannel}
           src={video1?.snippet?.thumbnails?.medium?.url || "..Loading.."}
-          className="w-10 h-10 rounded-full object-cover border border-[#303030]"
+          className="w-12 h-12 rounded-full object-cover border cursor-pointer border-[#303030]"
           alt="Channel Avatar"
         />
         <div className="flex flex-col">
