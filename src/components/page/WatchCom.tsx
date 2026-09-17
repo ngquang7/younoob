@@ -152,7 +152,7 @@ export default function WatchCom() {
                         title={part}
                     >
                         {displayUrl}
-                        
+
                     </a>
                 );
             } else if (hashtagRegex.test(part)) {
@@ -167,7 +167,7 @@ export default function WatchCom() {
                         className="text-[#3ea6ff] font-medium hover:inline-block cursor-pointer"
                     >
                         {part}
-                        
+
                     </span>
                 );
             }

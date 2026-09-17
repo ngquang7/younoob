@@ -21,7 +21,6 @@ export default function PlaylistCard({
 }: PlaylistCardProps) {
     const firstItem = items?.[0];
     const hasItems = items && items.length > 0;
-
     return (
         <div
             onClick={() => {

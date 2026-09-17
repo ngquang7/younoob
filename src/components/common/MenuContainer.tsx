@@ -13,13 +13,12 @@ export default function MenuContainer({ onClose, children, className = "mt-12 ri
     if (menuRef.current) {
       const rect = menuRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-
-      // Nếu chân của menu vượt quá chiều cao màn hình (chạm đáy)
       if (rect.bottom > windowHeight - 20) {
-        setIsDropUp(true); // Bật chế độ lật ngược lên trên
+        setIsDropUp(true);
       }
     }
   }, []);
+  
   return (
     <>
       <div

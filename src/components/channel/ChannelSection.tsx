@@ -161,8 +161,8 @@ export default function ChannelSection({
                             </p>
                         </div>
 
-                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm text-gray-300">
-                            <h3 className="font-bold text-xl mb-2 text-white">More info</h3>
+                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm text-white">
+                            <h3 className="font-bold text-xl mb-5 text-white">More info</h3>
                             <div className="flex items-center gap-3">
                                 <span>
                                     <img src="/public/youtubelogoDes.png" className="h-6 w-7" alt="logo" />

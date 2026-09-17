@@ -101,7 +101,7 @@ export default function VideoCard({
 
                 {/* Title video */}
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
-                    <div className="flex flex-row">
+                    <div className="flex flex-row items-start justify-between gap-2">
                         <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
                             {video.snippet.title}
                         </h3>
@@ -117,7 +117,7 @@ export default function VideoCard({
                             </button>
                             {activeMenuId === video.id && (
                                 <MenuContainer
-                                    className="mt-2"
+                                    className="mt-1"
                                     onClose={() => setActiveMenuId(null)}>
                                     <AddToQueueButton />
                                     {(type === 'history' || type === 'liked') && (
@@ -161,7 +161,9 @@ export default function VideoCard({
                             )}
 
                             {selectedVideo?.id === video.id && (
-                                <SaveToPlaylistModal onClose={() => setSelectedVideo(null)}>
+                                <SaveToPlaylistModal 
+                                    className=""
+                                    onClose={() => setSelectedVideo(null)}>
                                     <SaveToWatchLater
                                         watchLaterVideoList={watchLaterVideoList}
                                         isSaved={isSaved}
@@ -188,8 +190,6 @@ export default function VideoCard({
                             <span className="text-gray-400">{formatView(video?.statistics?.viewCount || "")} views</span>
                             <span className="mx-1.5 text-[8px]">•</span>
                             <span className="text-gray-400">{formatTimeAgo(video.snippet.publishedAt)}</span>
-
-
                         </div>
 
                     </div>

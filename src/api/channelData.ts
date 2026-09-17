@@ -121,14 +121,14 @@ const youtubeApi = axios.create({
 
 
 export async function getChannelData(
-  videoIds: string | string[]
+  channelId: string | string[]
 ): Promise<YouTubeChannelResponse> {
     const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
     if (!apiKey) {
         throw new Error("YouTube API key is missing.");
     }
   // Convert array to a comma-separated string if necessary (YouTube allows up to 50 IDs)
-    const idParam = Array.isArray(videoIds) ? videoIds.join(",") : videoIds;
+    const idParam = Array.isArray(channelId) ? channelId.join(",") : channelId;
 
     const { data } = await youtubeApi.get<YouTubeChannelResponse>("/channels", {
     params: {
