@@ -17,15 +17,15 @@ export default function YouComponent() {
     const [isHovered, setIsHovered] = useState(false);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
-
     const goLikeVideo = () => navigate(`/playlist?list=LL`);
+
     const showNotice = (message: string) => {
         setNoticeMessage(message);
         setTimeout(() => {
             setNoticeMessage(null);
         }, 2300);
     };
-    
+
     const loadUserData = () => {
         const savedHistory = JSON.parse(localStorage.getItem('watch_history') || '[]');
         const savedLikedVideo = JSON.parse(localStorage.getItem('like_video') || '[]');

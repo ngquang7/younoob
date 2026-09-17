@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { searchYouTube } from '../../api/youtubeSearch';
 import { getVideosDetails } from "../../api/videoWatchingData";
 import { getChannelData } from '../../api/channelData';
@@ -246,8 +246,25 @@ export default function WatchCom() {
         return tags.join(' ');
     };
 
+      const commentRef = useRef<HTMLDivElement>(null);
+    
+      const handleScroll = () => {
+        if (commentRef.current) {
+                  console.log('reach the bootm');
+    
+          const rect = commentRef.current.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
+          if (rect.bottom > windowHeight - 20) {
+            console.log('reach the bootm');
+          }
+        }
+      };
+
     return (
-        <div className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+        <div 
+                    ref={commentRef}
+            onScroll={handleScroll}
+        className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
 
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">

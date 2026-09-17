@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
 import LeftBar from '../components/navigation/LeftBar';
 import LikedVideoComponent from '../components/page/LikedVideoComponent';
-
+import PlaylistTest from '../components/playlistPublic';
 const LikedVideoPage = () => {
   const navigate = useNavigate();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);  
@@ -30,7 +30,7 @@ const LikedVideoPage = () => {
       />
       
       <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-          <LikedVideoComponent/>
+          <PlaylistTest/>
       </main>
     </>
   );

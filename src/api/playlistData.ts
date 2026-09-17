@@ -1,4 +1,3 @@
-// src/api/youtubePlaylistMeta.ts
 import axios from "axios";
 
 export interface YouTubeThumbnail {
@@ -6,6 +5,8 @@ export interface YouTubeThumbnail {
     width: number;
     height: number;
 }
+
+//INTERFACES PLAYLIST METADATA (/playlists) 
 
 export interface YouTubePlaylistResource {
     kind: "youtube#playlist";
@@ -58,10 +59,58 @@ export interface YouTubePlaylistListResponse {
     items: YouTubePlaylistResource[];
 }
 
+//INTERFACES PLAYLIST ITEMS (/playlistItems) 
+
+export interface YouTubePlaylistItemResource {
+    kind: "youtube#playlistItem";
+    etag: string;
+    id: string;
+    snippet: {
+        publishedAt: string;
+        channelId: string;
+        title: string;
+        description: string;
+        thumbnails: {
+            default?: YouTubeThumbnail;
+            medium?: YouTubeThumbnail;
+            high?: YouTubeThumbnail;
+            standard?: YouTubeThumbnail;
+            maxres?: YouTubeThumbnail;
+        };
+        channelTitle: string;
+        playlistId: string;
+        position: number;
+        resourceId: {
+            kind: string;
+            videoId: string;
+        };
+        videoOwnerChannelTitle?: string;
+        videoOwnerChannelId?: string;
+    };
+    contentDetails?: {
+        videoId: string;
+        videoPublishedAt?: string;
+    };
+}
+
+export interface YouTubePlaylistItemListResponse {
+    kind: string;
+    etag: string;
+    nextPageToken?: string;
+    prevPageToken?: string;
+    pageInfo: {
+        totalResults: number;
+        resultsPerPage: number;
+    };
+    items: YouTubePlaylistItemResource[];
+}
+
+
 const youtubeApi = axios.create({
     baseURL: "https://www.googleapis.com/youtube/v3",
     timeout: 10_000,
 });
+
 
 export async function getPlaylistDetails(
     playlistIds: string | string[]
@@ -78,6 +127,29 @@ export async function getPlaylistDetails(
             part: "snippet,status,contentDetails,player,localizations",
             id: idParam,
             key: apiKey,
+        },
+    });
+
+    return data;
+}
+
+
+export async function getPlaylistItems(
+    playlistId: string,
+    pageToken?: string
+): Promise<YouTubePlaylistItemListResponse> {
+    const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+    if (!apiKey) {
+        throw new Error("YouTube API key is missing.");
+    }
+
+    const { data } = await youtubeApi.get<YouTubePlaylistItemListResponse>("/playlistItems", {
+        params: {
+            part: "snippet,contentDetails",
+            playlistId: playlistId,
+            key: apiKey,
+            maxResults: 10,
+            pageToken: pageToken,   
         },
     });
 

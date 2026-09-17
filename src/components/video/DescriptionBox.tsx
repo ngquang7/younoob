@@ -42,7 +42,7 @@ export default function DescriptionBox({
           </>
         ) : (
           <>
-            <span>{formatView(video?.statistics?.viewCount)}</span>
+            <span>{formatView(video?.statistics?.viewCount)} views</span>
             <span>{formatTimeAgo(video?.snippet?.publishedAt)}</span>
             <span className="text-gray-400">
               {getHashtags(video?.snippet?.description)}

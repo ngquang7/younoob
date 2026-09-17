@@ -45,7 +45,7 @@ export default function PlayListComponent() {
                 />
 
                 <PlaylistCard
-                    title="Watch Later Videos"
+                    title="Watch Later"
                     items={savedVideoList}
                     playlistKey="WL"
                     navigate={navigate}

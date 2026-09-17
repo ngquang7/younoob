@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
@@ -29,6 +29,7 @@ export default function CommentSection({
   const navigate = useNavigate();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [likedCommentIds, setLikedCommentIds] = useState<string[]>([]);
+
 
   const toggleLike = (commentId: string) => {
     console.log("helko")
@@ -123,7 +124,8 @@ export default function CommentSection({
         const baseLikes = comment.likeCount || 0;
         const displayLikes = isLikedComment ? baseLikes + 1 : baseLikes;
         return (
-          <div key={item.id} className="flex gap-4">
+          <div 
+            key={item.id} className="flex gap-4">
             <img
               src={comment.authorProfileImageUrl}
               className="w-10 h-10 rounded-full cursor-pointer object-cover"

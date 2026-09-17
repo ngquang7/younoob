@@ -118,7 +118,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           title="History"
           onClick={goHistory}
         >
-          <img src="/public/history.png" className="h-7.5 w-8" />
+          <img src="/public/history.png" className="h-6.5 w-7" />
           <div className=" text-base">History</div>
         </button>
 
@@ -127,7 +127,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           title="Playlist"
           onClick={goPlayList}
         >
-          <img src="/public/playlist.png" className="h-7.5 w-7.5" />
+          <img src="/public/playlist.png" className="h-6.5 w-6.5" />
           <div className="text-base">Playlist</div>
         </button>
 
@@ -136,7 +136,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           title="Watch Later"
           onClick={goWatchLater}
         >
-          <img src="/public/watchlater.png" className="h-7.5 w-7.5" />
+          <img src="/public/watchlater.png" className="h-6.5 w-6.5" />
           <div className="text-base">Watch Later</div>
         </button>
 
@@ -145,7 +145,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           title="Liked videos"
           onClick={goLikeVideo}
         >
-          <img src="/public/like.png" className="h-7.5 w-7.5" />
+          <img src="/public/like.png" className="h-6.5 w-6.5" />
           <div className="text-base">Liked videos</div>
         </button>
 
@@ -153,7 +153,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
           title="Subcription"
         >
-          <img src="/public/subcribe.png" className="h-8 w-8" />
+          <img src="/public/subcribe.png" className="h-7 w-7" />
           <div className=" text-base">Subcription</div>
         </button>
 
