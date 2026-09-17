@@ -42,6 +42,7 @@ export default function WatchCom() {
     const currenVideoTitle = video?.snippet?.title || "loading...";
     const channelId = video?.snippet?.channelId || "loading...";
 
+    const [maxResult, setMaxResult] = useState(10);
     const goChannel = () => navigate(`/channel/${channelId}`);
     const goWatch = (videoidd: string) => {
         navigate(`/watch?v=${videoidd}`);
@@ -70,7 +71,7 @@ export default function WatchCom() {
                         setVideo1(channelItem);
                     }
                 }
-                const commentResponse = await getCommentData(videoId);
+                const commentResponse = await getCommentData(videoId, 5);
                 if (commentResponse.items) {
                     setComments(commentResponse.items);
                 }
@@ -246,25 +247,60 @@ export default function WatchCom() {
         return tags.join(' ');
     };
 
-      const commentRef = useRef<HTMLDivElement>(null);
-    
-      const handleScroll = () => {
-        if (commentRef.current) {
-                  console.log('reach the bootm');
-    
-          const rect = commentRef.current.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
-          if (rect.bottom > windowHeight - 20) {
-            console.log('reach the bootm');
-          }
+    const [hasMore, setHasMore] = useState(true);
+    const loadMoreComments = async () => {
+        if (loading || !hasMore) return;
+
+        setLoading(true);
+        // Tăng maxResult lên thêm 10 đơn vị cho lần gọi tiếp theo
+        try {
+            const newMaxResult = maxResult + 10;
+
+            const data = await getCommentData(videoId, newMaxResult);
+
+            if (data.items.length <= comments.length) {
+                setHasMore(false); // Nếu số lượng trả về không đổi nghĩa là đã hết dữ liệu
+            } else {
+                setComments(data.items); // Ghi đè hoặc nối thêm tùy cấu trúc API trả về
+                setMaxResult(newMaxResult);
+            }
+        } catch (error) {
+            console.log("loading comment fail");
+        } finally {
+            setLoading(false);
+
         }
-      };
+    };
+    const commentRef = useRef(null);
+    useEffect(() => {
+        const currentElement = commentRef.current;
+        if (!currentElement) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const firstEntry = entries[0];
+                // Khi div này xuất hiện trên màn hình (hoặc cách màn hình một khoảng)
+                if (firstEntry.isIntersecting && !loading) {
+                    console.log('reach the bottom / element is visible!');
+                    loadMoreComments();
+                }
+            },
+            {
+                root: null, // tính theo viewport của trình duyệt
+                threshold: 0.1 // khi thấy 10% của div là kích hoạt
+            }
+        );
+        observer.observe(currentElement);
+        return () => {
+            if (currentElement) observer.unobserve(currentElement);
+        };
+
+    }, [loading]);
+
 
     return (
-        <div 
-                    ref={commentRef}
-            onScroll={handleScroll}
-        className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+        <div
+
+            className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
 
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">
@@ -305,18 +341,23 @@ export default function WatchCom() {
                     getHashtags={getHashtags}
                     handleDescription={handleDescription}
                 />
+                {comments.length > 0 && (
+                    <div
+                        ref={commentRef}>
+                        <CommentSection
+                            comments={comments}
+                            setComments={setComments}
+                            commentText={commentText}
+                            setCommentText={setCommentText}
+                            isAddComment={isAddComment}
+                            setIsAddComment={setIsAddComment}
+                            commentCount={video?.statistics?.commentCount}
+                            video={video}
+                            setVideo={setVideo}
+                        />
+                    </div>
+                )}
 
-                <CommentSection
-                    comments={comments}
-                    setComments={setComments}
-                    commentText={commentText}
-                    setCommentText={setCommentText}
-                    isAddComment={isAddComment}
-                    setIsAddComment={setIsAddComment}
-                    commentCount={video?.statistics?.commentCount}
-                    video={video}
-                    setVideo={setVideo}
-                />
             </div>
 
             {/* RIGHT COLUMN (SIDEBAR) */}

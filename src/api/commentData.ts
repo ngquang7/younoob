@@ -36,7 +36,8 @@ const youtubeApi = axios.create({
 
 
 export async function getCommentData(
-  videoIds: string
+  videoIds: string,
+  maxResults: number
 ): Promise<YouTubeCommentResponse> {  
     // const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
     const apiKey = (import.meta as any).env.VITE_YOUTUBE_API_KEY;
@@ -52,7 +53,7 @@ export async function getCommentData(
         part: "snippet",
         videoId: idParam,
         key: apiKey,
-        maxResults: 3,
+        maxResults: maxResults,
     },
     });
 

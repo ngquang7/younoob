@@ -75,7 +75,7 @@ export async function searchYouTube(
   const params: any = {
     part: "snippet",
     type: "video",
-    maxResults: 10,
+    maxResults: 12,
     pageToken,
     key: apiKey,
   };
