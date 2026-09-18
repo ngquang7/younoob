@@ -42,7 +42,7 @@ export default function WatchCom() {
     const currenVideoTitle = video?.snippet?.title || "loading...";
     const channelId = video?.snippet?.channelId || "loading...";
 
-    const [maxResult, setMaxResult] = useState(10);
+    const [maxResult, setMaxResult] = useState(5);
     const goChannel = () => navigate(`/channel/${channelId}`);
     const goWatch = (videoidd: string) => {
         navigate(`/watch?v=${videoidd}`);
@@ -252,16 +252,15 @@ export default function WatchCom() {
         if (loading || !hasMore) return;
 
         setLoading(true);
-        // Tăng maxResult lên thêm 10 đơn vị cho lần gọi tiếp theo
         try {
-            const newMaxResult = maxResult + 10;
-
+            const newMaxResult = maxResult + 2;
+            if(videoId == null) return;
             const data = await getCommentData(videoId, newMaxResult);
-
             if (data.items.length <= comments.length) {
-                setHasMore(false); // Nếu số lượng trả về không đổi nghĩa là đã hết dữ liệu
+                setHasMore(false);
+
             } else {
-                setComments(data.items); // Ghi đè hoặc nối thêm tùy cấu trúc API trả về
+                setComments(data.items);
                 setMaxResult(newMaxResult);
             }
         } catch (error) {
@@ -286,7 +285,7 @@ export default function WatchCom() {
             },
             {
                 root: null, // tính theo viewport của trình duyệt
-                threshold: 0.1 // khi thấy 10% của div là kích hoạt
+                threshold: 0.2 // khi thấy 10% của div là kích hoạt
             }
         );
         observer.observe(currentElement);
@@ -295,7 +294,6 @@ export default function WatchCom() {
         };
 
     }, [loading]);
-
 
     return (
         <div
@@ -343,7 +341,8 @@ export default function WatchCom() {
                 />
                 {comments.length > 0 && (
                     <div
-                        ref={commentRef}>
+                        ref={commentRef}
+                        >
                         <CommentSection
                             comments={comments}
                             setComments={setComments}
