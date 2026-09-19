@@ -4,9 +4,9 @@ interface PlaylistCardProps {
     title: string;
     items: any[];
     visibility?: string;
-    playlistKey: string; // Truyền 'LL' hoặc 'WL'
+    playlistKey: string;
     navigate: (path: string) => void;
-    onViewFull: () => void;
+    goFullList: () => void;
     PlaylistBackgroundLayers: React.ReactNode;
 }
 
@@ -16,7 +16,7 @@ export default function PlaylistCard({
     visibility = "Private",
     playlistKey,
     navigate,
-    onViewFull,
+    goFullList,
     PlaylistBackgroundLayers,
 }: PlaylistCardProps) {
     const firstItem = items?.[0];
@@ -27,7 +27,7 @@ export default function PlaylistCard({
                 if (hasItems) {
                     navigate(`/watch?v=${firstItem?.id}&list=${playlistKey}`);
                 } else {
-                    onViewFull();
+                    goFullList();
                 }
             }}
             className="group rounded-[10px] cursor-pointer hover:bg-[#272727] transition-all"
@@ -81,7 +81,7 @@ export default function PlaylistCard({
                     <div
                         onClick={(e) => {
                             e.stopPropagation();
-                            onViewFull();
+                            goFullList();
                         }}
                         className="text-gray-400 text-sm font-[550] hover:text-white z-3"
                     >

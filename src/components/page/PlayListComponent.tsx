@@ -40,7 +40,7 @@ export default function PlayListComponent() {
                     items={likedVideoList}
                     playlistKey="LL"
                     navigate={navigate}
-                    onViewFull={goLikeVideo}
+                    goFullList={goLikeVideo}
                     PlaylistBackgroundLayers={PlaylistBackgroundLayers}
                 />
 
@@ -49,7 +49,7 @@ export default function PlayListComponent() {
                     items={savedVideoList}
                     playlistKey="WL"
                     navigate={navigate}
-                    onViewFull={goWatchLaterVideo}
+                    goFullList={goWatchLaterVideo}
                     PlaylistBackgroundLayers={PlaylistBackgroundLayers}
                 />
             </div>

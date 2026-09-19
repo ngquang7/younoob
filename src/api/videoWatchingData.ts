@@ -6,6 +6,9 @@ interface YouTubeThumbnail {
   width: number;
   height: number;
 }
+export interface YouTubeStatus {
+  containsSyntheticMedia?: boolean;
+}
 
 export interface YouTubeStatistics {
   viewCount: string;
@@ -34,6 +37,7 @@ export interface YouTubeVideoItem {
     categoryId: string;
   };
   statistics?: YouTubeStatistics;
+  status?: YouTubeStatus;
 }
 
 export interface YouTubeVideoResponse {
@@ -68,7 +72,7 @@ export async function getVideosDetails(
 
   const { data } = await youtubeApi.get<YouTubeVideoResponse>("/videos", {
     params: {
-      part: "snippet,statistics", // Requests both metadata and stats
+      part: "snippet,statistics,status", // Requests both metadata and stats
       id: idParam,
       key: apiKey,
     },

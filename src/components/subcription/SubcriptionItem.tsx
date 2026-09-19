@@ -1,17 +1,15 @@
 import React from 'react';
-
+import { formatSubcriberCount } from '../../utils/formatSubcriberCount';
 interface SubscriptionItemProps {
     channel: any;
     onChannelClick: (id: string) => void;
     onUnsubscribeClick: (channel: any) => void;
-    getSubscriberCount: (count: string) => string | undefined;
 }
 
 export default function SubscriptionItem({
     channel,
     onChannelClick,
     onUnsubscribeClick,
-    getSubscriberCount
 }: SubscriptionItemProps) {
     return (
         <div 
@@ -30,7 +28,7 @@ export default function SubscriptionItem({
                         {channel?.snippet?.title}
                     </h1>
                     <p className="text-gray-400 text-xs mt-3">
-                        <span>{channel?.snippet?.customUrl}</span> • {getSubscriberCount(channel?.statistics?.subscriberCount)} subscribers
+                        <span>{channel?.snippet?.customUrl}</span> • {formatSubcriberCount(channel?.statistics?.subscriberCount)} subscribers
                     </p>
                     <div className="text-gray-400 text-xs mt-0">
                         {channel?.brandingSettings?.channel?.description?.slice(0, 320)}

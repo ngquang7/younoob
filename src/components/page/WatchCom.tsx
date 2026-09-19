@@ -93,7 +93,6 @@ export default function WatchCom() {
             setPlayListVideo(savedSavedVideos);
         }
     }, [listId]);
-
     useEffect(() => {
         if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
         const currentParams = new URLSearchParams(window.location.search);
