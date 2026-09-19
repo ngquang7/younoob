@@ -1,4 +1,4 @@
-# Creating a clone Youtube by react, typescript
+# Creating a clone Youtube by react, tailwind-css
 
 
 
