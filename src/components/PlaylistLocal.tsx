@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { formatView } from '../utils/formatView';
 import { formatTimeAgo } from '../utils/formatTimeAgo';
 import MenuContainer from './common/MenuContainer';
@@ -32,7 +32,6 @@ interface PlaylistLocalProps {
     setIsShareModal: (open: boolean) => void;
     selectedShareVideo: any;
     setSelectedShareVideo: (video: any) => void;
-
 }
 export default function PlaylistLocal({
     videoListLength,
@@ -57,6 +56,9 @@ export default function PlaylistLocal({
     setSelectedShareVideo,
 }: PlaylistLocalProps) {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const listParam = searchParams.get('list');
+
     const getRealVideoId = (video: any) => {
         return video.snippet?.resourceId?.videoId
             || video.contentDetails?.videoId
@@ -104,7 +106,8 @@ export default function PlaylistLocal({
                                     {video.snippet?.channelTitle}
                                 </span>
                                 <span className="text-xs text-gray-400 mt-1">
-                                    {video.statistics?.viewCount ? `${formatView(video.statistics.viewCount)} views` : ''} • {video.snippet?.publishedAt ? `${formatTimeAgo(video.snippet.publishedAt)}` : ''}
+                                    {video.statistics?.viewCount ? `${formatView(video.statistics.viewCount)} views •` : ''}
+                                    {video.snippet?.publishedAt ? `${formatTimeAgo(video.snippet.publishedAt)}` : ''}
                                 </span>
                             </div>
 
@@ -146,16 +149,18 @@ export default function PlaylistLocal({
                                     <ShareModal
                                         isOpen={isShareModal && selectedShareVideo?.id === video.id}
                                         onClose={() => setIsShareModal(false)}
-                                        videoId={selectedShareVideo?.id || ''}
+                                        videoId={realVideoId || ''}
                                         videoTitle={selectedShareVideo?.snippet?.title || ''}
                                         showNotice={showNotice}
                                     />
-                                    <RemoveButton
-                                        videoId={video.id}
-                                        label={`Remove from ${playlistTitle ? 'Watch Later' : 'Liked Videos'}`}
-                                        onClose={() => setActiveMenuId(null)}
-                                        remove={removeVideoFromList}
-                                    />
+                                    {(listParam === 'WL' || listParam === 'LL') && (
+                                        <RemoveButton
+                                            videoId={video.id}
+                                            label={`Remove from ${playlistTitle ? 'Watch Later' : 'Liked Videos'}`}
+                                            onClose={() => setActiveMenuId(null)}
+                                            remove={removeVideoFromList}
+                                        />
+                                    )}
                                 </MenuContainer>
                             )}
                             {selectedVideo?.id === video.id && (
@@ -168,7 +173,6 @@ export default function PlaylistLocal({
                                 </SaveToPlaylistModal>
                             )}
                         </div>)
-
                 })}
             </div>
         </div>

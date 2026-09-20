@@ -60,7 +60,6 @@ export interface YouTubePlaylistListResponse {
 }
 
 //INTERFACES PLAYLIST ITEMS (/playlistItems) 
-
 export interface YouTubePlaylistItemResource {
     kind: "youtube#playlistItem";
     etag: string;

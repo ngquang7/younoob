@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { storageService } from '../hooks/storageService';
 import PlaylistLocal from './PlaylistLocal';
-import { getPlaylistDetails, getPlaylistItems } from '../api/playlistData'; 
+import { getPlaylistDetails, getPlaylistItems } from '../api/playlistData';
 
 export default function PlaylistTest() {
     const [videoList, setVideoList] = useState<any[]>([]);
@@ -10,6 +10,7 @@ export default function PlaylistTest() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState<any>(null);
     const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
     const [selectedShareVideo, setSelectedShareVideo] = useState<any>(null);
@@ -18,30 +19,30 @@ export default function PlaylistTest() {
     const [isSaved, setIsSaved] = useState(false);
     const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
-    const [publicPlaylistMeta, setPublicPlaylistMeta] = useState<any>(null);
+    const [publicPlaylist, setPublicPlaylist] = useState<any>(null);
     const [isLoadingAPI, setIsLoadingAPI] = useState(false);
 
     const listParam = searchParams.get('list');
-    
+
     const isPublicPlaylist = listParam && !['LL', 'WL'].includes(listParam);
 
     const listType = listParam === 'WL' ? 'WL' : 'LL';
     const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
-    
-    const title = isPublicPlaylist 
-        ? (publicPlaylistMeta?.snippet?.title || 'YouTube Playlist') 
+
+    const title = isPublicPlaylist
+        ? (publicPlaylist?.snippet?.title || 'YouTube Playlist')
         : (listParam === 'WL' ? 'Watch Later' : 'Liked Video');
 
-    const channelTitle = isPublicPlaylist 
-        ? (publicPlaylistMeta?.snippet?.channelTitle || '') 
+    const channelTitle = isPublicPlaylist
+        ? (publicPlaylist?.snippet?.channelTitle || '')
         : 'Quang playList';
 
-    const getTotalVideo = isPublicPlaylist 
-        ? (publicPlaylistMeta?.contentDetails?.itemCount || videoList.length) 
+    const getTotalVideo = isPublicPlaylist
+        ? (publicPlaylist?.contentDetails?.itemCount || videoList.length)
         : videoList.length;
 
     const thumbnailSrc = isPublicPlaylist
-        ? (publicPlaylistMeta?.snippet?.thumbnails?.medium?.url || videoList[0]?.snippet?.thumbnails?.medium?.url)
+        ? (publicPlaylist?.snippet?.thumbnails?.medium?.url || videoList[0]?.snippet?.thumbnails?.medium?.url)
         : videoList[0]?.snippet?.thumbnails?.medium?.url;
 
     useEffect(() => {
@@ -59,22 +60,22 @@ export default function PlaylistTest() {
                     ]);
 
                     if (metaRes.items && metaRes.items.length > 0) {
-                        setPublicPlaylistMeta(metaRes.items[0]);
+                        setPublicPlaylist(metaRes.items[0]);
                     }
 
                     if (itemsRes.items) {
                         setVideoList(itemsRes.items);
                     }
                 } catch (error) {
-                    console.error("Lỗi khi tải public playlist:", error);
-                    showNotice("Không thể tải danh sách playlist này.");
+                    console.error("error when loading public playlist:", error);
+                    showNotice("Cannot load this playlist.");
                 } finally {
                     setIsLoadingAPI(false);
                 }
             } else {
                 const data = listParam === 'WL' ? storageService.getSaved() : storageService.getLiked();
                 setVideoList(data);
-                setPublicPlaylistMeta(null);
+                setPublicPlaylist(null);
             }
         };
 
@@ -99,7 +100,7 @@ export default function PlaylistTest() {
 
     const removeVideoFromList = (id: string) => {
         if (isPublicPlaylist) {
-            showNotice("Không thể xóa video khỏi playlist công khai của người khác.");
+            showNotice("Cannot delete video of others");
             return;
         }
         const updated = videoList.filter(v => v.id !== id);
@@ -152,8 +153,20 @@ export default function PlaylistTest() {
                                 </div>
                             </div>
                             <h1 className="text-2xl font-bold font-sans mt-5 ml-5 z-10 flex relative line-clamp-1">{title}</h1>
-                            <p className="text-l font-bold font-sans mt-2 ml-5 z-10 flex relative">{channelTitle}</p>
-                            <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative">{getTotalVideo} videos</p>
+                            <div
+                                onClick={() => navigate(`/channel/${publicPlaylist.snippet.channelId}`)}
+                                className="cursor-pointer text-sm font-semibold font-sans mt-2 ml-5 z-10 flex relative">
+                                by {channelTitle}
+                            </div>
+                            <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative mb-3">Playlist • {getTotalVideo} videos</p>
+                            <div
+                                onClick={() => setIsModalOpen(true)}
+                                className="text-sm cursor-pointer text-gray-400 mt-1 ml-5 z-10 flex relative line-clamp-1 ">
+                                <span>{publicPlaylist?.snippet?.description.slice(0, 80) || ''}
+                                    <span className="font-semibold text-white">...more</span>
+                                </span>
+
+                            </div>
                             <button
                                 className="cursor-pointer bg-white h-[40px] w-[150px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-gray-300 transition"
                                 onClick={() => navigate(`/watch?v=${videoList[0]?.snippet?.resourceId?.videoId || videoList[0]?.id}&list=${listParam || listType}`)}
@@ -163,13 +176,48 @@ export default function PlaylistTest() {
                                 </svg>
                                 <div className="text-sm font-bold font-sans ml-2 text-black">Play all</div>
                             </button>
+                            {(listParam !== "WL" || "LL") && (
+                                <button
+                                    className="cursor-pointer bg-white h-[30px] w-[140px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-gray-300 transition"
+                                    onClick={() => window.open(`https://youtube.com/playlist?list=${listParam}`, '_blank')}
+                                >
+                                    <div className="text-sm font-bold font-sans text-black">
+                                        Open on Youtube
+                                    </div>
+                                </button>
+                            )}
                         </>
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-500 bg-gradient-to-b from-[#5c241c] via-[#241517] to-[#121212]">
                             No thumbnail
                         </div>
                     )}
+
                 </aside>
+                {isModalOpen && (
+                    <div
+                        onClick={() => setIsModalOpen(false)}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                    >
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-[#212121] text-white w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative border border-gray-700 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-[#555] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                        >
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl p-2 rounded-full cursor-pointer hover:bg-gray-700 transition"
+                            >
+                                ✕
+                            </button>
+                            <h2 className="text-xl font-bold mb-6">Description</h2>
+                            <div className="mb-6">
+                                <p className="text-m text-sm whitespace-pre-wrap leading-relaxed">
+                                    {publicPlaylist?.snippet?.description}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* RIGHT */}
                 <PlaylistLocal
