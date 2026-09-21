@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { storageService } from '../hooks/storageService';
-import PlaylistLocal from './PlaylistLocal';
+import PlaylistList from './list/PlaylistList';
 import { getPlaylistDetails, getPlaylistItems } from '../api/playlistData';
 
 export default function PlaylistTest() {
@@ -25,9 +25,7 @@ export default function PlaylistTest() {
     const listParam = searchParams.get('list');
 
     const isPublicPlaylist = listParam && !['LL', 'WL'].includes(listParam);
-
     const listType = listParam === 'WL' ? 'WL' : 'LL';
-    const storageKey = listType === 'WL' ? 'saved_video' : 'like_video';
 
     const title = isPublicPlaylist
         ? (publicPlaylist?.snippet?.title || 'YouTube Playlist')
@@ -103,10 +101,15 @@ export default function PlaylistTest() {
             showNotice("Cannot delete video of others");
             return;
         }
+        if (listParam === 'WL') {
+            storageService.removeFromSaved(id);
+            showNotice(`Removed from ${title}`);
+        } else {
+            storageService.removeFromLiked(id);
+            showNotice(`Removed from ${title}`);
+        }
         const updated = videoList.filter(v => v.id !== id);
         setVideoList(updated);
-        localStorage.setItem(storageKey, JSON.stringify(updated));
-        showNotice(`Removed from ${title}`);
     };
 
     const handleSaveToggle = (video: any) => {
@@ -176,12 +179,12 @@ export default function PlaylistTest() {
                                 </svg>
                                 <div className="text-sm font-bold font-sans ml-2 text-black">Play all</div>
                             </button>
-                            {(listParam !== "WL" || "LL") && (
+                            {(listParam !== "WL" && listParam !== "LL") && (
                                 <button
-                                    className="cursor-pointer bg-white h-[30px] w-[140px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-gray-300 transition"
+                                    className="cursor-pointer bg-red-500 h-[30px] w-[120px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-red-700 transition"
                                     onClick={() => window.open(`https://youtube.com/playlist?list=${listParam}`, '_blank')}
                                 >
-                                    <div className="text-sm font-bold font-sans text-black">
+                                    <div className="text-xs font-bold font-sans text-white">
                                         Open on Youtube
                                     </div>
                                 </button>
@@ -194,6 +197,7 @@ export default function PlaylistTest() {
                     )}
 
                 </aside>
+
                 {isModalOpen && (
                     <div
                         onClick={() => setIsModalOpen(false)}
@@ -220,7 +224,7 @@ export default function PlaylistTest() {
                 )}
 
                 {/* RIGHT */}
-                <PlaylistLocal
+                <PlaylistList
                     videoListLength={videoList.length}
                     playlistTitle={!isPublicPlaylist && listType === 'WL'}
                     videoList={videoList}

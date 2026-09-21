@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 
@@ -124,7 +124,7 @@ export default function CommentSection({
         const baseLikes = comment.likeCount || 0;
         const displayLikes = isLikedComment ? baseLikes + 1 : baseLikes;
         return (
-          <div 
+          <div
             key={item.id} className="flex gap-4">
             <img
               src={comment.authorProfileImageUrl}

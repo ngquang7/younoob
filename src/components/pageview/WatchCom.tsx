@@ -9,7 +9,7 @@ import type { YouTubeSearchItem } from "../../type";
 import ShareModal from '../common/ShareModal';
 import DescriptionBox from '../video/DescriptionBox';
 import CommentSection from '../video/CommentSection';
-import UpNext from '../video/UpNext';
+import UpNext from '../upnext/UpNext';
 import VideoInfoSection from '../video/VideoInfoSection';
 
 import { useWatchHistory } from '../../hooks/useWatchHistory';
@@ -249,15 +249,14 @@ export default function WatchCom() {
     const [hasMore, setHasMore] = useState(true);
     const loadMoreComments = async () => {
         if (loading || !hasMore) return;
-
+        if (videoId === null) return;
         setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         try {
             const newMaxResult = maxResult + 2;
-            if(videoId == null) return;
             const data = await getCommentData(videoId, newMaxResult);
             if (data.items.length <= comments.length) {
                 setHasMore(false);
-
             } else {
                 setComments(data.items);
                 setMaxResult(newMaxResult);
@@ -266,7 +265,6 @@ export default function WatchCom() {
             console.log("loading comment fail");
         } finally {
             setLoading(false);
-
         }
     };
     const commentRef = useRef(null);
@@ -276,15 +274,14 @@ export default function WatchCom() {
         const observer = new IntersectionObserver(
             (entries) => {
                 const firstEntry = entries[0];
-                // Khi div này xuất hiện trên màn hình (hoặc cách màn hình một khoảng)
                 if (firstEntry.isIntersecting && !loading) {
                     console.log('reach the bottom / element is visible!');
                     loadMoreComments();
                 }
             },
             {
-                root: null, // tính theo viewport của trình duyệt
-                threshold: 0.2 // khi thấy 10% của div là kích hoạt
+                root: null,
+                threshold: 0.2
             }
         );
         observer.observe(currentElement);
@@ -296,9 +293,7 @@ export default function WatchCom() {
 
     return (
         <div
-
             className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
-
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">
                 <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
@@ -341,7 +336,7 @@ export default function WatchCom() {
                 {comments.length > 0 && (
                     <div
                         ref={commentRef}
-                        >
+                    >
                         <CommentSection
                             comments={comments}
                             setComments={setComments}
@@ -353,6 +348,14 @@ export default function WatchCom() {
                             video={video}
                             setVideo={setVideo}
                         />
+                        {loading && (
+                            <div className="flex flex-col items-center justify-center gap-2 text-gray-500 text-sm">
+                                <div>Loading comment...</div>
+                                <div>Loading comment...</div>
+                                <div>Loading comment...</div>
+
+                            </div>
+                        )}
                     </div>
                 )}
 

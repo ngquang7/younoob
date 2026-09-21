@@ -1,29 +1,27 @@
-import { useNavigate } from "react-router-dom";
-import type {YouTubeSearchItem}  from "../type";
-import {useState, useRef} from 'react';
-import {formatTimeAgo}  from "../utils/formatTimeAgo";
+import type { YouTubeSearchItem } from "../type";
+import { useState, useRef } from 'react';
+import { formatTimeAgo } from "../utils/formatTimeAgo";
 
 // Interface
-interface VideoGridProps {
+interface VideoSearchCardProps {
   video: YouTubeSearchItem;
   goWatch: (videoId: string) => void;
   goChannel: (channelId: string) => void;
 
 }
-export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps) {
+export default function VideoSearchCard({ video, goWatch, goChannel }: VideoSearchCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const navigate = useNavigate();
 
   const handleMouseEnter = () => {
     timerRef.current = setTimeout(() => {
-        setIsHovered(true);
+      setIsHovered(true);
     }, 1100);
   };
 
   const handleMouseLeave = () => {
     if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      clearTimeout(timerRef.current);
     }
     setIsHovered(false);
   };
@@ -36,7 +34,7 @@ export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps)
           goWatch(video.id.videoId);
         }
       }}
-      >
+    >
       {/* Thumbnail with overlay duration */}
       {/* adjust size here --------------------
                                               | */}
@@ -58,9 +56,9 @@ export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps)
             // alt={video.snippet.title}
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
-          )}
-          {/* Video duration */}
-            {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
+        )}
+        {/* Video duration */}
+        {/* <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[11px] font-sans font-medium text-white tracking-wide border border-white/5">
               video duration
             </span> */}
       </div>
@@ -81,9 +79,9 @@ export default function VideoGrid ( {video, goWatch, goChannel}: VideoGridProps)
           <h3 className="text-sm font-sans font-semibold text-[#f1f1f1] leading-snug line-clamp-2 group-hover:text-white transition-colors duration-200">
             {video.snippet.title}
           </h3>
-          
+
           <div className="flex flex-col gap-0.5">
-            <span 
+            <span
               onClick={(e) => {
                 e.stopPropagation();
                 goChannel(video.snippet.channelId);

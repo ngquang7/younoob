@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getChannelData } from '../../api/channelData';
+import { getChannelData } from '../../api/channelData.ts';
 import { searchYouTube, type YouTubeSearchItem } from "../../api/youtubeSearch.ts";
-import ChannelBanner from './ChannelBanner.tsx';
-import ChannelSection from './ChannelSection.tsx';
+import ChannelBanner from '../channel/ChannelBanner.tsx';
+import ChannelSection from '../channel/ChannelSection.tsx';
 import { formatTimeAgo } from '../../utils/formatTimeAgo.ts';
 export default function ChannelComponent() {
 
@@ -12,7 +12,6 @@ export default function ChannelComponent() {
 
     const [isHovered, setIsHovered] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [channel, setChannel] = useState<any>(null); //Channel
     const [channelVideo, setChannelVideo] = useState<YouTubeSearchItem[]>([]);
@@ -56,8 +55,7 @@ export default function ChannelComponent() {
     const handleSubscribeToggle = () => {
         const nextState = !isSubscribed;
         setIsSubscribed(nextState);
-        // get the old subcription list from localStorage
-        // convert string to array
+
         const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
 
         // Add this channel into this localstorage, this is hashmap(key, value)

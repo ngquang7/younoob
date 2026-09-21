@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getChannelData } from '../../api/channelData';
 import { storageService } from '../../hooks/storageService';
-import SubscriptionItem from './SubcriptionItem';
+import SubscriptionItem from '../list/SubcriptionList';
 import UnsubscribeModal from '../common/UnsubcribeModal';
 export default function SubcriptionChannel() {
     const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function SubcriptionChannel() {
                             key={channel.id}
                             channel={channel}
                             onChannelClick={goChannel}
-                            onUnsubscribeClick={(ch) => setSelectedChannel(ch)}            
+                            onUnsubscribeClick={(ch) => setSelectedChannel(ch)}
                         />
                     ))
                 )}

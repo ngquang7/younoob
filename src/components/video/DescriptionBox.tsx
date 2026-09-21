@@ -22,9 +22,9 @@ export default function DescriptionBox({
   getHashtags,
   handleDescription,
 }: DescriptionBoxProps) {
-      const navigate = useNavigate();
-    const channelId = video?.snippet?.channelId || "loading...";
-      const goChannel = () => navigate(`/channel/${channelId}`);
+  const navigate = useNavigate();
+  const channelId = video?.snippet?.channelId || "loading...";
+  const goChannel = () => navigate(`/channel/${channelId}`);
   return (
     <div
       onClick={() => setIsExpanded(true)}
@@ -57,30 +57,30 @@ export default function DescriptionBox({
       >
         {video?.snippet?.description ? (
           <>
-          <div>
-            {handleDescription(video.snippet.description)}
             <div>
-                    <div className="flex items-center gap-3 mt-10">
-                      <img
-                        onClick={goChannel}
-                        src={video1?.snippet?.thumbnails?.medium?.url || "..Loading.."}
-                        className="w-10 h-10 rounded-full cursor-pointer object-cover border border-[#303030]"
-                        alt="Channel Avatar"
-                      />
-                      <div className="flex flex-col">
-                        <span
-                          onClick={goChannel}
-                          className="font-sans font-bold text-[20px] hover:cursor-pointer"
-                        >
-                          {video?.snippet?.channelTitle || "Loading..."}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {formatSubcriberCount(video1?.statistics?.subscriberCount)} subscribers
-                        </span>
-                        </div>
-                      </div>
+              {handleDescription(video.snippet.description)}
+              <div>
+                <div className="flex items-center gap-3 mt-10">
+                  <img
+                    onClick={goChannel}
+                    src={video1?.snippet?.thumbnails?.medium?.url || "..Loading.."}
+                    className="w-10 h-10 rounded-full cursor-pointer object-cover border border-[#303030]"
+                    alt="Channel Avatar"
+                  />
+                  <div className="flex flex-col">
+                    <span
+                      onClick={goChannel}
+                      className="font-sans font-bold text-[20px] hover:cursor-pointer"
+                    >
+                      {video?.snippet?.channelTitle || "Loading..."}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {formatSubcriberCount(video1?.statistics?.subscriberCount)} subscribers
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
           </>
         ) : (
           <div className="italic">No description has been added to this video</div>

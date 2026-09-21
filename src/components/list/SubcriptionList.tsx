@@ -1,18 +1,19 @@
 import React from 'react';
 import { formatSubcriberCount } from '../../utils/formatSubcriberCount';
-interface SubscriptionItemProps {
+interface SubscriptionListProps {
     channel: any;
     onChannelClick: (id: string) => void;
     onUnsubscribeClick: (channel: any) => void;
 }
 
-export default function SubscriptionItem({
-    channel,
-    onChannelClick,
-    onUnsubscribeClick,
-}: SubscriptionItemProps) {
+export default function SubscriptionList
+    ({
+        channel,
+        onChannelClick,
+        onUnsubscribeClick,
+    }: SubscriptionListProps) {
     return (
-        <div 
+        <div
             onClick={() => onChannelClick(channel.id)}
             // bg-[#272727], co gi test cai khung bao quanh
             className="flex items-center justify-between py-2 mb-2 rounded-xl hover:cursor-pointer"

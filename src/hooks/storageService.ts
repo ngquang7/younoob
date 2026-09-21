@@ -1,7 +1,7 @@
 export const storageService = {
   //History
   getHistory: () => JSON.parse(localStorage.getItem('watch_history') || '[]'),
-  
+
   saveHistory: (video: any) => {
     if (!video) return;
     const history = storageService.getHistory();
@@ -23,7 +23,7 @@ export const storageService = {
 
   //Liked Videos
   getLiked: () => JSON.parse(localStorage.getItem('like_video') || '[]'),
-  
+
   addToLiked: (video: any) => {
     if (!video) return;
     const liked = storageService.getLiked();
@@ -55,7 +55,7 @@ export const storageService = {
 
   //Watch Later / Saved
   getSaved: () => JSON.parse(localStorage.getItem('saved_video') || '[]'),
-  
+
   addToSaved: (video: any) => {
     if (!video) return;
     const saved = storageService.getSaved();
@@ -132,7 +132,7 @@ export const storageService = {
 
   //Subscriptions
   getSubscribedChannels: () => JSON.parse(localStorage.getItem('subscribed_channels') || '[]'),
-  
+
   toggleSubscribe: (channelData: any) => {
     const subs = storageService.getSubscribedChannels();
     const channelId = channelData?.id || channelData?.channelId;

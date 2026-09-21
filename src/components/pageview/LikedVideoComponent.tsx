@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { storageService } from '../../hooks/storageService';
-import PlaylistLocal from '../PlaylistLocal';
+import PlaylistLocal from '../list/PlaylistList';
 export default function LikedVideoComponent() {
     const [videoList, setVideoList] = useState<any[]>([]);
     const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);

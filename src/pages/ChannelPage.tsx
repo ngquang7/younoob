@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
-import VideoGrid from '../components/VideoGrid';
+import VideoGrid from '../components/VideoSearchCard';
 import LeftBar from '../components/navigation/LeftBar'
-import ChannelComponent from '../components/channel/ChannelComponent';
+import ChannelComponent from '../components/pageview/ChannelComponent';
 
 const ChannelPage = () => {
   const navigate = useNavigate();

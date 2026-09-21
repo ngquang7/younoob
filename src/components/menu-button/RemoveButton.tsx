@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface RemoveButtonProps {
     videoId: string;
     label?: string;

@@ -18,7 +18,7 @@ interface PlaylistMenuProps {
     setIsShareModalUpNext: (isOpen: boolean) => void;
 }
 
-export default function MenuPlaylist({
+export default function UpNextPlaylist({
     item,
     listType,
     activeMenuId,

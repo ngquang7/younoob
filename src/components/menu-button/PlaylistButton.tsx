@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface PlaylistButtonProps {
     video: any;
     onClose: () => void;

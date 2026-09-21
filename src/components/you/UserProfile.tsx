@@ -3,18 +3,18 @@ interface UserProfileProps {
     userId: string;
     avatar?: string;
 }
-export default function UserProfile({ 
-    username, 
-    userId, 
+export default function UserProfile({
+    username,
+    userId,
     avatar
 }: UserProfileProps) {
     return (
         <div className="flex items-start gap-3 ml-4 mt-3">
             {avatar ? (
-                <img 
-                    src={avatar} 
-                    alt={username} 
-                    className="w-35 h-35 rounded-full object-cover border border-[#303030]" 
+                <img
+                    src={avatar}
+                    alt={username}
+                    className="w-35 h-35 rounded-full object-cover border border-[#303030]"
                 />
             ) : (
                 <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-xl font-bold text-white shadow-md">
@@ -30,7 +30,7 @@ export default function UserProfile({
                     <p className="text-gray-400 text-sm mt-3 items-start">
                         Mr. Quang
                     </p>
-                </div> 
+                </div>
 
             </div>
         </div>

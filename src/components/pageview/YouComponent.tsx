@@ -1,21 +1,16 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { formatView } from '../../utils/formatView';
-import { formatTimeAgo } from '../../utils/formatTimeAgo';
-import UserProfile from "./UserProfile";
+import UserProfile from "../you/UserProfile";
 import VideoCard from "../card/VideoCard";
-import SectionHeader from './SectionHeader';
+import SectionHeader from '../you/SectionHeader';
 import EmptyState from '../common/EmptyState';
 import PlaylistCard from '../card/PlaylistCard';
 
 export default function YouComponent() {
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const navigate = useNavigate();
     const [historyList, setHistoryList] = useState<any[]>([]);
     const [likedList, setLikedList] = useState<any[]>([]);
     const [savedList, setSavedList] = useState<any[]>([]);
-    const [isHovered, setIsHovered] = useState(false);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
     const goLikeVideo = () => navigate(`/playlist?list=LL`);
 
@@ -111,7 +106,7 @@ export default function YouComponent() {
                         items={likedList}
                         playlistKey="LL"
                         navigate={navigate}
-                        onViewFull={goLikeVideo}
+                        goFullList={goLikeVideo}
                         PlaylistBackgroundLayers={PlaylistBackgroundLayers}
                     />
                 </div>

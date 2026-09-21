@@ -1,17 +1,17 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { formatView } from '../utils/formatView';
-import { formatTimeAgo } from '../utils/formatTimeAgo';
-import MenuContainer from './common/MenuContainer';
-import SaveToPlaylistModal from './common/SaveToPlaylistModal';
-import SaveToWatchLater from './common/SaveToWatchLater';
+import { formatView } from '../../utils/formatView';
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
+import MenuContainer from '../common/MenuContainer';
+import SaveToPlaylistModal from '../common/SaveToPlaylistModal';
+import SaveToWatchLater from '../common/SaveToWatchLater';
 
-import ShareModal from './common/ShareModal';
-import AddToQueueButton from './menu-button/AddToQueueButton';
-import PlaylistButton from './menu-button/PlaylistButton';
-import RemoveButton from './menu-button/RemoveButton';
-import ShareButton from './menu-button/ShareButton';
-import SaveToWatchLaterButton from './menu-button/SaveToWatchLaterButton';
-interface PlaylistLocalProps {
+import ShareModal from '../common/ShareModal';
+import AddToQueueButton from '../menu-button/AddToQueueButton';
+import PlaylistButton from '../menu-button/PlaylistButton';
+import RemoveButton from '../menu-button/RemoveButton';
+import ShareButton from '../menu-button/ShareButton';
+import SaveToWatchLaterButton from '../menu-button/SaveToWatchLaterButton';
+interface PlaylistListProps {
     videoListLength: number;
     playlistTitle: boolean;
     videoList: any[];
@@ -33,7 +33,7 @@ interface PlaylistLocalProps {
     selectedShareVideo: any;
     setSelectedShareVideo: (video: any) => void;
 }
-export default function PlaylistLocal({
+export default function PlaylistList({
     videoListLength,
     playlistTitle,
     videoList,
@@ -54,7 +54,7 @@ export default function PlaylistLocal({
     setIsShareModal,
     selectedShareVideo,
     setSelectedShareVideo,
-}: PlaylistLocalProps) {
+}: PlaylistListProps) {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const listParam = searchParams.get('list');

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShareModal from '../common/ShareModal';
-import MenuUpNext from '../menu/MenuUpNext';
-import MenuPlaylist from '../menu/MenuPlaylist';
+import MenuUpNext from './MenuUpNext';
+import MenuPlaylist from './MenuUpNextPlaylist';
 import { formatTimeAgo } from '../../utils/formatTimeAgo';
 interface SidebarProps {
   listId: string | null;
@@ -257,7 +257,6 @@ export default function UpNext({
           })}
         </>
       )}
-
       <ShareModal
         isOpen={isShareModalUpNext}
         onClose={() => setIsShareModalUpNext(false)}

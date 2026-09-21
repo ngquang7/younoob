@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { storageService } from '../../hooks/storageService';
-
-
-import HistoryList from '../history/HistoryList';
+import HistoryList from '../list/HistoryList';
 import ClearHistoryModal from '../common/ClearHistoryModal';
-
 
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
@@ -48,14 +44,14 @@ export default function HistoryComponent() {
     e.preventDefault(); // Stop page refresh
   };
 
-const handleOpenSaveModal = (video: any) => {
+  const handleOpenSaveModal = (video: any) => {
     if (video && video.id) {
-        const savedVideos = storageService.getSaved(); 
-        const isSaved = savedVideos.some((v: any) => v.id === video.id);
-        setIsSaved(isSaved);
-        setSelectedVideo(video);
+      const savedVideos = storageService.getSaved();
+      const isSaved = savedVideos.some((v: any) => v.id === video.id);
+      setIsSaved(isSaved);
+      setSelectedVideo(video);
     }
-};
+  };
 
   const handleSaveToggle = (video: any) => {
     if (!video || !video.id) return;

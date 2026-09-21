@@ -56,8 +56,8 @@ export default function VideoInfoSection({
         <button
           onClick={handleSubscribeToggle}
           className={`gap-1 px-4 py-2 text-xs font-semibold rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
-              ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
-              : 'bg-white hover:bg-gray-200 text-black'
+            ? 'bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]'
+            : 'bg-white hover:bg-gray-200 text-black'
             }`}
         >
           {isSubscribed ? 'Subscribed' : 'Subscribe'}
@@ -88,8 +88,8 @@ export default function VideoInfoSection({
         <button
           onClick={handleSaveToggle}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#303030]/50 transition text-xs font-semibold shrink-0 cursor-pointer ${isSaved
-              ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80'
-              : 'bg-[#212121] hover:bg-[#303030]'
+            ? 'bg-emerald-950/40 hover:bg-emerald-900/40 text-green-400 border-emerald-800/80'
+            : 'bg-[#212121] hover:bg-[#303030]'
             }`}
         >
           {isSaved ? (

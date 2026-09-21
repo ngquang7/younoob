@@ -177,11 +177,11 @@ export default function ChannelSection({
                                 </a>
                             </div>
                             {country ? (
-                            <div className="flex items-center gap-3">
-                                <img src="/public/countryDes.png" className="h-7 w-7" alt="logo" />
-                                <span>{formatCountryName(country)}</span>
-                            </div>
-                            ): (<></>)}
+                                <div className="flex items-center gap-3">
+                                    <img src="/public/countryDes.png" className="h-7 w-7" alt="logo" />
+                                    <span>{formatCountryName(country)}</span>
+                                </div>
+                            ) : (<></>)}
                             <div className="flex items-center gap-3">
                                 <img src="/public/iDes.png" className="h-7 w-7" alt="logo" />
                                 <span>Joined {publishedAt ? formatDateTime(publishedAt) : ""}</span>
