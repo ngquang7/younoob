@@ -20,7 +20,7 @@ export default function ChannelBanner({ bannerUrl }: { bannerUrl?: string }) {
                     <img
                         src={previewImage}
                         alt="Preview Large"
-                        className="w-120 h-120 rounded-full object-cover shadow-lg border-4 border-gray-600"
+                        className="w-full h-120 object-cover shadow-lg border-4 border-gray-600"
                     />
                 </div>
             )}

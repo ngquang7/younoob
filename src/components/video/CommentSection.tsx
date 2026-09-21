@@ -30,7 +30,6 @@ export default function CommentSection({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [likedCommentIds, setLikedCommentIds] = useState<string[]>([]);
 
-
   const toggleLike = (commentId: string) => {
     console.log("helko")
     setLikedCommentIds((prev) =>
@@ -119,6 +118,7 @@ export default function CommentSection({
       </form>
 
       {comments.map((item) => {
+        const [isDisliked, setIsDisLiked] = useState(false);
         const isLikedComment = likedCommentIds.includes(item.id);
         const comment = item.snippet.topLevelComment.snippet;
         const baseLikes = comment.likeCount || 0;
@@ -164,9 +164,10 @@ export default function CommentSection({
                   <span className="mt-1.5">{displayLikes == 0 ? '' : displayLikes}</span>
 
                   <button
+                    onClick={() => setIsDisLiked(!isDisliked)}
                     className="w-7 h-7 flex items-center justify-center cursor-pointer rounded-full hover:bg-neutral-700 transition-colors text-left">
                     <img
-                      src="/public/notdislike.png"
+                      src={isDisliked ? "/public/disliked.png" : "/public/notdislike.png"}
                       className="h-4 w-4"
                     />
                   </button>

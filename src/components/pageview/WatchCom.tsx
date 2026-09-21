@@ -110,23 +110,89 @@ export default function WatchCom() {
         fetchUpNext();
     }, [currenVideoTitle, listId]);
 
+    // const handleDescription = (text: string) => {
+    //     if (!text) return null;
+    //     const regex = /((?:https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)|(?:https?:\/\/[^\s]+)|(#(?!\d)[\p{L}\p{N}_]+))/gu;
+
+    //     const youtubeRegex = /^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+$/;
+    //     const generalUrlRegex = /^https?:\/\/[^\s]+$/;
+    //     const hashtagRegex = /^#(?!\d)[\p{L}\p{N}_]+$/u;
+
+    //     const parts = text.split(regex);
+
+    //     return parts.map((part, index) => {
+    //         if (!part) return null;
+
+    //         if (youtubeRegex.test(part)) {
+    //             return (
+    //                 <a
+    //                     key={index}
+    //                     href={part}
+    //                     target="_blank"
+    //                     rel="noopener noreferrer"
+    //                     className="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-[#272727] hover:bg-[#3f3f3f] text-white text-xs font-medium rounded-full transition align-middle shadow-sm"
+    //                     onClick={(e) => e.stopPropagation()}
+    //                     title={part}
+    //                 >
+    //                     <img src="/public/logo.png" className="w-[15px] h-[15px]" />
+    //                     <span className="text-gray-300">•</span>
+    //                     <span className="truncate max-w-[180px]">YouTube Video</span>
+    //                 </a>
+    //             );
+    //         } else if (generalUrlRegex.test(part)) {
+    //             const displayUrl = part.length > 30 ? part.substring(0, 30) + '...' : part;
+    //             return (
+    //                 <a
+    //                     key={index}
+    //                     href={part}
+    //                     target="_blank"
+    //                     rel="noopener noreferrer"
+    //                     className="text-[#3ea6ff] hover:inline-block"
+    //                     onClick={(e) => e.stopPropagation()}
+    //                     title={part}
+    //                 >
+    //                     {displayUrl}
+
+    //                 </a>
+    //             );
+    //         } else if (hashtagRegex.test(part)) {
+    //             const cleanWord = part.replace('#', '');
+    //             return (
+    //                 <span
+    //                     key={index}
+    //                     onClick={(e) => {
+    //                         e.stopPropagation();
+    //                         navigate(`/search?q=${cleanWord}`);
+    //                     }}
+    //                     className="text-[#3ea6ff] font-medium hover:inline-block cursor-pointer"
+    //                 >
+    //                     {part}
+
+    //                 </span>
+    //             );
+    //         }
+    //         return part;
+    //     });
+    // };
+
     const handleDescription = (text: string) => {
         if (!text) return null;
-        const regex = /((?:https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+)|(?:https?:\/\/[^\s]+)|(#(?!\d)[\p{L}\p{N}_]+))/gu;
+        const regex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+|https?:\/\/[^\s]+|#(?!\d)[\p{L}\p{N}_]+)/gu;
+        const parts = [];
+        let lastIndex = 0;
+        let match;
 
-        const youtubeRegex = /^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+$/;
-        const generalUrlRegex = /^https?:\/\/[^\s]+$/;
-        const hashtagRegex = /^#(?!\d)[\p{L}\p{N}_]+$/u;
+        while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                parts.push(text.substring(lastIndex, match.index));
+            }
 
-        const parts = text.split(regex);
-
-        return parts.map((part, index) => {
-            if (!part) return null;
-
-            if (youtubeRegex.test(part)) {
-                return (
+            const part = match[0];
+            const key = match.index;
+            if (/^https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+$/.test(part)) {
+                parts.push(
                     <a
-                        key={index}
+                        key={key}
                         href={part}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -139,11 +205,11 @@ export default function WatchCom() {
                         <span className="truncate max-w-[180px]">YouTube Video</span>
                     </a>
                 );
-            } else if (generalUrlRegex.test(part)) {
+            } else if (/^https?:\/\/[^\s]+$/.test(part)) {
                 const displayUrl = part.length > 30 ? part.substring(0, 30) + '...' : part;
-                return (
+                parts.push(
                     <a
-                        key={index}
+                        key={key}
                         href={part}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -152,14 +218,13 @@ export default function WatchCom() {
                         title={part}
                     >
                         {displayUrl}
-
                     </a>
                 );
-            } else if (hashtagRegex.test(part)) {
+            } else if (/^#(?!\d)[\p{L}\p{N}_]+$/u.test(part)) {
                 const cleanWord = part.replace('#', '');
-                return (
+                parts.push(
                     <span
-                        key={index}
+                        key={key}
                         onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/search?q=${cleanWord}`);
@@ -167,13 +232,19 @@ export default function WatchCom() {
                         className="text-[#3ea6ff] font-medium hover:inline-block cursor-pointer"
                     >
                         {part}
-
                     </span>
                 );
             }
-            return part;
-        });
+
+            lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < text.length) {
+            parts.push(text.substring(lastIndex));
+        }
+
+        return parts;
     };
+
 
     useWatchHistory(video);
     const {
