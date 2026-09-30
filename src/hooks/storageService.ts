@@ -1,8 +1,18 @@
 export const storageService = {
   //History
+
+  getHistoryPaused: () => localStorage.getItem('pause_watch_history') === 'true',
+  toggleHistoryPause: () => {
+    const isPaused = storageService.getHistoryPaused();
+    const nextState = !isPaused;
+    localStorage.setItem('pause_watch_history', String(nextState));
+    return nextState; // Return new state
+  },
+
   getHistory: () => JSON.parse(localStorage.getItem('watch_history') || '[]'),
 
   saveHistory: (video: any) => {
+    if(storageService.getHistoryPaused() == true) return;
     if (!video) return;
     const history = storageService.getHistory();
     const videoId = video.id || video?.id?.videoId;

@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { storageService } from '../../hooks/storageService';
 import HistoryList from '../list/HistoryList';
 import ClearHistoryModal from '../common/ClearHistoryModal';
-
+import PauseHistoryModal from '../common/PauseHistory';
 export default function HistoryComponent() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isClearAllHis, setIsClearAllHis] = useState(false);
+  const [isPauseHistory, setIsPauseHistory] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [isShareModal, setIsShareModal] = useState(false);
@@ -14,12 +15,15 @@ export default function HistoryComponent() {
   const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
   const [searchText, setSearchText] = useState('');
   const [selectedShareVideo, setSelectedShareVideo] = useState<any>(null);
+  const [isPaused, setIsPaused] = useState(storageService.getHistoryPaused());
+
   const filteredHistory = historyList.filter((video) => {
     const title = video.snippet?.title?.toLowerCase() || '';
     const channelTitle = video.snippet?.channelTitle?.toLowerCase() || '';
     const query = searchText.toLowerCase().trim();
     return title.includes(query) || channelTitle.includes(query);
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);  /* TEST console.log(`${searchText}`); */
 
   const showNotice = (message: string) => {
@@ -79,6 +83,12 @@ export default function HistoryComponent() {
     showNotice("Watch history cleared");
   };
 
+
+  const handleTogglePause = () => {
+    const newPauseState = storageService.toggleHistoryPause();
+    setIsPaused(newPauseState);
+  };
+  console.log(`${isPaused}`);
   return (
     <>
       <div className="mx-auto px-15 py-2 text-white min-h-screen">
@@ -124,7 +134,6 @@ export default function HistoryComponent() {
                     <div className="relative flex flex-1 w-[250px] items-center border-b border-[#303030] group px-4">
                       <button
                         className="w-12 h-10 flex items-center justify-center -ml-5 hover:bg-neutral-700 rounded-full transition-colors"
-                        // onClick={() => filteredHistory(searchText)}
                         type="submit"
                       >
                         <img
@@ -149,13 +158,40 @@ export default function HistoryComponent() {
 
                   <button
                     onClick={() => setIsClearAllHis(true)}
-                    className="px-4 py-2 text-xs font-semibold bg-[#212121] mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
+                    className="px-4 ml-3 flex flex-row justify-center py-2 text-xs font-semibold mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
                   >
-                    Clear all watch history
+                    <img
+                      src="/public/bin.png"
+                      className="h-6 w-5"
+                    />
+                    <span className="text-[14px] ml-3 font-semibold"> Clear all watch history</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsPauseHistory(true)}
+                    className="px-4 ml-3 flex flex-row justify-center py-2 text-xs font-semibold mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
+                  >
+                    <img
+                      src={isPaused ? "/public/start.png" : "/public/pause.png"}
+                      className="h-6 w-6"
+                    />
+                    <span className="text-[14px] ml-3 font-semibold">
+                      {isPaused ? "Turn on watch history" : "Pause watch history"}
+                    </span>
                   </button>
 
                 </>
               )}
+              
+              <PauseHistoryModal
+                state={isPaused}
+                isOpen={isPauseHistory}
+                onClose={() => setIsPauseHistory(false)}
+                onConfirm={() => {
+                  setIsPauseHistory(false);
+                  handleTogglePause();
+                }}
+              />
 
               <ClearHistoryModal
                 isOpen={isClearAllHis}
