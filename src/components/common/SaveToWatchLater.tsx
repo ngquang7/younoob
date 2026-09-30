@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface SaveToWatchLaterProps {
   watchLaterVideoList: any[];
   isSaved: boolean;
@@ -11,7 +9,6 @@ export default function SaveToWatchLater({
   isSaved,
   onToggleSave,
 }: SaveToWatchLaterProps) {
-  const hasVideos = watchLaterVideoList.length > 0;
   const firstVideoThumb = watchLaterVideoList[0]?.snippet?.thumbnails?.medium?.url || '/loading1.png';
 
   return (

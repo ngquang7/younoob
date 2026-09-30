@@ -162,14 +162,15 @@ export default function PlaylistTest() {
                                 by {channelTitle}
                             </div>
                             <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative mb-3">Playlist • {getTotalVideo} videos</p>
+                            {publicPlaylist?.snippet?.description && (
                             <div
                                 onClick={() => setIsModalOpen(true)}
                                 className="text-sm cursor-pointer text-gray-400 mt-1 ml-5 z-10 flex relative line-clamp-1 ">
                                 <span>{publicPlaylist?.snippet?.description.slice(0, 80) || ''}
                                     <span className="font-semibold text-white">...more</span>
                                 </span>
-
                             </div>
+                            )}
                             <button
                                 className="cursor-pointer bg-white h-[40px] w-[150px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-gray-300 transition"
                                 onClick={() => navigate(`/watch?v=${videoList[0]?.snippet?.resourceId?.videoId || videoList[0]?.id}&list=${listParam || listType}`)}

@@ -30,9 +30,7 @@ const YouPage = () => {
       />
       
       <main className={`pt-16 ${sidebarExpanded ? 'ml-60' : 'ml-16'} p-4`}>
-        {/* <div className="w-full mt-1 flex flex-col border-gray-600"> */}
           <YouComponent />
-        {/* </div> */}
       </main>
     </>
   );

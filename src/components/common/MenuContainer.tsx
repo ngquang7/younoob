@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 interface MenuContainerProps {
   onClose: () => void;
   children: React.ReactNode;
-  className?: string; // Thêm prop này để nhận khoảng cách tùy chỉnh
+  className?: string;
 }
 
 export default function MenuContainer({ onClose, children, className = "mt-12 right-0" }: MenuContainerProps) {

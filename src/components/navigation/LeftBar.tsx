@@ -27,24 +27,29 @@ export default function LeftBar({ expanded }: SidebarProps) {
       <aside className="fixed top-14 left-0 bottom-0 w-18 bg-neutral-1000 hidden sm:flex flex-col items-center py-2 gap-4 z-40 select-none border-r border-[#212121]/50 ">
         {/* Home */}
         <button
-          className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className="flex flex-col items-center gap-1 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goHome}
         >
-          <img src="/public/home.png" className="h-8 w-8" />
+          <img src="/public/home.png" className="h-6 w-6" />
+          <span className="font-normal text-[10px]">Home</span>
         </button>
         {/* Subcription */}
         <button
-          className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className="flex flex-col -mt-3 items-center gap-1 px-1 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goSubcriptionChannel}
         >
-          <img src="/public/subcribe.png" className="h-8 w-8" />
+          <img src="/public/subcribe.png" className="h-7 w-7" />
+          <span className="font-normal text-[10px]">Subcriptions</span>
+
         </button>
         {/* Profile */}
         <button
-          className=" flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className=" flex flex-col -mt-3 items-center gap-1 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goYou}
         >
-          <img src="/public/avatar.png" className="h-8 w-8" />
+          <img src="/public/noob.png" className="h-7 w-7" />
+          <span className="font-normal text-xs">You</span>
+
         </button>
       </aside>
     );
@@ -62,7 +67,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
           onClick={goHome}
           title="Home"
         >
-          <img src="/public/home.png" className="h-8 w-8" />
+          <img src="/public/home.png" className="h-6 w-6" />
           <div
             className="text-base">
             Home

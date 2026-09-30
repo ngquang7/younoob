@@ -30,7 +30,7 @@ export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) 
           id="nav-toggle-btn"
           className="p-2 hover:bg-[#212121] rounded-full active:scale-95 transition cursor-pointer text-[#f1f1f1]"
         >
-          <img src="/public/sidebar.png" className="w-6 h-6" />
+          <img src="/public/sidebar.png" className="w-5 h-4" />
         </button>
 
         <div

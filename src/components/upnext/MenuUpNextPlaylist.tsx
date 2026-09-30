@@ -29,7 +29,6 @@ export default function UpNextPlaylist({
     setIsShareModalUpNext,
 }: PlaylistMenuProps) {
     if (activeMenuId !== item.id) return null;
-
     return (
         <>
             <MenuContainer

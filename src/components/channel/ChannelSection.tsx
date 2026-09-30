@@ -156,7 +156,7 @@ export default function ChannelSection({
 
                         <div className="mb-6">
                             <h3 className="font-bold text-xl mb-2">{description ? "Description" : ""}</h3>
-                            <p className="text-gray-300 text-sm whitespace-pre-wrap leading-relaxed">
+                            <p className="text-white text-sm whitespace-pre-wrap leading-relaxed">
                                 {description}
                             </p>
                         </div>
