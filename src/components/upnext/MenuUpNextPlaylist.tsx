@@ -32,7 +32,8 @@ export default function UpNextPlaylist({
     return (
         <>
             <MenuContainer
-                className="mt-[55px]"
+                dropUp="bottom-full mb-10"
+                className="mt-[40px] right-3"
                 onClose={() => setActiveMenuId(null)}>
                 <div className="pb-2 border-b border-gray-500">
                     {!listType && (

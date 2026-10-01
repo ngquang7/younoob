@@ -7,7 +7,6 @@ export interface YouTubeThumbnail {
 }
 
 //INTERFACES PLAYLIST METADATA (/playlists) 
-
 export interface YouTubePlaylistResource {
     kind: "youtube#playlist";
     etag: string;

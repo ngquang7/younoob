@@ -3,9 +3,10 @@ interface MenuContainerProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  dropUp?: string;
 }
 
-export default function MenuContainer({ onClose, children, className = "mt-12 right-0" }: MenuContainerProps) {
+export default function MenuContainer({ onClose, children, className = "mt-12 right-0", dropUp = "bottom-full mb-2" }: MenuContainerProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [isDropUp, setIsDropUp] = useState(false);
 
@@ -32,7 +33,7 @@ export default function MenuContainer({ onClose, children, className = "mt-12 ri
         ref={menuRef}
         onClick={(e) => e.stopPropagation()}
         className={`absolute w-64 bg-[#282828] text-white rounded-xl shadow-2xl py-2 z-50 text-sm border border-neutral-700 overflow-hidden 
-        ${isDropUp ? 'bottom-full mb-2' : ''}  
+        ${isDropUp ? `${dropUp}` : ''}  
         ${className}`}
       >
         {children}

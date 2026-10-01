@@ -83,7 +83,6 @@ export default function HistoryComponent() {
     showNotice("Watch history cleared");
   };
 
-
   const handleTogglePause = () => {
     const newPauseState = storageService.toggleHistoryPause();
     setIsPaused(newPauseState);
