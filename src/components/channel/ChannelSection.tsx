@@ -195,7 +195,7 @@ export default function ChannelSection({
                             {videoCount > 0 ? (
                                 <div className="flex items-center gap-3">
                                     <img src="/public/videoDes.png" className="h-6 w-7" alt="logo" />
-                                    <span>{videoCount} videos</span>
+                                    <span>{formatNumberUsStyle(videoCount)} videos</span>
                                 </div>
                             ) : (<></>)}
 

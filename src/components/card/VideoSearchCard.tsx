@@ -1,6 +1,6 @@
-import type { YouTubeSearchItem } from "../type";
+import type { YouTubeSearchItem } from "../../type";
 import { useState, useRef } from 'react';
-import { formatTimeAgo } from "../utils/formatTimeAgo";
+import { formatTimeAgo } from "../../utils/formatTimeAgo";
 
 // Interface
 interface VideoSearchCardProps {

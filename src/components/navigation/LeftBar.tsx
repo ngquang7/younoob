@@ -62,7 +62,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
       <div className="flex flex-col gap-0.5 border-b border-gray-700 pb-3">
         {/* Home button */}
         <button
-          className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className={`w-full flex items-center gap-5 px-2.5 py-1.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
           //Never put goHome button in div, put it in button card
           onClick={goHome}
           title="Home"

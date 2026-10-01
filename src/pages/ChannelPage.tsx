@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header';
-import VideoGrid from '../components/VideoSearchCard';
+import VideoGrid from '../components/card/VideoSearchCard';
 import LeftBar from '../components/navigation/LeftBar'
 import ChannelComponent from '../components/pageview/ChannelComponent';
 

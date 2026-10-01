@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/navigation/Header.tsx';
-import VideoGrid from '../components/VideoSearchCard.tsx';
+import VideoGrid from '../components/card/VideoSearchCard.tsx';
 import LeftBar from '../components/navigation/LeftBar.tsx'
 import { searchYouTube, type YouTubeSearchItem } from "../api/youtubeSearch.ts";
 import axios from "axios";
@@ -66,7 +66,8 @@ const SearchResultsPage = () => {
       //videoId, to get id from video, and convert
       return video.id.videoId;
     })
-    // Load detail (like and view) to videos array
+
+    // Load detail (like and view) to videos array (in progress)
     const loadDetail = async () => {
       try {
         console.log('callingSearchYoutube');
