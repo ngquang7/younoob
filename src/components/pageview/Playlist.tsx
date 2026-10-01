@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { storageService } from '../hooks/storageService';
-import PlaylistList from './list/PlaylistList';
-import { getPlaylistDetails, getPlaylistItems } from '../api/playlistData';
+import { storageService } from '../../hooks/storageService';
+import PlaylistList from '../list/PlaylistList';
+import { getPlaylistDetails, getPlaylistItems } from '../../api/playlistData';
 
-export default function PlaylistTest() {
+export default function Playlist() {
     const [videoList, setVideoList] = useState<any[]>([]);
     const [watchLaterVideoList, setWatchLaterVideoList] = useState<any[]>([]);
     const [searchParams] = useSearchParams();
@@ -163,13 +163,14 @@ export default function PlaylistTest() {
                             </div>
                             <p className="text-m text-gray-400 mt-1 ml-5 z-10 flex relative mb-3">Playlist • {getTotalVideo} videos</p>
                             {publicPlaylist?.snippet?.description && (
-                            <div
-                                onClick={() => setIsModalOpen(true)}
-                                className="text-sm cursor-pointer text-gray-400 mt-1 ml-5 z-10 flex relative line-clamp-1 ">
-                                <span>{publicPlaylist?.snippet?.description.slice(0, 80) || ''}
-                                    <span className="font-semibold text-white">...more</span>
-                                </span>
-                            </div>
+                                <div
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="text-sm cursor-pointer text-gray-400 mt-1 ml-5 z-10 flex relative line-clamp-1 ">
+                                    <span>
+                                        {publicPlaylist?.snippet?.description.slice(0, 80) || ''}
+                                        <span className="font-semibold text-white">...more</span>
+                                    </span>
+                                </div>
                             )}
                             <button
                                 className="cursor-pointer bg-white h-[40px] w-[150px] mt-5 ml-5 z-10 flex relative rounded-[20px] items-center justify-center hover:bg-gray-300 transition"

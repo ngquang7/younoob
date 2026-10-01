@@ -102,9 +102,10 @@ export default function HistoryList({
                     </button>
 
                     {activeMenuId === video.id && (
-                        <MenuContainer 
+                        <MenuContainer
                             className="mt-11 left-160"
-                            onClose={() => setActiveMenuId(null)}>
+                            onClose={() => setActiveMenuId(null)}
+                        >
                             <AddToQueueButton />
                             <SaveToWatchLaterButton
                                 video={video}
@@ -142,7 +143,7 @@ export default function HistoryList({
                     )}
 
                     {selectedVideo?.id === video.id && (
-                        <SaveToPlaylistModal 
+                        <SaveToPlaylistModal
                             className="mt-11 left-160"
                             onClose={() => setSelectedVideo(null)}>
                             <SaveToWatchLater

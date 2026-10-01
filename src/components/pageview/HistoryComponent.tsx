@@ -88,7 +88,7 @@ export default function HistoryComponent() {
     const newPauseState = storageService.toggleHistoryPause();
     setIsPaused(newPauseState);
   };
-  console.log(`${isPaused}`);
+
   return (
     <>
       <div className="mx-auto px-15 py-2 text-white min-h-screen">
@@ -182,7 +182,7 @@ export default function HistoryComponent() {
 
                 </>
               )}
-              
+
               <PauseHistoryModal
                 state={isPaused}
                 isOpen={isPauseHistory}

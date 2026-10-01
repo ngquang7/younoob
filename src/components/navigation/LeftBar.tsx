@@ -59,7 +59,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
 
     <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1] [&::-webkit-scrollbar]:w-0 hover:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30 hover:[&::-webkit-scrollbar-thumb]:rounded-full">
       {/* MAIN section  */}
-      <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
+      <div className="flex flex-col gap-0.5 border-b border-gray-700 pb-3">
         {/* Home button */}
         <button
           className={`w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
@@ -76,7 +76,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
       </div>
 
       {/* SUBCRIPTION section */}
-      <div className="flex flex-col gap-0.5 border-b border-[#212121] pb-3">
+      <div className="flex flex-col gap-0.5 border-b border-gray-700 pb-3">
         <button
           onClick={goSubcriptionChannel}
           className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
