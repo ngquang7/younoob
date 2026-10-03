@@ -41,7 +41,23 @@ export default function UpNext({
   const [shareVideoTarget, setShareVideoTarget] = useState<{ id: string; title: string } | null>(null);
 
   const isPlaylistMode = listId === 'LL' || listId === 'WL';
-
+  // const getVideoId = (v: any) => {
+  //   if (!v) return '';
+  //   if (typeof v.id === 'object' && v.id !== null) {
+  //     return v.id.videoId || v.id;
+  //   }
+  //   return v.id;
+  // };
+  const getVideoId = (item: any) => {
+    if (!item) return '';
+    if (typeof item === 'string') return item;
+    const id = item.id;
+    if (typeof id === 'string') return id;
+    if (typeof id === 'object' && id !== null) {
+      return id.videoId || id.id || '';
+    }
+    return '';
+  };
   return (
     <>
       {!isPlaylistMode && (
@@ -230,11 +246,7 @@ export default function UpNext({
                               </div>
                             </div>
                             <div className="text-neutral-300 pr-2">
-                              {watchLaterVideoList.some(
-                                (v: any) =>
-                                  (typeof v.id === 'object' ? v.id.videoId : v.id) ===
-                                  vId
-                              ) ? (
+                              {watchLaterVideoList.some((v: any) => getVideoId(v) === vId) ? (
                                 <img
                                   src="/public/savedVideo.png"
                                   className="h-6 w-5"

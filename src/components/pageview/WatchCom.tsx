@@ -111,6 +111,10 @@ export default function WatchCom() {
         fetchUpNext();
     }, [currenVideoTitle, listId]);
 
+    useEffect(() => {
+        setWatchLaterVideoList(storageService.getSaved());
+    }, [watchLaterVideoList]);
+
     const handleDescription = (text: string) => {
         if (!text) return null;
         const regex = /(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s]+|https?:\/\/[^\s]+|#(?!\d)[\p{L}\p{N}_]+)/gu;
@@ -198,6 +202,7 @@ export default function WatchCom() {
         localStorage.setItem(storageKey, JSON.stringify(updated));
         showNotice(`Removed from ${listType ? 'Watch Later' : 'Liked Videos'}`);
     };
+
 
     const handleSaveToggleUpNext = (videoUpNext: any) => {
         if (!videoUpNext) return;
