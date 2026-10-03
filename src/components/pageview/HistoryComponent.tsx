@@ -124,47 +124,59 @@ export default function HistoryComponent() {
           {/* RIGHT COLUMN */}
           <aside className="fixed justify-end flex shrink-0 right-10 mt-[10px] rounded-[15px] overflow-hidden">
             <div className="flex flex-col items-start w-[400px] justify-center h-full text-gray-500 bg-[#0f0f0f]">
-              {historyList.length > 0 && (
+              {historyList.length >= 0 && (
                 <>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="flex-1 max-2xl mx-4 hidden md:flex items-center"
-                  >
-                    <div className="relative flex flex-1 w-[250px] items-center border-b border-[#303030] group px-4">
-                      <button
-                        className="w-12 h-10 flex items-center justify-center -ml-5 hover:bg-neutral-700 rounded-full transition-colors"
-                        type="submit"
-                      >
-                        <img
-                          src="/public/find.png"
-                          className="h-6 w-6"
+                  {historyList.length > 0 && (
+                    <form
+                      onSubmit={handleSubmit}
+                      className="flex-1 max-2xl mx-4 hidden md:flex items-center"
+                    >
+                      <div className="relative flex flex-1 w-[250px] items-center border-b border-[#303030] group px-4">
+                        <button
+                          className="w-12 h-10 flex items-center justify-center -ml-5 hover:bg-neutral-700 rounded-full transition-colors"
+                          type="submit"
+                        >
+                          <img
+                            src="/public/find.png"
+                            className="h-6 w-6"
+                          />
+                        </button>
+
+                        <input
+                          onChange={handleChange}
+                          value={searchText}
+                          type="text"
+                          placeholder="Search watch history"
+                          className="w-full bg-transparent text-[#f1f1f1] placeholder-gray-500 text-sm focus:outline-none"
                         />
-                      </button>
+                        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white scale-x-0 transition-transform duration-150 ease-out origin-center group-focus-within:scale-x-100"></div>
+                      </div>
 
-                      <input
-                        onChange={handleChange}
-                        value={searchText}
-                        type="text"
-                        placeholder="Search watch history"
-                        className="w-full bg-transparent text-[#f1f1f1] placeholder-gray-500 text-sm focus:outline-none"
+                      {/* Submit (Finding) button */}
+                    </form>
+                  )}
+                  {historyList.length > 0 ? (
+                    <button
+                      onClick={() => setIsClearAllHis(true)}
+                      className="px-4 ml-3 flex flex-row justify-center py-2 text-xs font-semibold mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
+                    >
+                      <img
+                        src="/public/bin.png"
+                        className="h-6 w-5"
                       />
-                      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white scale-x-0 transition-transform duration-150 ease-out origin-center group-focus-within:scale-x-100"></div>
-
-                    </div>
-
-                    {/* Submit (Finding) button */}
-                  </form>
-
-                  <button
-                    onClick={() => setIsClearAllHis(true)}
-                    className="px-4 ml-3 flex flex-row justify-center py-2 text-xs font-semibold mt-4 hover:bg-[#303030] rounded-full transition cursor-pointer text-gray-300 hover:text-white"
-                  >
-                    <img
-                      src="/public/bin.png"
-                      className="h-6 w-5"
-                    />
-                    <span className="text-[14px] ml-3 font-semibold"> Clear all watch history</span>
-                  </button>
+                      <span className="text-[14px] ml-3 font-semibold"> Clear all watch history</span>
+                    </button>
+                  ) : (
+                    <button
+                      className="px-4 ml-3 flex flex-row justify-center py-2 text-xs font-semibold mt-4 rounded-full transition text-gray-500"
+                    >
+                      <img
+                        src="/public/bin.png"
+                        className="h-6 w-5 "
+                      />
+                      <span className="text-[14px] ml-3 font-semibold"> Clear all watch history</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => setIsPauseHistory(true)}

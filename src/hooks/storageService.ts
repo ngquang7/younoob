@@ -142,7 +142,6 @@ export const storageService = {
 
   //Subscriptions
   getSubscribedChannels: () => JSON.parse(localStorage.getItem('subscribed_channels') || '[]'),
-
   toggleSubscribe: (channelData: any) => {
     const subs = storageService.getSubscribedChannels();
     const channelId = channelData?.id || channelData?.channelId;

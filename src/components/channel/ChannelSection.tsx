@@ -72,9 +72,10 @@ export default function ChannelSection({
                             setModalUnsubscribe(true);
                         }
                     }}
-                    className={`-ml-2 py-2 text-sm font-semibold w-30 mt-3 rounded-full cursor-pointer transition active:scale-95 ${isSubscribed
-                        ? "bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]"
-                        : "bg-white hover:bg-gray-200 text-black"
+                    className={`-ml-2 py-2 text-sm font-semibold w-30 mt-3 rounded-full cursor-pointer transition active:scale-95 
+                        ${isSubscribed
+                            ? "bg-[#212121] hover:bg-[#303030] border border-[#404040] text-[#f1f1f1]"
+                            : "bg-white hover:bg-gray-200 text-black"
                         }`}
                 >
                     {isSubscribed ? (

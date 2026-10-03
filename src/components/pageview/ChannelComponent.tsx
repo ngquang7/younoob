@@ -2,9 +2,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getChannelData } from '../../api/channelData.ts';
 import { searchYouTube, type YouTubeSearchItem } from "../../api/youtubeSearch.ts";
+import { formatTimeAgo } from '../../utils/formatTimeAgo.ts';
+import { storageService } from '../../hooks/storageService.ts';
 import ChannelBanner from '../channel/ChannelBanner.tsx';
 import ChannelSection from '../channel/ChannelSection.tsx';
-import { formatTimeAgo } from '../../utils/formatTimeAgo.ts';
 export default function ChannelComponent() {
 
     const navigate = useNavigate();
@@ -15,8 +16,6 @@ export default function ChannelComponent() {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [channel, setChannel] = useState<any>(null); //Channel
     const [channelVideo, setChannelVideo] = useState<YouTubeSearchItem[]>([]);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-
 
     const goWatch = (videoidd: string) => navigate(`/watch?v=${videoidd}`);
 
@@ -27,7 +26,7 @@ export default function ChannelComponent() {
                 const channelIn4 = await getChannelData(channelId);
                 const videoChannel = await searchYouTube(undefined, undefined, channelId);
                 if (channelIn4.items && channelIn4.items.length > 0) {
-                    const channelItem = channelIn4.items[0];
+                    // const channelItem = channelIn4.items[0];
                     setChannel(channelIn4.items);
                 }
                 setChannelVideo(videoChannel.items);
@@ -42,44 +41,20 @@ export default function ChannelComponent() {
 
     useEffect(() => {
         if (channelId) {
-            const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-
-            // Check whether ID of current channel is in the subscription list
+            const savedSubs = storageService.getSubscribedChannels();
             const isSubbed = savedSubs.some((sub: any) => sub.id === channelId);
-
-            // Update the state of subcribe button again
             setIsSubscribed(isSubbed);
         }
-    }, []);
+    }, [channelId]);
 
     const handleSubscribeToggle = () => {
-        const nextState = !isSubscribed;
-        setIsSubscribed(nextState);
-
-        const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-
-        // Add this channel into this localstorage, this is hashmap(key, value)
         const currentChannel = {
             id: channelId || 'unknown_id',
             title: channel?.[0]?.snippet?.title || 'Channel Name',
             thumbnail: channel?.[0]?.snippet?.thumbnails?.medium?.url || '', // avatar channel
         };
-
-        if (nextState) {
-            // if click subcribe (Subscribe): Add channel to array if it is not in array
-            const exists = savedSubs.some((sub: any) => sub.id === currentChannel.id);
-            if (!exists) {
-                //add object(hashmap) into an array
-                //we get the old subcription list and push this object to the end of array
-                const updatedSubs = [...savedSubs, currentChannel];
-                //localstorage only save string, so we have to convert array to string
-                localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-            }
-        } else {
-            // IF WE UNSUBCRIBE (Unsubscribe): remove it from array
-            const updatedSubs = savedSubs.filter((sub: any) => sub.id !== currentChannel.id);
-            localStorage.setItem('subscribed_channels', JSON.stringify(updatedSubs));
-        }
+        const nextState = storageService.toggleSubscribe(currentChannel);
+        setIsSubscribed(nextState);
     };
 
     return (

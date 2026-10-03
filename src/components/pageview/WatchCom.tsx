@@ -11,7 +11,7 @@ import DescriptionBox from '../video/DescriptionBox';
 import CommentSection from '../video/CommentSection';
 import UpNext from '../upnext/UpNext';
 import VideoInfoSection from '../video/VideoInfoSection';
-
+import { storageService } from '../../hooks/storageService';
 import { useWatchHistory } from '../../hooks/useWatchHistory';
 import { useVideoActions } from '../../hooks/useVideoAction';
 
@@ -86,13 +86,14 @@ export default function WatchCom() {
 
     useEffect(() => {
         if (listId === 'LL') {
-            const savedLikedVideos = JSON.parse(localStorage.getItem('like_video') || '[]');
+            const savedLikedVideos = storageService.getLiked();
             setPlayListVideo(savedLikedVideos);
         } else if (listId === 'WL') {
-            const savedSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
+            const savedSavedVideos = storageService.getSaved();
             setPlayListVideo(savedSavedVideos);
         }
     }, [listId]);
+
     useEffect(() => {
         if (!currenVideoTitle || currenVideoTitle.includes("loading")) return;
         const currentParams = new URLSearchParams(window.location.search);
@@ -211,16 +212,9 @@ export default function WatchCom() {
                 thumbnails: videoUpNext?.snippet?.thumbnails || {},
             }
         };
-        const existingSavedVideos = JSON.parse(localStorage.getItem('saved_video') || '[]');
-        const isAlreadySaved = existingSavedVideos.some((v: any) => getVideoId(v) === cleanId);
-        let updatedSavedVideos;
-        if (isAlreadySaved) {
-            updatedSavedVideos = existingSavedVideos.filter((v: any) => getVideoId(v) !== cleanId);
-        } else {
-            updatedSavedVideos = [normalizedVideo, ...existingSavedVideos];
-        }
-        localStorage.setItem('saved_video', JSON.stringify(updatedSavedVideos));
-        setWatchLaterVideoList(updatedSavedVideos);
+        storageService.toggleSave(normalizedVideo);
+
+        setWatchLaterVideoList(storageService.getSaved());
     };
 
     const addVideoToList = (videoItem: any) => {
@@ -271,6 +265,7 @@ export default function WatchCom() {
             setLoading(false);
         }
     };
+
     const commentRef = useRef(null);
     useEffect(() => {
         const currentElement = commentRef.current;
@@ -292,7 +287,6 @@ export default function WatchCom() {
         return () => {
             if (currentElement) observer.unobserve(currentElement);
         };
-
     }, [loading]);
 
     return (
