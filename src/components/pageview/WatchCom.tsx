@@ -113,7 +113,7 @@ export default function WatchCom() {
 
     useEffect(() => {
         setWatchLaterVideoList(storageService.getSaved());
-    }, [watchLaterVideoList]);
+    }, []);
 
     const handleDescription = (text: string) => {
         if (!text) return null;

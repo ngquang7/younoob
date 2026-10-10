@@ -32,7 +32,8 @@ export default function MenuUpNext({
     return (
         <>
             <MenuContainer
-                className="mt-28 right-0"
+                className="mt-28 right-0 mb-30"
+                dropUp="-bottom-20 mb-4"
                 onClose={() => setActiveMenuId(null)}>
                 <AddToQueueButton />
                 <button

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { storageService } from '../../hooks/storageService';
+
 import PlaylistCard from '../card/PlaylistCard';
 export default function PlayListComponent() {
     const [likedVideoList, setlikedVideoList] = useState<any[]>([]);
@@ -9,12 +11,12 @@ export default function PlayListComponent() {
     const goLikeVideo = () => navigate(`/playlist?list=LL`);
     const goWatchLaterVideo = () => navigate(`/playlist?list=WL`);
     useEffect(() => {
-        const savedLikedVideo = JSON.parse(localStorage.getItem('like_video') || '[]');
+        const savedLikedVideo = storageService.getLiked();
         setlikedVideoList(savedLikedVideo);
     }, []);
 
     useEffect(() => {
-        const savedWatchLaterVideo = JSON.parse(localStorage.getItem('saved_video') || '[]');
+        const savedWatchLaterVideo = storageService.getSaved();
         setSavedVideoList(savedWatchLaterVideo);
     }, []);
 

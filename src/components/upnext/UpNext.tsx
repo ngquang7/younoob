@@ -39,6 +39,7 @@ export default function UpNext({
   const [isShareModalUpNext, setIsShareModalUpNext] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [shareVideoTarget, setShareVideoTarget] = useState<{ id: string; title: string } | null>(null);
+  const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
   const isPlaylistMode = listId === 'LL' || listId === 'WL';
   // const getVideoId = (v: any) => {
@@ -58,6 +59,14 @@ export default function UpNext({
     }
     return '';
   };
+
+  const showNotice = (message: string) => {
+    setNoticeMessage(message);
+    setTimeout(() => {
+      setNoticeMessage(null);
+    }, 2300);
+  };
+
   return (
     <>
       {!isPlaylistMode && (
@@ -274,7 +283,13 @@ export default function UpNext({
         onClose={() => setIsShareModalUpNext(false)}
         videoId={shareVideoTarget?.id || currentVideo?.id || ''}
         videoTitle={shareVideoTarget?.title || currentVideo?.snippet?.title || ''}
+        showNotice={showNotice}
       />
+      {noticeMessage && (
+        <div className="fixed bottom-6 z-[100] left-1/2 -translate-x-1/2 px-4 py-2 bg-white border border-neutral-700 text-black text-sm font-semibold rounded-xl shadow-2xl transition-all animate-fade-in flex items-center gap-2">
+          <span>{noticeMessage}</span>
+        </div>
+      )}
     </>
   );
 }
