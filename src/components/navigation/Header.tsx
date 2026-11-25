@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../../utils/AuthContext';
 interface HeaderProps {
   onToggleSidebar: () => void;
   onCustomClick: (message: string) => void;
@@ -9,16 +9,20 @@ export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) 
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
   const goHome = () => navigate(`/`);
+  const { user, logout } = useAuth();
 
   const [isSmallWindowOpen, setIsSmallWindowOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value);  /* TEST console.log(`${searchText}`); */
   const handleLoginClick = () => navigate('/login');
-
+  const handleLogoutClick = () => {
+    logout();
+    navigate('/');
+  };
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault(); // Stop page refresh
     onCustomClick(searchText.trim()); // Pass searchText value into goSearchResults
-    setIsSmallWindowOpen(false); 
+    setIsSmallWindowOpen(false);
   };
 
   return (
@@ -46,7 +50,7 @@ export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) 
           </span>
         </div>
       </div>
-      
+
       {isSmallWindowOpen && (
         <form onSubmit={handleSubmit} className="absolute inset-0 bg-[#0f0f0f] px-4 flex items-center gap-2 z-50 md:hidden">
           <button
@@ -106,21 +110,49 @@ export default function Header({ onToggleSidebar, onCustomClick }: HeaderProps) 
         </button>
       </form>
 
+
+
+
+      {/* Right Area: Mobile Search + Login / User Profile */}
       <div className="flex items-center gap-2 md:gap-3">
         <button
+          type="button"
           onClick={() => setIsSmallWindowOpen(true)}
           className="md:hidden p-2 hover:bg-[#212121] rounded-full cursor-pointer text-[#f1f1f1] flex items-center justify-center transition"
           title="Search"
         >
-          <img src="/public/find.png" className="h-5 w-5" alt="Search icon" />
+          <img src="/find.png" className="h-5 w-5" alt="Search icon" />
         </button>
-        <button
-          onClick={handleLoginClick}
-          className="border-1 rounded-full border-[#0000ff] h-7 w-18 hover: flex items-center justify-center cursor-pointer transition"
-        >
-          Login
-        </button>
+
+        {user ? (
+          <div className="flex items-center gap-2.5">
+            <img
+              src={user.avatarUrl}
+              alt={user.username}
+              className="w-8 h-8 rounded-full border border-[#303030] bg-[#212121]"
+            />
+            <span className="hidden sm:inline text-sm font-medium text-[#f1f1f1]">
+              {user.username}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogoutClick}
+              className="border border-[#303030] hover:bg-[#212121] text-xs text-[#f1f1f1] px-3 py-1.5 rounded-full cursor-pointer transition"
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleLoginClick}
+            className="border rounded-full border-[#3ea6ff] text-[#3ea6ff] hover:bg-[#3ea6ff]/10 h-8 px-4 text-sm font-medium flex items-center justify-center cursor-pointer transition"
+          >
+            Login
+          </button>
+        )}
       </div>
+
     </nav>
   );
 }

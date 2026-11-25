@@ -14,6 +14,8 @@ interface VideoInfoSectionProps {
   isSaved: boolean;
   handleSaveToggle: () => void;
   onOpenShare: () => void;
+  isExtended: boolean
+  onExtendToggle: () => void;
 }
 
 export default function VideoInfoSection({
@@ -30,6 +32,8 @@ export default function VideoInfoSection({
   isSaved,
   handleSaveToggle,
   onOpenShare,
+  isExtended,
+  onExtendToggle
 }: VideoInfoSectionProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-3 pb-4 border-b border-[#2d2d2d]">
@@ -120,6 +124,12 @@ export default function VideoInfoSection({
           className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
         >
           Youtube
+        </button>
+        <button
+          onClick={onExtendToggle}
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#212121] hover:bg-[#303030] border border-[#303030]/50 rounded-full transition text-xs font-semibold shrink-0 cursor-pointer"
+        >
+          {isExtended ? 'collapse' : 'extend'}
         </button>
       </div>
     </div>

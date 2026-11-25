@@ -41,6 +41,7 @@ export default function WatchCom() {
 
     const currenVideoTitle = video?.snippet?.title || "loading...";
     const channelId = video?.snippet?.channelId || "loading...";
+    const [isExtended, setIsExtended] = useState(false);
 
     const [maxResult, setMaxResult] = useState(5);
     const goChannel = () => navigate(`/channel/${channelId}`);
@@ -53,6 +54,8 @@ export default function WatchCom() {
             setNoticeMessage(null);
         }, 2300);
     };
+
+
 
     useEffect(() => {
         if (!videoId) return;
@@ -296,10 +299,11 @@ export default function WatchCom() {
 
     return (
         <div
-            className="w-full mx-auto py-0 flex flex-col lg:flex-row gap-5 text-[#f1f1f1]">
+            className={`w-full mx-auto py-0 flex flex-col ${isExtended ? '2xl:flex-row' : 'lg:flex-row'} gap-5 text-[#f1f1f1]`}
+            >
             {/* LEFT COLUMN */}
             <div className="flex-1 min-w-0">
-                <div className="w-full rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121]">
+                <div className="rounded-2xl overflow-hidden aspect-video bg-black shadow-2xl border border-[#212121] w-full">
                     <iframe
                         src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
                         className="w-full h-full border-none"
@@ -326,6 +330,8 @@ export default function WatchCom() {
                     isSaved={isSaved}
                     handleSaveToggle={handleSaveToggle}
                     onOpenShare={() => setIsShareModal(true)}
+                    isExtended={isExtended}
+                    onExtendToggle={() => setIsExtended(!isExtended)}
                 />
 
                 <DescriptionBox

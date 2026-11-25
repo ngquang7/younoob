@@ -1,26 +1,42 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../utils/AuthContext';
+import { storageService } from '../../hooks/storageService';
+
 interface SidebarProps {
   expanded: boolean;
 }
+
 export default function LeftBar({ expanded }: SidebarProps) {
   const navigate = useNavigate();
-  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const { user } = useAuth();
+  const [subscriptions, setSubscriptions] = useState<any[]>(() =>
+    user ? storageService.getSubscribedChannels() : []
+  );
 
   const goHistory = () => navigate(`/feed/history`);
   const goHome = () => navigate(`/`);
-  const goChannel = (chanelId: string) => navigate(`/channel/${chanelId}`);
+  const goChannel = (channelId: string) => navigate(`/channel/${channelId}`);
   const goSubcriptionChannel = () => navigate(`/feed/channels`);
   const goLikeVideo = () => navigate(`/playlist?list=LL`);
   const goYou = () => navigate(`/feed/you`);
   const goPlayList = () => navigate(`/feed/playlists`);
   const goWatchLater = () => navigate(`/playlist?list=WL`);
-  // Read the list that is subcribed in localStorage when Sidebar turn on
+
   useEffect(() => {
-    const savedSubs = JSON.parse(localStorage.getItem('subscribed_channels') || '[]');
-    setSubscriptions(savedSubs);
-  }, []);
+    const refresh = () => {
+      setSubscriptions(user ? storageService.getSubscribedChannels() : []);
+    };
+
+    refresh();
+    window.addEventListener('younoob_storage_updated', refresh);
+    window.addEventListener('storage', refresh);
+
+    return () => {
+      window.removeEventListener('younoob_storage_updated', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [user]);
 
   if (!expanded) {
     return (
@@ -40,95 +56,94 @@ export default function LeftBar({ expanded }: SidebarProps) {
         >
           <img src="/public/subcribe.png" className="h-7 w-7" />
           <span className="font-normal text-[10px]">Subcriptions</span>
-
         </button>
         {/* Profile */}
         <button
-          className=" flex flex-col -mt-3 items-center gap-1 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className="flex flex-col -mt-3 items-center gap-1 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goYou}
         >
           <img src="/public/noob.png" className="h-7 w-7" />
           <span className="font-normal text-xs">You</span>
-
         </button>
       </aside>
     );
   }
 
   return (
-
     <aside className="fixed top-14 left-0 bottom-0 w-60 bg-neutral-1000 p-3 hidden sm:flex flex-col gap-4 overflow-y-auto z-40 select-none border-r border-[#212121]/50 text-[#f1f1f1] [&::-webkit-scrollbar]:w-0 hover:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30 hover:[&::-webkit-scrollbar-thumb]:rounded-full">
-      {/* MAIN section  */}
+      {/* MAIN section */}
       <div className="flex flex-col gap-0.5 border-b border-gray-700 pb-3">
-        {/* Home button */}
         <button
-          className={`w-full flex items-center gap-5 px-2.5 py-1.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
-          //Never put goHome button in div, put it in button card
+          className="w-full flex items-center gap-5 px-2.5 py-1.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goHome}
           title="Home"
         >
           <img src="/public/home.png" className="h-6 w-6" />
-          <div
-            className="text-base">
-            Home
-          </div>
+          <div className="text-base">Home</div>
         </button>
       </div>
 
-      {/* SUBCRIPTION section */}
+      {/* SUBSCRIPTION section */}
       <div className="flex flex-col gap-0.5 border-b border-gray-700 pb-3">
         <button
           onClick={goSubcriptionChannel}
-          className="flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className="flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
         >
           Subcriptions &gt;
         </button>
         {subscriptions.length === 0 ? (
           <p className="px-3 text-xs text-gray-500 italic">No subscriptions yet</p>
         ) : (
-          subscriptions.map((channel) => (
-            <div onClick={() => goChannel(channel.id)}
-              key={channel.id}
-              className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#272727] cursor-pointer transition group"
+          subscriptions.map((channel) => {
+            const channelId = channel.id || channel.channelId;
+            const title = channel.title || channel.snippet?.title || 'Channel';
+            const thumbnail =
+              channel.thumbnail ||
+              channel.snippet?.thumbnails?.default?.url ||
+              '/public/noob.png';
 
-            >
-              {/* Avatar + channel name */}
-              <div className="flex items-center gap-3 overflow-hidden">
-                <img
-                  src={channel.thumbnail}
-                  alt={channel.title}
-                  className="w-7 h-7 rounded-full object-cover shrink-0"
-                />
-                <span className="text-sm truncate text-gray-200 group-hover:text-white">
-                  {channel.title}
-                  {/* {channel.id} */}
-                </span>
+            return (
+              <div
+                onClick={() => goChannel(channelId)}
+                key={channelId}
+                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#272727] cursor-pointer transition group"
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <img
+                    src={thumbnail}
+                    alt={title}
+                    className="w-7 h-7 rounded-full object-cover shrink-0"
+                  />
+                  <span className="text-sm truncate text-gray-200 group-hover:text-white">
+                    {title}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
       {/* YOU section */}
-      <div className="flex flex-col gap-0.5 ">
+      <div className="flex flex-col gap-0.5">
         <button
-          className="mb-1 flex flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider text-gray-500 transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
+          className="mb-1 flex items-start px-4 py-1.5 text-1xl font-sans font-semibold uppercase tracking-wider transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           onClick={goYou}
         >
           you &gt;
         </button>
-        {/* History button */}
+
         <button
-          className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className="mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           title="History"
           onClick={goHistory}
         >
           <img src="/public/history.png" className="h-6.5 w-7" />
-          <div className=" text-base">History</div>
+          <div className="text-base">History</div>
         </button>
 
         <button
-          className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className="mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           title="Playlist"
           onClick={goPlayList}
         >
@@ -137,7 +152,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
         </button>
 
         <button
-          className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className="mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           title="Watch Later"
           onClick={goWatchLater}
         >
@@ -146,7 +161,7 @@ export default function LeftBar({ expanded }: SidebarProps) {
         </button>
 
         <button
-          className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className="mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           title="Liked videos"
           onClick={goLikeVideo}
         >
@@ -155,13 +170,13 @@ export default function LeftBar({ expanded }: SidebarProps) {
         </button>
 
         <button
-          className={`mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white`}
+          className="mb-1 w-full flex items-center gap-5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium transition cursor-pointer hover:bg-[#272727] text-gray-300 hover:text-white"
           title="Subcription"
+          onClick={goSubcriptionChannel}
         >
           <img src="/public/subcribe.png" className="h-7 w-7" />
-          <div className=" text-base">Subcription</div>
+          <div className="text-base">Subcription</div>
         </button>
-
       </div>
     </aside>
   );

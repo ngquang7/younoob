@@ -51,7 +51,6 @@ export default function MenuUpNext({
                     Save to watch later
                 </button>
 
-
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

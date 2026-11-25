@@ -52,11 +52,7 @@ export default function YouComponent() {
     return (
         <div className="w-full mt-1 flex flex-col border-gray-600">
             {/* Profile */}
-            <UserProfile
-                username="Nguyễn Xuân Trí Quang"
-                userId="noobgau"
-                avatar="/public/Q.png"
-            />
+            <UserProfile />
             {/* 4 rows (HISTORY, PLAYLISTS, WATCH LATER, LIKED VIDEOS) */}
             {/* History */}
             <div className="w-full px-6 mt-1 flex flex-col items-center justify-between border-gray-600">
